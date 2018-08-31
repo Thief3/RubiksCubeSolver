@@ -1,6 +1,6 @@
 [package]
 name = "rubiks"
 version = "0.1.0"
-authors = ["Malik Kissarli <kissarlim@gmail.com>"]
+authors = ["Malik Kissarli <m.kissarli@lancaster.ac.uk>"]
 
 [dependencies]
