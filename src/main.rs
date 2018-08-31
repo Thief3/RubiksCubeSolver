@@ -78,7 +78,44 @@ fn rotate_right_clockwise(rubiks: Rubiks) -> Rubiks{
 
 	//my_rubiks.top = flip_horz(flip_vert(my_rubiks.top));
 	my_rubiks
-} 
+}
+
+fn r(rubiks: Rubiks) -> Rubiks{
+	let mut my_rubiks = Rubiks{
+		front: rubiks.front,
+		right: rubiks.right,
+		back: flip_horz(rubiks.back),
+		left: rubiks.left,
+		top: rubiks.top,
+		bottom: rubiks.bottom
+	};
+	my_rubiks = rotate_right_clockwise(rubiks);
+	my_rubiks.back = flip_horz(my_rubiks.back);
+	my_rubiks
+}
+
+fn l(rubiks: Rubiks) -> Rubiks{
+	let mut my_rubiks = Rubiks{
+		front: rubiks.back,
+		right: rubiks.left,
+		back: flip_horz(rubiks.front),
+		left: rubiks.right,
+		top: flip_horz(flip_vert(rubiks.top)),
+		bottom: flip_horz(flip_vert(rubiks.bottom))
+	};
+	my_rubiks = rotate_right_clockwise(my_rubiks);
+	my_rubiks = Rubiks{
+		front: flip_horz(my_rubiks.back),
+		right: my_rubiks.left,
+		back: my_rubiks.front,
+		left: my_rubiks.right,
+		top: flip_vert(flip_horz(my_rubiks.top)),
+		bottom: flip_vert(flip_horz(my_rubiks.bottom))
+	};
+	my_rubiks
+}
+
+
 
 #[cfg(test)]
 mod tests {
@@ -142,5 +179,55 @@ mod tests {
 		assert_eq!(
 			test_rubiks,
 			rotate_right_clockwise(rubiks))
+	}
+
+	#[test]
+	fn test_notation_r(){
+		let rubiks = Rubiks {
+    		front: [0i32 ; 9], 
+			right: [0,1,2,3,4,5,6,7,8],
+			back: [2i32 ; 9],
+			left: [3i32 ; 9],
+			top: [4i32 ; 9],
+			bottom: [5i32 ; 9]
+		};
+
+		let test_rubiks = Rubiks {
+			front: [0,0,5,0,0,5,0,0,5],
+			right: [0,3,6,1,4,7,2,5,8],
+			back: [4,2,2,4,2,2,4,2,2],
+			left: [3i32 ; 9],
+			top: [4,4,0,4,4,0,4,4,0],
+			bottom: [5,5,2,5,5,2,5,5,2]
+		};
+
+		assert_eq!(
+			test_rubiks,
+			r(rubiks))
+	}
+
+	#[test]
+	fn test_notation_l(){
+		let rubiks = Rubiks {
+    		front: [0i32 ; 9], 
+			right: [1i32; 9],
+			back: [2i32 ; 9],
+			left: [0,1,2,3,4,5,6,7,8],
+			top: [4i32 ; 9],
+			bottom: [5i32 ; 9]
+		};
+
+		let test_rubiks = Rubiks {
+			front: [4,0,0,4,0,0,4,0,0],
+			right: [1i32; 9],
+			back: [2,2,5,2,2,5,2,2,5],
+			left: [0,3,6,1,4,7,2,5,8],
+			top: [2,4,4,2,4,4,2,4,4],
+			bottom: [0,5,5,0,5,5,0,5,5]
+		};
+
+		assert_eq!(
+			test_rubiks,
+			l(rubiks))
 	}
 }
