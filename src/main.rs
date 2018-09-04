@@ -443,4 +443,96 @@ mod tests {
 
         assert_eq!(test_rubiks, b(rubiks))
     }
+
+    #[test]
+    fn test_notation_d() {
+        let rubiks = Rubiks {
+            front: [0i32; 9],
+            right: [1i32; 9],
+            back: [2i32; 9],
+            left: [3i32; 9],
+            top: [4i32; 9],
+            bottom: [0,1,2,3,4,5,6,7,8],
+        };
+
+        let test_rubiks = Rubiks{
+            front: [3,3,3,0,0,0,0,0,0],
+            right: [0,0,0,1,1,1,1,1,1],
+            back: [1,1,1,2,2,2,2,2,2],
+            left: [2,2,2,3,3,3,3,3,3],
+            top: [4i32; 9],
+            bottom: [2, 5, 8, 1, 4, 7, 0, 3, 6],
+        };
+
+        assert_eq!(test_rubiks, d(rubiks));
+    }
+
+    #[test]
+    fn test_notation_d_two(){
+        let rubiks = Rubiks {
+            front: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+            right: [9, 10, 11, 12, 13, 14, 15, 16, 17],
+            back: [18, 19, 20, 21, 22, 23, 24, 25, 26],
+            left: [27, 28, 29, 30, 31, 32, 33, 34, 35],
+            top: [36, 37, 38, 39, 40, 41, 42, 43, 44],
+            bottom: [45, 46, 47, 48, 49, 50, 51, 52, 53],
+        };
+
+        let test_rubiks = Rubiks {
+            front: [27,28,29,3,4,5,6,7,8],
+            right: [0,1,2,12,13,14,15,16,17],
+            back: [9,10,11,21,22,23,24,25,26],
+            left: [18,19,20,30,31,32,33,34,35],
+            top: [36, 37, 38, 39, 40, 41, 42,43,44],
+            bottom: [47,50,53,46,49,52,45,48,51],
+        };
+
+        assert_eq!(test_rubiks, d(rubiks))
+    }
+
+    #[test]
+    fn test_notation_u(){
+        let rubiks = Rubiks {
+            front: [0i32; 9],
+            right: [1i32; 9],
+            back: [2i32; 9],
+            left: [3i32; 9],
+            top: [0,1,2,3,4,5,6,7,8],
+            bottom: [5i32;9],
+        };
+
+        let test_rubiks = Rubiks{
+            front: [1,1,1,0,0,0,0,0,0],
+            right: [2,2,2,1,1,1,1,1,1],
+            back: [3,3,3,2,2,2,2,2,2],
+            left: [0,0,0,3,3,3,3,3,3],
+            top: [2, 5, 8, 1, 4, 7, 0, 3, 6],
+            bottom: [5i32; 9],
+        };
+
+        assert_eq!(test_rubiks, u(rubiks));
+    }
+
+    #[test]
+    fn test_notation_u_two(){
+        let rubiks = Rubiks {
+            front: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+            right: [9, 10, 11, 12, 13, 14, 15, 16, 17],
+            back: [18, 19, 20, 21, 22, 23, 24, 25, 26],
+            left: [27, 28, 29, 30, 31, 32, 33, 34, 35],
+            top: [36, 37, 38, 39, 40, 41, 42, 43, 44],
+            bottom: [45, 46, 47, 48, 49, 50, 51, 52, 53],
+        };
+
+        let test_rubiks = Rubiks {
+            front: [3,10,11,3,4,5,6,7,8],
+            right: [18,19,20,12,13,14,15,16,17],
+            back: [27,28,29,21,22,23,24,25,26],
+            left: [0,1,2,30,31,32,33,34,35],
+            top: [38,41,44,37,40,43,36,39,42],
+            bottom: [45, 46, 47, 48, 49, 50, 51, 52, 53],
+        };
+
+        assert_eq!(test_rubiks, u(rubiks))
+    }
 }
