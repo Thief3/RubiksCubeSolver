@@ -6,6 +6,7 @@
 
 use utility;
 mod corner_cubies;
+mod edge_cubies;
 
 /// The main struct of the program.
 ///
@@ -15,7 +16,7 @@ mod corner_cubies;
 ///
 /// # Variables
 ///
-/// * `corner_orientation` - A value between 0 and 2186, representing the 
+/// * `corner_orientation` - A value between 0 and 2186, representing the
 ///     orientation of the corners overall.
 /// * `edge_orientation` - A value between 0 and 2047, representing the
 ///     orientation of the edges overall.
@@ -25,7 +26,7 @@ mod corner_cubies;
 ///     the permutation of the cubes edges.
 /// * `ud_slice` - A value between 0 and 494, representing the front UD
 ///     slice edges.
-/// * `corners` - An array of the 8 `CornerCubie`. 
+/// * `corners` - An array of the 8 `CornerCubie`.
 #[derive(PartialEq, Debug)]
 pub struct Cube {
     pub corner_orientation: i32,
@@ -34,6 +35,7 @@ pub struct Cube {
     pub edge_permutation: i32,
     pub ud_slice: i32,
     pub corners: [corner_cubies::CornerCubie; 8],
+    pub edges: [edge_cubies::EdgeCubie; 12]
 }
 
 impl Cube {
@@ -55,45 +57,95 @@ impl Cube {
                 corner_cubies::CornerCubie::new(corner_cubies::Corner::DBL),
                 corner_cubies::CornerCubie::new(corner_cubies::Corner::DRB),
             ],
+            edges: [
+                edge_cubies::EdgeCubie::new(edge_cubies::Edge::UR),
+                edge_cubies::EdgeCubie::new(edge_cubies::Edge::UF),
+                edge_cubies::EdgeCubie::new(edge_cubies::Edge::UL),
+                edge_cubies::EdgeCubie::new(edge_cubies::Edge::UB),
+                edge_cubies::EdgeCubie::new(edge_cubies::Edge::DR),
+                edge_cubies::EdgeCubie::new(edge_cubies::Edge::DF),
+                edge_cubies::EdgeCubie::new(edge_cubies::Edge::DL),
+                edge_cubies::EdgeCubie::new(edge_cubies::Edge::DB),
+                edge_cubies::EdgeCubie::new(edge_cubies::Edge::FR),
+                edge_cubies::EdgeCubie::new(edge_cubies::Edge::FL),
+                edge_cubies::EdgeCubie::new(edge_cubies::Edge::BL),
+                edge_cubies::EdgeCubie::new(edge_cubies::Edge::BR),
+
+            ],
         }
     }
 
     /// Calculates the corner orientation.
-    /// 
+    ///
     /// Should be called after every movement. Calculates a tenary value used
     /// to represent the corner orientation of the whole cube.  Further
     /// explanation at (http://kociemba.org/cube.htm)
     pub fn calculate_corner_orientation(&mut self) {
         let mut sum = 0;
-        for i in 0..6 {
+        for i in 0..7 {
             sum = sum + self.corners[i].orientation * 3_i32.pow((6 - i) as u32)
         }
         self.corner_orientation = sum
     }
 
     /// Calculates the corner permutation.
-    /// 
+    ///
     /// Should be called after every movement. Calculates a tenary value used
     /// to represent the corner permutation of the whole cube. Further
     /// explanation at (http://kociemba.org/cube.htm)
-    pub fn calculate_corner_permutation(&mut self){
+    pub fn calculate_corner_permutation(&mut self) {
         let mut sum = 0;
         for i in 1..8 {
-            let mut diff =  self.corners[i].old_coordinate as i32 - self.corners[i].coordinate as i32;
-            if diff == 0 {diff = diff + 1};
+            let mut diff =
+                self.corners[i].old_coordinate as i32 - self.corners[i].coordinate as i32;
+            if diff == 0 {
+                diff = diff + 1
+            };
             if diff >= 0 {
-                
-                sum = sum + diff*(utility::factorial(i as i64) as i32);
+                sum = sum + diff * (utility::factorial(i as i64) as i32);
+            }
+        }
+        self.corner_permutation = sum;
+    }
+
+    /// Calculates the edge orientation.
+    ///
+    /// Should be called after every movement. Calculates a tenary value used
+    /// to represent the edge orientation of the whole cube.  Further
+    /// explanation at (http://kociemba.org/cube.htm)
+    pub fn calculate_edge_orientation(&mut self) {
+        let mut sum = 0;
+        for i in 0..10 {
+            sum = sum + self.edges[i].orientation * 2_i32.pow((12 - i) as u32)
+        }
+        self.corner_orientation = sum
+    }
+
+    /// Calculates the edge permutation.
+    ///
+    /// Should be called after every movement. Calculates a tenary value used
+    /// to represent the edge permutation of the whole cube. Further
+    /// explanation at (http://kociemba.org/cube.htm)
+    pub fn calculate_edge_permutation(&mut self) {
+        let mut sum = 0;
+        for i in 1..12 {
+            let mut diff =
+                self.edges[i].old_coordinate as i32 - self.edges[i].coordinate as i32;
+            if diff == 0 {
+                diff = diff + 1
+            };
+            if diff >= 0 {
+                sum = sum + diff * (utility::factorial(i as i64) as i32);
             }
         }
         self.corner_permutation = sum;
     }
 
     /// Functions to be called after each move.c
-    /// 
+    ///
     /// Used to update the internal state of the variables in the struct
     /// after movements.
-    pub fn coordinate_adjustments(&mut self){
+    pub fn coordinate_adjustments(&mut self) {
         self.calculate_corner_orientation();
         self.calculate_corner_permutation();
     }

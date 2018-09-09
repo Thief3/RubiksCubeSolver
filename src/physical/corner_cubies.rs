@@ -1,12 +1,12 @@
 //! A module relating specifically to the corner pieces of the rubiks cube.
-//! 
+//!
 //! Deals with movements and how they shift the coordinates and orientation
 //! of the corner cube in question.
 
 /// A numbered enum of the corner pieces.
-/// 
+///
 /// It is numbered to make ordered operations for permutation calculations,
-/// easier to compute.
+/// easier to compute. The order is important.
 #[derive(Debug, PartialEq, PartialOrd, Copy, Clone)]
 pub enum Corner {
     URF = 0,
@@ -19,9 +19,8 @@ pub enum Corner {
     DRB,
 }
 
-
 /// The main CornerCubie struct.
-/// 
+///
 /// # Variables
 /// * `orientation` - A value of 0, 1, and 2, where 0 is the default
 ///     orientation, 1 a clockwise twist, and 2 an anti-clockwise twist.
@@ -36,11 +35,11 @@ pub struct CornerCubie {
 
 impl CornerCubie {
     /// Creates a new `CornerCubie` with coordinate c.
-    /// 
+    ///
     /// # Parameters
     /// * `c` - The default `Corner` to set.
     /// # Return
-    /// * `CornerCubie` 
+    /// * `CornerCubie`
     pub fn new(c: Corner) -> CornerCubie {
         let a = CornerCubie {
             orientation: 0,
@@ -52,13 +51,13 @@ impl CornerCubie {
     }
 
     /// A generic movement function.
-    /// 
+    ///
     /// # Parameters
     /// * `corners` - A reference of what each corner should become with this
     ///     movement.
     /// * `orientation_change` - An array of 8 `i32` types, each relating to
-    ///     the additional orientation change. 
-    pub fn movement(&mut self, corners: &[Corner; 8], orientation_change: &[i32; 8]) {
+    ///     the additional orientation change.
+    fn movement(&mut self, corners: &[Corner; 8], orientation_change: &[i32; 8]) {
         self.old_coordinate = self.coordinate;
         match self.coordinate {
             Corner::URF => {
@@ -133,7 +132,7 @@ impl CornerCubie {
 /// The variables used in the generic `movement` function above. These are
 /// static as they'll be called a lot and there is no reason to create them
 /// each time instead of referencing these values.
-/// 
+///
 /// Obtained from (http://kociemba.org/math/CubeDefs.htm)
 /// ***************************************************************************
 
