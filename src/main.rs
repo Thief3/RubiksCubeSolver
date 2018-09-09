@@ -1,12 +1,11 @@
 //mod notation;
 
 mod physical;
+mod utility;
 
 fn main() {
     let mut c = physical::Cube::new();
-    c.d();
-    c.d();
-    c.d();
-    c.d();
-    println!("{:?}", c);
+    c.r();
+    c.calculate_corner_permutation();
+    println!("{:?}", c.corner_permutation);
 }

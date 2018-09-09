@@ -1,6 +1,6 @@
 #[derive(Debug, PartialEq, PartialOrd, Copy, Clone)]
 pub enum Corner {
-    URF = 1,
+    URF = 0,
     UFL,
     ULB,
     UBR,
@@ -12,8 +12,9 @@ pub enum Corner {
 
 #[derive(Debug, PartialEq)]
 pub struct CornerCubie {
-    orientation: i32,
-    coordinate: Corner,
+    pub orientation: i32,
+    pub coordinate: Corner,
+    pub old_coordinate: Corner,
 }
 
 impl CornerCubie {
@@ -21,12 +22,14 @@ impl CornerCubie {
         let a = CornerCubie {
             orientation: 0,
             coordinate: c,
+            old_coordinate: c,
         };
 
         a
     }
 
     pub fn movement(&mut self, corners: &[Corner; 8], orientation_change: [i32; 8]) {
+        self.old_coordinate = self.coordinate;
         match self.coordinate {
             Corner::URF => {
                 self.coordinate = corners[0];
@@ -115,7 +118,7 @@ static R_CORNER_TRANSFORM: [Corner; 8] = [
     Corner::DRB,
     Corner::DLF,
     Corner::DBL,
-    Corner::DRB,
+    Corner::UBR,
 ];
 static R_CORNER_ORIENTATION_TRANSFORM: [i32; 8] = [2, 0, 0, 1, 1, 0, 0, 2];
 
@@ -154,4 +157,3 @@ static D_CORNER_TRANSFORM: [Corner; 8] = [
     Corner::DFR,
 ];
 static D_CORNER_ORIENTATION_TRANSFORM: [i32; 8] = [0, 0, 0, 0, 0, 0, 0, 0];
-
