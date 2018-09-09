@@ -37,6 +37,7 @@ pub struct Cube {
 }
 
 impl Cube {
+    /// Creates a new `Cube` object with all values set at start positions.
     pub fn new() -> Cube {
         Cube {
             corner_orientation: 0,
@@ -57,6 +58,11 @@ impl Cube {
         }
     }
 
+    /// Calculates the corner orientation.
+    /// 
+    /// Should be called after every movement. Calculates a tenary value used
+    /// to represent the corner orientation of the whole cube.  Further
+    /// explanation at (http://kociemba.org/cube.htm)
     pub fn calculate_corner_orientation(&mut self) {
         let mut sum = 0;
         for i in 0..6 {
@@ -65,6 +71,11 @@ impl Cube {
         self.corner_orientation = sum
     }
 
+    /// Calculates the corner permutation.
+    /// 
+    /// Should be called after every movement. Calculates a tenary value used
+    /// to represent the corner permutation of the whole cube. Further
+    /// explanation at (http://kociemba.org/cube.htm)
     pub fn calculate_corner_permutation(&mut self){
         let mut sum = 0;
         for i in 1..8 {
@@ -78,34 +89,60 @@ impl Cube {
         self.corner_permutation = sum;
     }
 
+    /// Functions to be called after each move.c
+    /// 
+    /// Used to update the internal state of the variables in the struct
+    /// after movements.
+    pub fn coordinate_adjustments(&mut self){
+        self.calculate_corner_orientation();
+        self.calculate_corner_permutation();
+    }
+
+    /// A clockwise front move.
     pub fn f(&mut self) {
         for i in 0..8 {
             self.corners[i].f();
         }
+        self.coordinate_adjustments();
     }
+
+    /// A clockwise back move.
     pub fn b(&mut self) {
         for i in 0..8 {
             self.corners[i].b();
         }
+        self.coordinate_adjustments();
     }
+
+    /// A clockwise left move.
     pub fn l(&mut self) {
         for i in 0..8 {
             self.corners[i].l();
         }
+        self.coordinate_adjustments();
     }
+
+    /// A clockwise right move.
     pub fn r(&mut self) {
         for i in 0..8 {
             self.corners[i].r();
         }
+        self.coordinate_adjustments();
     }
+
+    /// A clockwise upper move.
     pub fn u(&mut self) {
         for i in 0..8 {
             self.corners[i].u();
         }
+        self.coordinate_adjustments();
     }
+
+    /// A clockwise down move.
     pub fn d(&mut self) {
         for i in 0..8 {
             self.corners[i].d();
         }
+        self.coordinate_adjustments();
     }
 }

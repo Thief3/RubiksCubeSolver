@@ -1,3 +1,12 @@
+//! A module relating specifically to the corner pieces of the rubiks cube.
+//! 
+//! Deals with movements and how they shift the coordinates and orientation
+//! of the corner cube in question.
+
+/// A numbered enum of the corner pieces.
+/// 
+/// It is numbered to make ordered operations for permutation calculations,
+/// easier to compute.
 #[derive(Debug, PartialEq, PartialOrd, Copy, Clone)]
 pub enum Corner {
     URF = 0,
@@ -10,6 +19,14 @@ pub enum Corner {
     DRB,
 }
 
+
+/// The main CornerCubie struct.
+/// 
+/// # Variables
+/// * `orientation` - A value of 0, 1, and 2, where 0 is the default
+///     orientation, 1 a clockwise twist, and 2 an anti-clockwise twist.
+/// * `coordinate` - A `Corner` that represents the cubes current position.
+/// * `old_coordiante` - The `coordinate` that was last held before a move.
 #[derive(Debug, PartialEq)]
 pub struct CornerCubie {
     pub orientation: i32,
@@ -18,6 +35,12 @@ pub struct CornerCubie {
 }
 
 impl CornerCubie {
+    /// Creates a new `CornerCubie` with coordinate c.
+    /// 
+    /// # Parameters
+    /// * `c` - The default `Corner` to set.
+    /// # Return
+    /// * `CornerCubie` 
     pub fn new(c: Corner) -> CornerCubie {
         let a = CornerCubie {
             orientation: 0,
@@ -28,7 +51,14 @@ impl CornerCubie {
         a
     }
 
-    pub fn movement(&mut self, corners: &[Corner; 8], orientation_change: [i32; 8]) {
+    /// A generic movement function.
+    /// 
+    /// # Parameters
+    /// * `corners` - A reference of what each corner should become with this
+    ///     movement.
+    /// * `orientation_change` - An array of 8 `i32` types, each relating to
+    ///     the additional orientation change. 
+    pub fn movement(&mut self, corners: &[Corner; 8], orientation_change: &[i32; 8]) {
         self.old_coordinate = self.coordinate;
         match self.coordinate {
             Corner::URF => {
@@ -66,25 +96,46 @@ impl CornerCubie {
         };
     }
 
+    /// Typical rubiks cube movements.
+
+    /// A forward clockwise movement.
     pub fn f(&mut self) {
-        self.movement(&F_CORNER_TRANSFORM, F_CORNER_ORIENTATION_TRANSFORM)
+        self.movement(&F_CORNER_TRANSFORM, &F_CORNER_ORIENTATION_TRANSFORM)
     }
+
+    /// A back clockwise movement.
     pub fn b(&mut self) {
-        self.movement(&B_CORNER_TRANSFORM, B_CORNER_ORIENTATION_TRANSFORM)
+        self.movement(&B_CORNER_TRANSFORM, &B_CORNER_ORIENTATION_TRANSFORM)
     }
+
+    /// A right clockwise movement.
     pub fn r(&mut self) {
-        self.movement(&R_CORNER_TRANSFORM, R_CORNER_ORIENTATION_TRANSFORM)
+        self.movement(&R_CORNER_TRANSFORM, &R_CORNER_ORIENTATION_TRANSFORM)
     }
+
+    /// A left clockwise movement.
     pub fn l(&mut self) {
-        self.movement(&L_CORNER_TRANSFORM, L_CORNER_ORIENTATION_TRANSFORM)
+        self.movement(&L_CORNER_TRANSFORM, &L_CORNER_ORIENTATION_TRANSFORM)
     }
+
+    /// A upper clockwise movement.
     pub fn u(&mut self) {
-        self.movement(&U_CORNER_TRANSFORM, U_CORNER_ORIENTATION_TRANSFORM)
+        self.movement(&U_CORNER_TRANSFORM, &U_CORNER_ORIENTATION_TRANSFORM)
     }
+
+    /// A down clockwise movement.
     pub fn d(&mut self) {
-        self.movement(&D_CORNER_TRANSFORM, D_CORNER_ORIENTATION_TRANSFORM)
+        self.movement(&D_CORNER_TRANSFORM, &D_CORNER_ORIENTATION_TRANSFORM)
     }
 }
+
+/// ***************************************************************************
+/// The variables used in the generic `movement` function above. These are
+/// static as they'll be called a lot and there is no reason to create them
+/// each time instead of referencing these values.
+/// 
+/// Obtained from (http://kociemba.org/math/CubeDefs.htm)
+/// ***************************************************************************
 
 static F_CORNER_TRANSFORM: [Corner; 8] = [
     Corner::UFL,
