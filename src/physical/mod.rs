@@ -35,7 +35,7 @@ pub struct Cube {
     pub edge_permutation: i32,
     pub ud_slice: i32,
     pub corners: [corner_cubies::CornerCubie; 8],
-    pub edges: [edge_cubies::EdgeCubie; 12]
+    pub edges: [edge_cubies::EdgeCubie; 12],
 }
 
 impl Cube {
@@ -70,7 +70,6 @@ impl Cube {
                 edge_cubies::EdgeCubie::new(edge_cubies::Edge::FL),
                 edge_cubies::EdgeCubie::new(edge_cubies::Edge::BL),
                 edge_cubies::EdgeCubie::new(edge_cubies::Edge::BR),
-
             ],
         }
     }
@@ -129,8 +128,7 @@ impl Cube {
     pub fn calculate_edge_permutation(&mut self) {
         let mut sum = 0;
         for i in 1..12 {
-            let mut diff =
-                self.edges[i].old_coordinate as i32 - self.edges[i].coordinate as i32;
+            let mut diff = self.edges[i].old_coordinate as i32 - self.edges[i].coordinate as i32;
             if diff == 0 {
                 diff = diff + 1
             };
@@ -142,13 +140,13 @@ impl Cube {
     }
 
     /// Calculates the UD Slice.
-    /// 
+    ///
     /// This is best explained at the link. Essentially we take the positions
     /// of the UD slices and and any edges in between the positions (and
     /// position "12") are taken. These positions are then used to calculate
     /// a binomial coefficent, with k comibinations of:
     ///     -1 + the number of UD Slices to the left(smaller) than the current.
-    /// Further explanation at (http://kociemba.org/math/UDSliceCoord.htm) 
+    /// Further explanation at (http://kociemba.org/math/UDSliceCoord.htm)
     pub fn calculate_ud_slice(&mut self) {
         // FR, FL, BL, BR are the UD slice edges. This corresponds to the last
         // four values in our edges array, so we take these values and order
@@ -160,10 +158,10 @@ impl Cube {
         // @@TODO :: Really should clean this up and make it customizable
         for i in (values[3].coordinate as i32)..12 {
             sum = sum + utility::binomial(i as i64, 3 as i64) as i32;
-        };
+        }
         for i in 0..3 {
-            num_left =  num_left + 1;
-            for j in (values[i].coordinate as i32)..(values[i+1].coordinate as i32 - 1){
+            num_left = num_left + 1;
+            for j in (values[i].coordinate as i32)..(values[i + 1].coordinate as i32 - 1) {
                 sum = sum + utility::binomial(j as i64, num_left as i64) as i32;
             }
         }

@@ -1,14 +1,14 @@
 //mod notation;
 
 mod physical;
-mod utility;
 mod solver;
+mod utility;
 
 fn main() {
     let mut c = physical::Cube::new();
     c.r();
     c.r();
     c.r();
-    solver::phase_one::search(&mut c, 2);
+    solver::search(&mut c, 12);
     //println!("{}", utility::factorial(0));
 }

@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 
 /// A numbered enum of the edge pieces.
-/// 
+///
 /// It is numbered to make ordered operations for permutation calculations,
 /// easier to compute. The order is important.
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Copy, Clone)]
@@ -21,33 +21,33 @@ pub enum Edge {
 }
 
 #[derive(Debug, Eq, Copy, Clone)]
-pub struct EdgeCubie{
+pub struct EdgeCubie {
     pub orientation: i32,
     pub coordinate: Edge,
     pub old_coordinate: Edge,
 }
 
-impl Ord for EdgeCubie{
+impl Ord for EdgeCubie {
     fn cmp(&self, other: &EdgeCubie) -> Ordering {
         (self.coordinate as i32).cmp(&(other.coordinate as i32))
     }
 }
 
-impl PartialOrd for EdgeCubie{
+impl PartialOrd for EdgeCubie {
     fn partial_cmp(&self, other: &EdgeCubie) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
 
-impl PartialEq for EdgeCubie{
+impl PartialEq for EdgeCubie {
     fn eq(&self, other: &EdgeCubie) -> bool {
         (self.coordinate as i32) == (other.coordinate as i32)
     }
 }
 
 impl EdgeCubie {
-    pub fn new(e: Edge)-> EdgeCubie{
-        let a = EdgeCubie{
+    pub fn new(e: Edge) -> EdgeCubie {
+        let a = EdgeCubie {
             orientation: 0,
             coordinate: e,
             old_coordinate: e,
@@ -56,7 +56,7 @@ impl EdgeCubie {
         a
     }
 
-    fn movement(&mut self, edges: &[Edge; 12], orientation_change: &[i32; 12]){
+    fn movement(&mut self, edges: &[Edge; 12], orientation_change: &[i32; 12]) {
         self.old_coordinate = self.coordinate;
         match self.coordinate {
             Edge::UR => {
@@ -109,7 +109,7 @@ impl EdgeCubie {
             }
         }
     }
-        /// Typical rubiks cube movements.
+    /// Typical rubiks cube movements.
 
     /// A forward clockwise movement.
     pub fn f(&mut self) {
@@ -146,7 +146,7 @@ impl EdgeCubie {
 /// The variables used in the generic `movement` function above. These are
 /// static as they'll be called a lot and there is no reason to create them
 /// each time instead of referencing these values.
-/// 
+///
 /// Obtained from (http://kociemba.org/math/CubeDefs.htm)
 /// ***************************************************************************
 
@@ -167,7 +167,7 @@ static F_EDGE_TRANSFORM: [Edge; 12] = [
 static F_EDGE_ORIENTATION_TRANSFORM: [i32; 12] = [0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0];
 
 static B_EDGE_TRANSFORM: [Edge; 12] = [
-    Edge::UR, 
+    Edge::UR,
     Edge::UF,
     Edge::UL,
     Edge::BR,
@@ -183,7 +183,7 @@ static B_EDGE_TRANSFORM: [Edge; 12] = [
 static B_EDGE_ORIENTATION_TRANSFORM: [i32; 12] = [0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1];
 
 static R_EDGE_TRANSFORM: [Edge; 12] = [
-    Edge::FR, 
+    Edge::FR,
     Edge::UF,
     Edge::UL,
     Edge::UB,
@@ -199,7 +199,7 @@ static R_EDGE_TRANSFORM: [Edge; 12] = [
 static R_EDGE_ORIENTATION_TRANSFORM: [i32; 12] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
 static L_EDGE_TRANSFORM: [Edge; 12] = [
-    Edge::UR, 
+    Edge::UR,
     Edge::UF,
     Edge::BL,
     Edge::UB,
@@ -215,7 +215,7 @@ static L_EDGE_TRANSFORM: [Edge; 12] = [
 static L_EDGE_ORIENTATION_TRANSFORM: [i32; 12] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
 static U_EDGE_TRANSFORM: [Edge; 12] = [
-    Edge::UB, 
+    Edge::UB,
     Edge::UR,
     Edge::UF,
     Edge::UL,
@@ -231,7 +231,7 @@ static U_EDGE_TRANSFORM: [Edge; 12] = [
 static U_EDGE_ORIENTATION_TRANSFORM: [i32; 12] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
 static D_EDGE_TRANSFORM: [Edge; 12] = [
-    Edge::UR, 
+    Edge::UR,
     Edge::UF,
     Edge::UL,
     Edge::UB,

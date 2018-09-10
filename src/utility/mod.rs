@@ -15,7 +15,7 @@ pub fn factorial(n: i64) -> i64 {
 }
 
 /// Calculates a binomial coefficent.
-/// 
+///
 /// # Parameters
 /// * `n` - the number of objects
 /// * `k` - the number of combinations
