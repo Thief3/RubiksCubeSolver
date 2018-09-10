@@ -2,10 +2,13 @@
 
 mod physical;
 mod utility;
+mod solver;
 
 fn main() {
     let mut c = physical::Cube::new();
-    c.calculate_ud_slice();
-    println!("{}", c.ud_slice);
+    c.r();
+    c.r();
+    c.r();
+    solver::phase_one::search(&mut c, 2);
     //println!("{}", utility::factorial(0));
 }

@@ -27,7 +27,7 @@ mod edge_cubies;
 /// * `ud_slice` - A value between 0 and 494, representing the front UD
 ///     slice edges.
 /// * `corners` - An array of the 8 `CornerCubie`.
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Clone, Copy)]
 pub struct Cube {
     pub corner_orientation: i32,
     pub edge_orientation: i32,
@@ -85,7 +85,7 @@ impl Cube {
         for i in 0..7 {
             sum = sum + self.corners[i].orientation * 3_i32.pow((6 - i) as u32)
         }
-        self.corner_orientation = sum
+        self.corner_orientation = sum;
     }
 
     /// Calculates the corner permutation.
@@ -118,7 +118,7 @@ impl Cube {
         for i in 0..10 {
             sum = sum + self.edges[i].orientation * 2_i32.pow((12 - i) as u32)
         }
-        self.corner_orientation = sum
+        self.edge_orientation = sum
     }
 
     /// Calculates the edge permutation.
@@ -138,7 +138,7 @@ impl Cube {
                 sum = sum + diff * (utility::factorial(i as i64) as i32);
             }
         }
-        self.corner_permutation = sum;
+        self.edge_permutation = sum;
     }
 
     /// Calculates the UD Slice.

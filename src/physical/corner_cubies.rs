@@ -26,7 +26,7 @@ pub enum Corner {
 ///     orientation, 1 a clockwise twist, and 2 an anti-clockwise twist.
 /// * `coordinate` - A `Corner` that represents the cubes current position.
 /// * `old_coordiante` - The `coordinate` that was last held before a move.
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 pub struct CornerCubie {
     pub orientation: i32,
     pub coordinate: Corner,
