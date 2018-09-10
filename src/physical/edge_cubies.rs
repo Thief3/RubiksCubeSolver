@@ -1,8 +1,10 @@
+use std::cmp::Ordering;
+
 /// A numbered enum of the edge pieces.
 /// 
 /// It is numbered to make ordered operations for permutation calculations,
 /// easier to compute. The order is important.
-#[derive(Debug, PartialEq, PartialOrd, Copy, Clone)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Copy, Clone)]
 pub enum Edge {
     UR = 1,
     UF,
@@ -18,11 +20,29 @@ pub enum Edge {
     BR,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Eq, Copy, Clone)]
 pub struct EdgeCubie{
     pub orientation: i32,
     pub coordinate: Edge,
     pub old_coordinate: Edge,
+}
+
+impl Ord for EdgeCubie{
+    fn cmp(&self, other: &EdgeCubie) -> Ordering {
+        (self.coordinate as i32).cmp(&(other.coordinate as i32))
+    }
+}
+
+impl PartialOrd for EdgeCubie{
+    fn partial_cmp(&self, other: &EdgeCubie) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl PartialEq for EdgeCubie{
+    fn eq(&self, other: &EdgeCubie) -> bool {
+        (self.coordinate as i32) == (other.coordinate as i32)
+    }
 }
 
 impl EdgeCubie {

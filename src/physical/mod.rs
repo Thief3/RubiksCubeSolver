@@ -79,7 +79,7 @@ impl Cube {
     ///
     /// Should be called after every movement. Calculates a tenary value used
     /// to represent the corner orientation of the whole cube.  Further
-    /// explanation at (http://kociemba.org/cube.htm)
+    /// explanation at (http://kociemba.org/math/coordlevel.htm)
     pub fn calculate_corner_orientation(&mut self) {
         let mut sum = 0;
         for i in 0..7 {
@@ -92,7 +92,7 @@ impl Cube {
     ///
     /// Should be called after every movement. Calculates a tenary value used
     /// to represent the corner permutation of the whole cube. Further
-    /// explanation at (http://kociemba.org/cube.htm)
+    /// explanation at (http://kociemba.org/math/coordlevel.htm)
     pub fn calculate_corner_permutation(&mut self) {
         let mut sum = 0;
         for i in 1..8 {
@@ -112,7 +112,7 @@ impl Cube {
     ///
     /// Should be called after every movement. Calculates a tenary value used
     /// to represent the edge orientation of the whole cube.  Further
-    /// explanation at (http://kociemba.org/cube.htm)
+    /// explanation at (http://kociemba.org/math/coordlevel.htm)
     pub fn calculate_edge_orientation(&mut self) {
         let mut sum = 0;
         for i in 0..10 {
@@ -125,7 +125,7 @@ impl Cube {
     ///
     /// Should be called after every movement. Calculates a tenary value used
     /// to represent the edge permutation of the whole cube. Further
-    /// explanation at (http://kociemba.org/cube.htm)
+    /// explanation at (http://kociemba.org/math/coordlevel.htm)
     pub fn calculate_edge_permutation(&mut self) {
         let mut sum = 0;
         for i in 1..12 {
@@ -141,6 +141,36 @@ impl Cube {
         self.corner_permutation = sum;
     }
 
+    /// Calculates the UD Slice.
+    /// 
+    /// This is best explained at the link. Essentially we take the positions
+    /// of the UD slices and and any edges in between the positions (and
+    /// position "12") are taken. These positions are then used to calculate
+    /// a binomial coefficent, with k comibinations of:
+    ///     -1 + the number of UD Slices to the left(smaller) than the current.
+    /// Further explanation at (http://kociemba.org/math/UDSliceCoord.htm) 
+    pub fn calculate_ud_slice(&mut self) {
+        // FR, FL, BL, BR are the UD slice edges. This corresponds to the last
+        // four values in our edges array, so we take these values and order
+        // them for the algorithm.
+        let mut sum = 0;
+        let values = &mut self.edges[8..12];
+        values.sort();
+        let mut num_left = -1;
+        // @@TODO :: Really should clean this up and make it customizable
+        for i in (values[3].coordinate as i32)..12 {
+            sum = sum + utility::binomial(i as i64, 3 as i64) as i32;
+        };
+        for i in 0..3 {
+            num_left =  num_left + 1;
+            for j in (values[i].coordinate as i32)..(values[i+1].coordinate as i32 - 1){
+                sum = sum + utility::binomial(j as i64, num_left as i64) as i32;
+            }
+        }
+
+        self.ud_slice = sum;
+    }
+
     /// Functions to be called after each move.c
     ///
     /// Used to update the internal state of the variables in the struct
@@ -148,6 +178,9 @@ impl Cube {
     pub fn coordinate_adjustments(&mut self) {
         self.calculate_corner_orientation();
         self.calculate_corner_permutation();
+        self.calculate_edge_orientation();
+        self.calculate_edge_permutation();
+        self.calculate_ud_slice();
     }
 
     /// A clockwise front move.

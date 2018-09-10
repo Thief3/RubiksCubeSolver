@@ -5,7 +5,7 @@ mod utility;
 
 fn main() {
     let mut c = physical::Cube::new();
-    c.r();
-    c.calculate_corner_orientation();
-    println!("{:?}", c.corner_orientation);
+    c.calculate_ud_slice();
+    println!("{}", c.ud_slice);
+    //println!("{}", utility::factorial(0));
 }
