@@ -32,6 +32,72 @@ static PHASE_ONE_MOVE_LIST: [solver::Moves; 18] = [
     solver::Moves::R3,
 ];
 
-fn phase_one_subgoal(rubiks: &mut physical::Cube) -> bool {
+pub fn phase_one_search(
+    rubiks: physical::Cube,
+    depth: usize,
+    move_list: Vec<solver::Moves>,
+) -> Vec<solver::Moves> {
+    let current_moves = move_list.clone();
+    let c = rubiks.clone();
+    let mut result;
+    let mut current_depth = depth;
+    while !phase_one_subgoal(c) {
+        result = phase_one_tree_search(
+            c,
+            solver::MAX_PHASE_ONE_DEPTH - current_depth,
+            move_list.clone(),
+        );
+        if result.0 == true {
+            break;
+        } else if current_depth == 0 {
+            println!("No solution was found, so something is very broken");
+            break;
+        } else {
+            current_depth = current_depth - 1;
+        }
+    }
+    current_moves
+}
+
+#[cfg_attr(rustfmt, rustfmt_skip)]
+fn phase_one_tree_search(
+    rubiks: physical::Cube,
+    depth: usize,
+    move_list: Vec<solver::Moves>,
+) -> (bool, Vec<solver::Moves>) {
+    let mut current_moves = move_list.clone();
+    let mut current_depth = depth;
+    let mut c = rubiks.clone();
+    let mut result =(false, Vec::new());
+    while current_depth > 0 {
+        for movement in PHASE_ONE_MOVE_LIST.iter() {
+            let unwrapped = move_list.last().unwrap();
+
+            if move_list.len() == 0 ||
+                (*unwrapped != *movement &&
+                *unwrapped == solver::Moves::NONE ||
+                (*unwrapped != solver::opposite_move(*unwrapped) &&
+                *unwrapped != solver::cannot_follow(*unwrapped))) {
+
+                solver::do_move(&mut c, *movement);
+                current_moves.push(*movement);
+
+                println!("Corner Orientation: {:?}\nEdge Orientation: {:?}\nUD Slice: {:?}", rubiks.corner_orientation, rubiks.edge_orientation, rubiks.ud_slice,);
+                
+                if phase_one_subgoal(c) {
+                    result = (true, current_moves.clone())
+                } else {
+                    result = (false, Vec::new())
+                }
+            }
+        }
+        println!("Current Depth: {:?}", current_depth);
+        current_depth = current_depth - 1;
+    }
+    println!("Depth");
+    result 
+}
+
+fn phase_one_subgoal(rubiks: physical::Cube) -> bool {
     (rubiks.corner_orientation == 0) && (rubiks.edge_orientation == 0) && (rubiks.ud_slice == 0)
 }

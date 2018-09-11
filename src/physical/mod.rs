@@ -1,13 +1,13 @@
 //! ***************************************************************************
 //! Rust Rubiks Cube Solver <https://github.com/Thief3/RubiksCubeSolver>
-//! 
+//!
 //! Copyright 2018 by Malik Kissarli <kissarlim@gmail.com>
-//! Licensed under GNU General Public License 3.0 or later. 
+//! Licensed under GNU General Public License 3.0 or later.
 //! Some rights reserved. See COPYING, AUTHORS.
-//! 
+//!
 //! @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
 //! ***************************************************************************
-//! 
+//!
 //! A module for the physical representation of a Rubiks cube.
 //!
 //! Deals with all the moves a cube has, as well as insuring the
@@ -144,7 +144,7 @@ impl Cube {
     pub fn calculate_edge_permutation(&mut self) {
         let mut sum = 0;
         for i in 1..12 {
-            let mut diff = self.edges[i].old_coordinate as i32 - self.edges[i].coordinate as i32;;
+            let mut diff = self.edges[i].old_coordinate as i32 - self.edges[i].coordinate as i32;
             if diff == 0 {
                 diff = diff + 1
             };
@@ -186,45 +186,45 @@ impl Cube {
         self.ud_slice = sum;
     }
 
-    pub fn calculate_ud_sorted_slice(&mut self){
-        let mut x:i32 = 0;
+    pub fn calculate_ud_sorted_slice(&mut self) {
+        let mut x: i32 = 0;
         let mut arr: Vec<edge_cubies::EdgeCubie> = Vec::new();
         // All edges
-        for i in 0..12{
+        for i in 0..12 {
             let e = self.edges[i];
-            if e.coordinate == edge_cubies::Edge::FR ||
-                e.coordinate == edge_cubies::Edge::FL ||
-                e.coordinate == edge_cubies::Edge::BL ||
-                e.coordinate == edge_cubies::Edge::BR {
-                    arr.push(e);
-                };
-        };
+            if e.coordinate == edge_cubies::Edge::FR
+                || e.coordinate == edge_cubies::Edge::FL
+                || e.coordinate == edge_cubies::Edge::BL
+                || e.coordinate == edge_cubies::Edge::BR
+            {
+                arr.push(e);
+            };
+        }
 
         for j in 3_i32..0_i32 {
-            let mut s:i32 = 0;
+            let mut s: i32 = 0;
             for k in (j)..(0) {
-                if arr[(k-1) as usize] > arr[j as usize] {
+                if arr[(k - 1) as usize] > arr[j as usize] {
                     s = s + 1;
                 };
-            };
-            x = (x+s)*j;
-        };
-        self.ud_sorted_slice = self.ud_slice*24 + x;
-        
+            }
+            x = (x + s) * j;
+        }
+        self.ud_sorted_slice = self.ud_slice * 24 + x;
     }
 
     /// @@TODO :: Broken as hell.
     /// Include 0.
-    pub fn calculate_phase_two_edge_permutation(&mut self){
+    pub fn calculate_phase_two_edge_permutation(&mut self) {
         let mut x = 0;
         for i in (1..8).rev() {
             let mut k = 0;
-            for j in (0..(i) as i32).rev(){
+            for j in (0..(i) as i32).rev() {
                 if self.edges[j as usize].coordinate as i32 != j {
-                    k = k+1;
+                    k = k + 1;
                 };
-            };
-            x = (x+k) * (i as i32)
+            }
+            x = (x + k) * (i as i32)
         }
         self.phase_two_edge_permutation = x;
     }
@@ -242,7 +242,7 @@ impl Cube {
         self.calculate_ud_slice();
         self.calculate_ud_sorted_slice();
         self.calculate_phase_two_edge_permutation()
-   }
+    }
 
     /// A clockwise front move.
     pub fn f(&mut self) {
