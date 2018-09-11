@@ -1,3 +1,13 @@
+//! ***************************************************************************
+//! Rust Rubiks Cube Solver <https://github.com/Thief3/RubiksCubeSolver>
+//! 
+//! Copyright 2018 by Malik Kissarli <kissarlim@gmail.com>
+//! Licensed under GNU General Public License 3.0 or later. 
+//! Some rights reserved. See COPYING, AUTHORS.
+//! 
+//! @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
+//! ***************************************************************************
+//! 
 //! A module for the physical representation of a Rubiks cube.
 //!
 //! Deals with all the moves a cube has, as well as insuring the
@@ -26,14 +36,17 @@ mod edge_cubies;
 ///     the permutation of the cubes edges.
 /// * `ud_slice` - A value between 0 and 494, representing the front UD
 ///     slice edges.
-/// * `corners` - An array of the 8 `CornerCubie`.
+/// * `corners` - An array of the 8 `CornerCubies`.
+/// * `edges` - An array of the 12 `EdgeCubies`.
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub struct Cube {
     pub corner_orientation: i32,
     pub edge_orientation: i32,
     pub corner_permutation: i32,
     pub edge_permutation: i32,
+    pub phase_two_edge_permutation: i32,
     pub ud_slice: i32,
+    pub ud_sorted_slice: i32,
     pub corners: [corner_cubies::CornerCubie; 8],
     pub edges: [edge_cubies::EdgeCubie; 12],
 }
@@ -46,7 +59,9 @@ impl Cube {
             edge_orientation: 0,
             corner_permutation: 0,
             edge_permutation: 0,
+            phase_two_edge_permutation: 0,
             ud_slice: 0,
+            ud_sorted_slice: 0,
             corners: [
                 corner_cubies::CornerCubie::new(corner_cubies::Corner::URF),
                 corner_cubies::CornerCubie::new(corner_cubies::Corner::UFL),
@@ -128,7 +143,7 @@ impl Cube {
     pub fn calculate_edge_permutation(&mut self) {
         let mut sum = 0;
         for i in 1..12 {
-            let mut diff = self.edges[i].old_coordinate as i32 - self.edges[i].coordinate as i32;
+            let mut diff = self.edges[i].old_coordinate as i32 - self.edges[i].coordinate as i32;;
             if diff == 0 {
                 diff = diff + 1
             };
@@ -169,6 +184,30 @@ impl Cube {
         self.ud_slice = sum;
     }
 
+    pub fn calculate_ud_sorted_slice(&mut self){
+        let a = 0;
+        let x = 0;
+        // All edges
+        for i in 12..0 {
+            
+        }
+    }
+
+    pub fn calculate_phase_two_edge_permutation(&mut self){
+        let mut x = 0;
+        for i in 0..8 {
+            let mut s = 0;
+            for j in i..8 {
+                if self.edges[j].coordinate as i32 > self.edges[i].coordinate as i32 {
+                    s = s + 1;
+                };
+            };
+            //println!("{}", (x+s));
+            x = ((x+s) as i32) * (self.edges[i].coordinate as i32);
+        };
+        self.phase_two_edge_permutation = x;
+    }
+
     /// Functions to be called after each move.c
     ///
     /// Used to update the internal state of the variables in the struct
@@ -179,7 +218,9 @@ impl Cube {
         self.calculate_edge_orientation();
         self.calculate_edge_permutation();
         self.calculate_ud_slice();
-    }
+        //self.calculate_ud_sorted_slice();
+        self.calculate_phase_two_edge_permutation()
+   }
 
     /// A clockwise front move.
     pub fn f(&mut self) {

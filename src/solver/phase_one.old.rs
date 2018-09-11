@@ -32,44 +32,52 @@ static PHASE_ONE_MOVE_LIST: [solver::Moves; 18] = [
     solver::Moves::R3,
 ];
 
-static mut DONE: bool = false;
-
 pub fn phase_one_search(
     rubiks: &mut physical::Cube,
     depth: i32,
-    move_list: &Vec<solver::Moves>) -> bool{
-
-    let mut a = false;
-    println!("{:?}", move_list);
-    if phase_one_subgoal(rubiks) {
-        println!("Solved.");
-        
-        a = true;
-    } else if depth > 0 && !phase_one_subgoal(rubiks) {
-        let mut final_moves = move_list.clone();
-        for movement in PHASE_ONE_MOVE_LIST.iter(){
+    move_list: &Vec<solver::Moves>,
+) -> Vec<solver::Moves> {
+    let mut final_moves = move_list.clone();
+    let mut acc_final_moves = move_list.clone();
+    //println!("Final Moves: {:?}", final_moves);
+    let mut my_depth = depth;
+    println!("Depth: {}", my_depth);
+    while (!phase_one_subgoal(rubiks) && my_depth > 0) {
+        for movement in PHASE_ONE_MOVE_LIST.iter() {
             let unwrapped = final_moves.last().unwrap();
-            //println!("{:?}", unwrapped);
+            println!("{:?}", unwrapped);
             if final_moves.len() == 0
                 || (*unwrapped != *movement &&
                     *unwrapped == solver::Moves::NONE || (
                     *unwrapped != solver::opposite_move(*unwrapped) &&
-                    *unwrapped != solver::cannot_follow(*unwrapped))) &&
-                !a {
+                    *unwrapped != solver::cannot_follow(*unwrapped))) {
+                let mut current_moves = move_list.clone();
                 let mut c = rubiks.clone();
-                let mut current_move = final_moves.clone();
-                current_move.push(*movement);
-
+                
                 solver::do_move(&mut c, *movement);
-                a = phase_one_search(&mut c, depth - 1, &current_move);
+                current_moves.push(*movement);
+                println!(
+                    "Corner: {}, \nEdge: {}, \nUDSlice: {}",
+                    c.corner_orientation, c.edge_orientation, c.ud_slice
+                );
+                if phase_one_subgoal(&mut c) {
+                    *rubiks = c;
+
+                    acc_final_moves = current_moves;
+                    break;
+                } else {
+                    //println!("Last move: {:?}", *movement);
+                    phase_one_search(&mut c, my_depth - 1, &current_moves);
+                };
+                //println!("MoveList: {:?}", current_moves);
             }
         }
-    } else{
-        //println!("For fucks sake.");
+        my_depth = 0;
     }
-    a
+
+    acc_final_moves
 }
 
 fn phase_one_subgoal(rubiks: &mut physical::Cube) -> bool {
-    (rubiks.corner_orientation == 0) && (rubiks.edge_orientation == 0)  && (rubiks.ud_slice == 0)
+    (rubiks.corner_orientation == 0) && (rubiks.edge_orientation == 0) && (rubiks.ud_slice == 0)
 }

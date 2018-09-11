@@ -1,4 +1,15 @@
+//! ***************************************************************************
+//! Rust Rubiks Cube Solver <https://github.com/Thief3/RubiksCubeSolver>
+//! 
+//! Copyright 2018 by Malik Kissarli <kissarlim@gmail.com>
+//! Licensed under GNU General Public License 3.0 or later. 
+//! Some rights reserved. See COPYING, AUTHORS.
+//! 
+//! @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
+//! ***************************************************************************
+
 pub mod phase_one;
+pub mod phase_two;
 use physical;
 #[derive(PartialEq, Debug, Copy, Clone)]
 pub enum Moves {
@@ -23,11 +34,13 @@ pub enum Moves {
     NONE,
 }
 
-pub fn search(rubiks: &mut physical::Cube, depth: i32) {
+pub fn search(rubiks: &mut physical::Cube) {
     let mut a = Vec::new();
     a.push(Moves::NONE);
-    let g1_state_movelist = phase_one::phase_one_search(rubiks, depth, &a);
-    println!("Move list: {:?}", g1_state_movelist);
+    let g1_state_move_list = phase_one::phase_one_search(rubiks, 12, &a);
+    println!("Move list: {:?}", g1_state_move_list);
+    let pristine_state_move_list = phase_two::phase_two_search(rubiks, 6, &a);
+    println!("Move list two: {:?}", pristine_state_move_list);
 }
 
 pub fn do_move(rubiks: &mut physical::Cube, movement: Moves) {

@@ -1,0 +1,4 @@
+- All algorithms devived from *Herbert Kociemba's* :
+    - General collection here (http://kociemba.org/cube.htm)
+    - His GitHub sourcefiles here (https://github.com/hkociemba/RubiksCube-TwophaseSolver/ )
+- No direct code has been used, only reimplamentations.
