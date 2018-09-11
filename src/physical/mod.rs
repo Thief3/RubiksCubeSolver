@@ -137,6 +137,7 @@ impl Cube {
 
     /// Calculates the edge permutation.
     ///
+    /// @@TODO :: Broken as hell.
     /// Should be called after every movement. Calculates a tenary value used
     /// to represent the edge permutation of the whole cube. Further
     /// explanation at (http://kociemba.org/math/coordlevel.htm)
@@ -151,6 +152,7 @@ impl Cube {
                 sum = sum + diff * (utility::factorial(i as i64) as i32);
             }
         }
+        println!("Edge perm: {}", sum);
         self.edge_permutation = sum;
     }
 
@@ -185,26 +187,46 @@ impl Cube {
     }
 
     pub fn calculate_ud_sorted_slice(&mut self){
-        let a = 0;
-        let x = 0;
+        let mut x:i32 = 0;
+        let mut arr: Vec<edge_cubies::EdgeCubie> = Vec::new();
         // All edges
-        for i in 12..0 {
-            
-        }
-    }
+        for i in 0..12{
+            let e = self.edges[i];
+            if e.coordinate == edge_cubies::Edge::FR ||
+                e.coordinate == edge_cubies::Edge::FL ||
+                e.coordinate == edge_cubies::Edge::BL ||
+                e.coordinate == edge_cubies::Edge::BR {
+                    arr.push(e);
+                };
+        };
 
-    pub fn calculate_phase_two_edge_permutation(&mut self){
-        let mut x = 0;
-        for i in 0..8 {
-            let mut s = 0;
-            for j in i..8 {
-                if self.edges[j].coordinate as i32 > self.edges[i].coordinate as i32 {
+        for j in 3_i32..0_i32 {
+            let mut s:i32 = 0;
+            for k in (j)..(0) {
+                if arr[(k-1) as usize] > arr[j as usize] {
                     s = s + 1;
                 };
             };
-            //println!("{}", (x+s));
-            x = ((x+s) as i32) * (self.edges[i].coordinate as i32);
+            x = (x+s)*j;
         };
+        self.ud_sorted_slice = self.ud_slice*24 + x;
+        
+    }
+
+    /// @@TODO :: Broken as hell.
+    /// Include 0.
+    pub fn calculate_phase_two_edge_permutation(&mut self){
+        let mut x = 0;
+        for i in (1..8).rev() {
+            let mut k = 0;
+            for j in (0..(i) as i32).rev(){
+                if self.edges[j as usize].coordinate as i32 != j {
+                    k = k+1;
+                };
+            };
+            x = (x+k) * (i as i32)
+        }
+        println!("P2 Edge perm: {}", x);
         self.phase_two_edge_permutation = x;
     }
 
@@ -218,7 +240,7 @@ impl Cube {
         self.calculate_edge_orientation();
         self.calculate_edge_permutation();
         self.calculate_ud_slice();
-        //self.calculate_ud_sorted_slice();
+        self.calculate_ud_sorted_slice();
         self.calculate_phase_two_edge_permutation()
    }
 
@@ -226,6 +248,9 @@ impl Cube {
     pub fn f(&mut self) {
         for i in 0..8 {
             self.corners[i].f();
+        }
+        for i in 0..12 {
+            self.edges[i].f();
         }
         self.coordinate_adjustments();
     }
@@ -235,6 +260,9 @@ impl Cube {
         for i in 0..8 {
             self.corners[i].b();
         }
+        for i in 0..12 {
+            self.edges[i].b();
+        }
         self.coordinate_adjustments();
     }
 
@@ -242,6 +270,9 @@ impl Cube {
     pub fn l(&mut self) {
         for i in 0..8 {
             self.corners[i].l();
+        }
+        for i in 0..12 {
+            self.edges[i].l();
         }
         self.coordinate_adjustments();
     }
@@ -251,6 +282,9 @@ impl Cube {
         for i in 0..8 {
             self.corners[i].r();
         }
+        for i in 0..12 {
+            self.edges[i].r();
+        }
         self.coordinate_adjustments();
     }
 
@@ -259,6 +293,9 @@ impl Cube {
         for i in 0..8 {
             self.corners[i].u();
         }
+        for i in 0..12 {
+            self.edges[i].u();
+        }
         self.coordinate_adjustments();
     }
 
@@ -266,6 +303,9 @@ impl Cube {
     pub fn d(&mut self) {
         for i in 0..8 {
             self.corners[i].d();
+        }
+        for i in 0..12 {
+            self.edges[i].d();
         }
         self.coordinate_adjustments();
     }

@@ -40,7 +40,7 @@ pub fn phase_one_search(
     move_list: &Vec<solver::Moves>) -> bool{
 
     let mut a = false;
-    println!("{:?}", move_list);
+    //println!("{:?}", move_list);
     if phase_one_subgoal(rubiks) {
         println!("Solved.");
         

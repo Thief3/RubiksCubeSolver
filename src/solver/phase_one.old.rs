@@ -41,7 +41,7 @@ pub fn phase_one_search(
     let mut acc_final_moves = move_list.clone();
     //println!("Final Moves: {:?}", final_moves);
     let mut my_depth = depth;
-    println!("Depth: {}", my_depth);
+    //println!("Depth: {}", my_depth);
     while (!phase_one_subgoal(rubiks) && my_depth > 0) {
         for movement in PHASE_ONE_MOVE_LIST.iter() {
             let unwrapped = final_moves.last().unwrap();
@@ -56,10 +56,10 @@ pub fn phase_one_search(
                 
                 solver::do_move(&mut c, *movement);
                 current_moves.push(*movement);
-                println!(
-                    "Corner: {}, \nEdge: {}, \nUDSlice: {}",
-                    c.corner_orientation, c.edge_orientation, c.ud_slice
-                );
+                //println!(
+                //    "Corner: {}, \nEdge: {}, \nUDSlice: {}",
+                //    c.corner_orientation, c.edge_orientation, c.ud_slice
+                //);
                 if phase_one_subgoal(&mut c) {
                     *rubiks = c;
 

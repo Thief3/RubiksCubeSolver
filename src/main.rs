@@ -63,6 +63,6 @@ fn main() {
     c.r();
     c.f();
     c.d();
-    solver::search(&mut c);
+    //solver::search(&mut c);
     //println!("{}", utility::factorial(0));
 }

@@ -37,9 +37,9 @@ pub enum Moves {
 pub fn search(rubiks: &mut physical::Cube) {
     let mut a = Vec::new();
     a.push(Moves::NONE);
-    let g1_state_move_list = phase_one::phase_one_search(rubiks, 12, &a);
+    let g1_state_move_list = phase_one::phase_one_search(rubiks, 4, &a);
     println!("Move list: {:?}", g1_state_move_list);
-    let pristine_state_move_list = phase_two::phase_two_search(rubiks, 6, &a);
+    let pristine_state_move_list = phase_two::phase_two_search(rubiks, 4, &a);
     println!("Move list two: {:?}", pristine_state_move_list);
 }
 

@@ -44,8 +44,8 @@ pub fn phase_two_search(
                 solver::do_move(&mut c, *movement);
                 current_moves.push(*movement);
                 //println!(
-                //    "Corner: {}, \nEdge: {}, \nUDSlice: {}",
-                //    c.corner_permutation, c.edge_permutation, c.ud_slice
+                //    "********************\nCorner: {}, \nEdge: {}, \nUDSortedSlice: {}",
+                //    c.corner_permutation, c.phase_two_edge_permutation, c.ud_sorted_slice
                 //);
                 if phase_two_subgoal(&mut c) || c.edge_permutation != 43954713 {
                     *rubiks = c;
@@ -56,7 +56,7 @@ pub fn phase_two_search(
                     //println!("Last move: {:?}", *movement);
                     phase_two_search(&mut c, my_depth - 1, &current_moves);
                 };
-                println!("MoveList: {:?}", current_moves);
+                //println!("MoveList: {:?}", current_moves);
             }
         }
         my_depth = 0;
