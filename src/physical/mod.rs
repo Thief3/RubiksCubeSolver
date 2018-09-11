@@ -226,7 +226,6 @@ impl Cube {
             };
             x = (x+k) * (i as i32)
         }
-        println!("P2 Edge perm: {}", x);
         self.phase_two_edge_permutation = x;
     }
 
@@ -238,7 +237,8 @@ impl Cube {
         self.calculate_corner_orientation();
         self.calculate_corner_permutation();
         self.calculate_edge_orientation();
-        self.calculate_edge_permutation();
+        // Removed for now as its not needed for anything?
+        //self.calculate_edge_permutation();
         self.calculate_ud_slice();
         self.calculate_ud_sorted_slice();
         self.calculate_phase_two_edge_permutation()

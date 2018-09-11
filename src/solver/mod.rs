@@ -1,10 +1,10 @@
 //! ***************************************************************************
 //! Rust Rubiks Cube Solver <https://github.com/Thief3/RubiksCubeSolver>
-//! 
+//!
 //! Copyright 2018 by Malik Kissarli <kissarlim@gmail.com>
-//! Licensed under GNU General Public License 3.0 or later. 
+//! Licensed under GNU General Public License 3.0 or later.
 //! Some rights reserved. See COPYING, AUTHORS.
-//! 
+//!
 //! @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
 //! ***************************************************************************
 
@@ -37,32 +37,74 @@ pub enum Moves {
 pub fn search(rubiks: &mut physical::Cube) {
     let mut a = Vec::new();
     a.push(Moves::NONE);
-    let g1_state_move_list = phase_one::phase_one_search(rubiks, 4, &a);
+    let g1_state_move_list = phase_one::phase_one_search(rubiks, 5, &a);
     println!("Move list: {:?}", g1_state_move_list);
-    let pristine_state_move_list = phase_two::phase_two_search(rubiks, 4, &a);
+    let pristine_state_move_list = phase_two::phase_two_search(rubiks, 5, &a);
     println!("Move list two: {:?}", pristine_state_move_list);
 }
 
 pub fn do_move(rubiks: &mut physical::Cube, movement: Moves) {
     match movement {
         Moves::F1 => rubiks.f(),
-        Moves::F2 => {rubiks.f();rubiks.f()},
-        Moves::F3 => {rubiks.f();rubiks.f(); rubiks.f()},
+        Moves::F2 => {
+            rubiks.f();
+            rubiks.f()
+        }
+        Moves::F3 => {
+            rubiks.f();
+            rubiks.f();
+            rubiks.f()
+        }
         Moves::B1 => rubiks.b(),
-        Moves::B2 => {rubiks.b();rubiks.b()},
-        Moves::B3 => {rubiks.b();rubiks.b(); rubiks.b()},
+        Moves::B2 => {
+            rubiks.b();
+            rubiks.b()
+        }
+        Moves::B3 => {
+            rubiks.b();
+            rubiks.b();
+            rubiks.b()
+        }
         Moves::U1 => rubiks.u(),
-        Moves::U2 => {rubiks.u();rubiks.u()},
-        Moves::U3 => {rubiks.u();rubiks.u(); rubiks.u()},
+        Moves::U2 => {
+            rubiks.u();
+            rubiks.u()
+        }
+        Moves::U3 => {
+            rubiks.u();
+            rubiks.u();
+            rubiks.u()
+        }
         Moves::D1 => rubiks.d(),
-        Moves::D2 => {rubiks.d();rubiks.d()},
-        Moves::D3 => {rubiks.d();rubiks.d(); rubiks.d()},
+        Moves::D2 => {
+            rubiks.d();
+            rubiks.d()
+        }
+        Moves::D3 => {
+            rubiks.d();
+            rubiks.d();
+            rubiks.d()
+        }
         Moves::L1 => rubiks.l(),
-        Moves::L2 => {rubiks.l();rubiks.l()},
-        Moves::L3 => {rubiks.l();rubiks.l(); rubiks.l()},
+        Moves::L2 => {
+            rubiks.l();
+            rubiks.l()
+        }
+        Moves::L3 => {
+            rubiks.l();
+            rubiks.l();
+            rubiks.l()
+        }
         Moves::R1 => rubiks.r(),
-        Moves::R2 => {rubiks.r();rubiks.r()},
-        Moves::R3 => {rubiks.r();rubiks.r(); rubiks.r()},
+        Moves::R2 => {
+            rubiks.r();
+            rubiks.r()
+        }
+        Moves::R3 => {
+            rubiks.r();
+            rubiks.r();
+            rubiks.r()
+        }
         Moves::NONE => {}
     }
 }
