@@ -141,6 +141,7 @@ impl Cube {
     /// Should be called after every movement. Calculates a tenary value used
     /// to represent the edge permutation of the whole cube. Further
     /// explanation at (http://kociemba.org/math/coordlevel.htm)
+    #[allow(dead_code)]
     pub fn calculate_edge_permutation(&mut self) {
         let mut sum = 0;
         for i in 1..12 {
@@ -241,7 +242,8 @@ impl Cube {
         //self.calculate_edge_permutation();
         self.calculate_ud_slice();
         self.calculate_ud_sorted_slice();
-        self.calculate_phase_two_edge_permutation()
+        self.calculate_phase_two_edge_permutation();
+        println!("Adjusments are made.")
     }
 
     /// A clockwise front move.
@@ -309,4 +311,68 @@ impl Cube {
         }
         self.coordinate_adjustments();
     }
+}
+
+#[cfg(test)]
+#[allow(dead_code)]
+mod tests {
+    use super::*;
+
+    fn test_cube_1() -> Cube {
+        let mut test_rubiks = Cube::new();
+        test_rubiks.edges = [
+            edge_cubies::EdgeCubie::new(edge_cubies::Edge::UR),
+            edge_cubies::EdgeCubie::new(edge_cubies::Edge::UF),
+            edge_cubies::EdgeCubie::new(edge_cubies::Edge::BR),
+            edge_cubies::EdgeCubie::new(edge_cubies::Edge::FL),
+            edge_cubies::EdgeCubie::new(edge_cubies::Edge::DF),
+            edge_cubies::EdgeCubie::new(edge_cubies::Edge::UL),
+            edge_cubies::EdgeCubie::new(edge_cubies::Edge::DB),
+            edge_cubies::EdgeCubie::new(edge_cubies::Edge::UB),
+            edge_cubies::EdgeCubie::new(edge_cubies::Edge::FR),
+            edge_cubies::EdgeCubie::new(edge_cubies::Edge::BL),
+            edge_cubies::EdgeCubie::new(edge_cubies::Edge::DL),
+            edge_cubies::EdgeCubie::new(edge_cubies::Edge::DR),
+        ];
+        let edge_orientation_values = [0, 2, 1, 1, 2, 0, 0, 0, 2, 1, 2, 2];
+        for i in 0..12 {
+            test_rubiks.edges[i].orientation = edge_orientation_values[i]
+        }
+        test_rubiks.corners = [
+            corner_cubies::CornerCubie::new(corner_cubies::Corner::DRB),
+            corner_cubies::CornerCubie::new(corner_cubies::Corner::ULB),
+            corner_cubies::CornerCubie::new(corner_cubies::Corner::UFL),
+            corner_cubies::CornerCubie::new(corner_cubies::Corner::DFR),
+            corner_cubies::CornerCubie::new(corner_cubies::Corner::DBL),
+            corner_cubies::CornerCubie::new(corner_cubies::Corner::URF),
+            corner_cubies::CornerCubie::new(corner_cubies::Corner::DLF),
+            corner_cubies::CornerCubie::new(corner_cubies::Corner::UBR),
+        ];
+        let corners_orientation_values = [1, 1, 2, 2, 0, 0, 0, 0];
+        for i in 0..12 {
+            test_rubiks.corners[i].orientation = corners_orientation_values[i]
+        }
+
+        test_rubiks
+    }
+
+    fn test_calculate_corner_orientation() {}
+    fn test_calculate_corner_permutation() {}
+    fn test_calculate_edge_orientation() {}
+    fn test_calculate_ud_slice() {}
+    fn test_calculate_ud_sorted_slice() {}
+    fn test_calculate_phase_two_edge_permutation() {}
+    fn test_coordinate_adjustments() {}
+
+    fn test_f() {}
+
+    fn test_b() {}
+
+    fn test_l() {}
+
+    fn test_r() {}
+
+    fn test_u() {}
+
+    fn test_d() {}
 }

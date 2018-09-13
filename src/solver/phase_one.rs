@@ -59,7 +59,7 @@ pub fn phase_one_search(
     current_moves
 }
 
-#[cfg_attr(rustfmt, rustfmt_skip)]
+//#[cfg_attr(rustfmt, rustfmt_skip)]
 fn phase_one_tree_search(
     rubiks: physical::Cube,
     depth: usize,
@@ -68,22 +68,32 @@ fn phase_one_tree_search(
     let mut current_moves = move_list.clone();
     let mut current_depth = depth;
     let mut c = rubiks.clone();
-    let mut result =(false, Vec::new());
+    let mut result = (false, Vec::new());
     while current_depth > 0 {
+        //let mut last_move = move_list.first().unwrap();
+        let mut last_move: solver::Moves = solver::Moves::F1;
         for movement in PHASE_ONE_MOVE_LIST.iter() {
-            let unwrapped = move_list.last().unwrap();
-
-            if move_list.len() == 0 ||
-                (*unwrapped != *movement &&
-                *unwrapped == solver::Moves::NONE ||
-                (*unwrapped != solver::opposite_move(*unwrapped) &&
-                *unwrapped != solver::cannot_follow(*unwrapped))) {
-
+            //println!("Current Moves: {:?}", current_moves);
+            println!(
+                "************************************\nCurrent Move: {:?}",
+                last_move
+            );
+            println!("Opposite move: {:?}", solver::opposite_move(last_move));
+            // Can't be the same as the last move.
+            // Shouldn't basically reverse last loops call
+            if last_move != *movement
+                && last_move != solver::opposite_move(last_move)
+                && last_move != solver::cannot_follow(last_move)
+            {
                 solver::do_move(&mut c, *movement);
+                last_move = *movement;
                 current_moves.push(*movement);
+                //println!("Is current moves updated locally? {:?}", current_moves);
+                println!(
+                    "Corner Orientation: {:?}\nEdge Orientation: {:?}\nUD Slice: {:?}",
+                    c.corner_orientation, c.edge_orientation, c.ud_slice,
+                );
 
-                println!("Corner Orientation: {:?}\nEdge Orientation: {:?}\nUD Slice: {:?}", rubiks.corner_orientation, rubiks.edge_orientation, rubiks.ud_slice,);
-                
                 if phase_one_subgoal(c) {
                     result = (true, current_moves.clone())
                 } else {
@@ -95,7 +105,7 @@ fn phase_one_tree_search(
         current_depth = current_depth - 1;
     }
     println!("Depth");
-    result 
+    result
 }
 
 fn phase_one_subgoal(rubiks: physical::Cube) -> bool {

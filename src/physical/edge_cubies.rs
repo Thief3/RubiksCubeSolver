@@ -16,7 +16,7 @@ use std::cmp::Ordering;
 /// easier to compute. The order is important.
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Copy, Clone)]
 pub enum Edge {
-    UR = 1,
+    UR = 0,
     UF,
     UL,
     UB,
