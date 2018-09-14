@@ -180,20 +180,17 @@ impl Cube {
         // four values in our edges array, so we take these values and order
         // them for the algorithm.
         let mut sum = 0;
-        let values = &mut self.edges[8..12];
-        values.sort();
-        let mut num_left = -1;
-        // @@TODO :: Really should clean this up and make it customizable
-        for i in (values[3].coordinate as i32)..12 {
-            sum = sum + utility::binomial(i as i64, 3 as i64) as i32;
-        }
-        for i in 0..3 {
-            num_left = num_left + 1;
-            for j in (values[i].coordinate as i32)..(values[i + 1].coordinate as i32 - 1) {
-                sum = sum + utility::binomial(j as i64, num_left as i64) as i32;
-            }
-        }
+        let values = [edge_cubies::Edge::FR, edge_cubies::Edge::FL,edge_cubies::Edge::BL, edge_cubies::Edge::BR];
 
+        let mut k = -1;
+        for i in 0..12{
+            if values.contains(&self.edges[i].coordinate)== true{
+                k = k + 1;
+            }else if k >= 0 {
+                sum = sum + utility::binomial(i  as i64, k as i64) as i32;
+            };
+        };
+        
         self.ud_slice = sum;
     }
 
@@ -384,7 +381,12 @@ mod tests {
         test.calculate_edge_orientation();
         assert_eq!(test.edge_orientation, 3098);
     }
-    fn test_calculate_ud_slice() {}
+    #[test]
+    fn test_calculate_ud_slice() {
+        let mut test = test_cube_1();
+        test.calculate_ud_slice();
+        assert_eq!(test.ud_slice, 307);
+    }
     fn test_calculate_ud_sorted_slice() {}
     fn test_calculate_phase_two_edge_permutation() {}
     fn test_coordinate_adjustments() {}
