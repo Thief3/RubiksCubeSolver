@@ -97,6 +97,7 @@ impl Cube {
     pub fn calculate_corner_orientation(&mut self) {
         let mut sum = 0;
         for i in 0..7 {
+            println!("{}", i);
             sum = sum + self.corners[i].orientation * 3_i32.pow((6 - i) as u32)
         }
         self.corner_orientation = sum;
@@ -109,7 +110,7 @@ impl Cube {
     /// explanation at (http://kociemba.org/math/coordlevel.htm)
     pub fn calculate_corner_permutation(&mut self) {
         let mut sum = 0;
-        for i in 1..8 {
+        /*for i in 1..8 {
             let mut diff =
                 self.corners[i].old_coordinate as i32 - self.corners[i].coordinate as i32;
             if diff == 0 {
@@ -118,6 +119,16 @@ impl Cube {
             if diff >= 0 {
                 sum = sum + diff * (utility::factorial(i as i64) as i32);
             }
+    }*/
+        for i in 1..8 {
+            let mut diff = 0_i32;
+            for j in 0..i{
+                if self.corners[j].coordinate as i32 > self.corners[i].coordinate as i32 {
+                    diff = diff + 1;
+                }
+            }
+            println!("Diff: {}, Factorial: {}", diff, i);
+            sum = sum + diff * utility::factorial(i as i64) as i32;
         }
         self.corner_permutation = sum;
     }
@@ -129,8 +140,8 @@ impl Cube {
     /// explanation at (http://kociemba.org/math/coordlevel.htm)
     pub fn calculate_edge_orientation(&mut self) {
         let mut sum = 0;
-        for i in 0..10 {
-            sum = sum + self.edges[i].orientation * 2_i32.pow((12 - i) as u32)
+        for i in 0..12 {
+            sum = sum + self.edges[i].orientation * 2_i32.pow((11 - i) as u32)
         }
         self.edge_orientation = sum
     }
@@ -141,7 +152,6 @@ impl Cube {
     /// Should be called after every movement. Calculates a tenary value used
     /// to represent the edge permutation of the whole cube. Further
     /// explanation at (http://kociemba.org/math/coordlevel.htm)
-    #[allow(dead_code)]
     pub fn calculate_edge_permutation(&mut self) {
         let mut sum = 0;
         for i in 1..12 {
@@ -349,16 +359,31 @@ mod tests {
             corner_cubies::CornerCubie::new(corner_cubies::Corner::UBR),
         ];
         let corners_orientation_values = [1, 1, 2, 2, 0, 0, 0, 0];
-        for i in 0..12 {
+        for i in 0..8 {
             test_rubiks.corners[i].orientation = corners_orientation_values[i]
         }
 
         test_rubiks
     }
 
-    fn test_calculate_corner_orientation() {}
-    fn test_calculate_corner_permutation() {}
-    fn test_calculate_edge_orientation() {}
+    #[test]
+    fn test_calculate_corner_orientation() {
+        let mut test = test_cube_1();
+        test.calculate_corner_orientation();
+        assert_eq!(test.corner_orientation, 1188);
+    }
+    #[test]
+    fn test_calculate_corner_permutation() {
+        let mut test = test_cube_1();
+        test.calculate_corner_permutation();
+        assert_eq!(test.corner_permutation, 22235);
+    }
+    #[test]
+    fn test_calculate_edge_orientation() {
+        let mut test = test_cube_1();
+        test.calculate_edge_orientation();
+        assert_eq!(test.edge_orientation, 3098);
+    }
     fn test_calculate_ud_slice() {}
     fn test_calculate_ud_sorted_slice() {}
     fn test_calculate_phase_two_edge_permutation() {}
