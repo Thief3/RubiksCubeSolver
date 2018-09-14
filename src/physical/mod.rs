@@ -161,9 +161,8 @@ impl Cube {
             };
             if diff >= 0 {
                 sum = sum + diff * (utility::factorial(i as i64) as i32);
-            }
-        }
-        println!("Edge perm: {}", sum);
+            };
+        };
         self.edge_permutation = sum;
     }
 
@@ -196,7 +195,7 @@ impl Cube {
 
     pub fn calculate_ud_sorted_slice(&mut self) {
         let mut x: i32 = 0;
-        let mut arr: Vec<edge_cubies::EdgeCubie> = Vec::new();
+        let mut arr: Vec<i32> = Vec::new();
         // All edges
         for i in 0..12 {
             let e = self.edges[i];
@@ -205,19 +204,20 @@ impl Cube {
                 || e.coordinate == edge_cubies::Edge::BL
                 || e.coordinate == edge_cubies::Edge::BR
             {
-                arr.push(e);
+                arr.push(e.coordinate as i32);
             };
-        }
-
-        for j in 3_i32..0_i32 {
-            let mut s: i32 = 0;
-            for k in (j)..(0) {
-                if arr[(k - 1) as usize] > arr[j as usize] {
+        };
+        for i in (1..4).rev() {
+            let mut s = 1;
+            for j in (0..i-1).rev() {
+                if arr[j]>arr[i] {
                     s = s + 1;
                 };
-            }
-            x = (x + s) * j;
-        }
+            };
+            println!("s: {}, x: {}, i: {}",s,x,i);
+            
+            x = (x + s) * i as i32;
+        };
         self.ud_sorted_slice = self.ud_slice * 24 + x;
     }
 
@@ -250,7 +250,6 @@ impl Cube {
         self.calculate_ud_slice();
         self.calculate_ud_sorted_slice();
         self.calculate_phase_two_edge_permutation();
-        println!("Adjusments are made.")
     }
 
     /// A clockwise front move.
@@ -387,7 +386,15 @@ mod tests {
         test.calculate_ud_slice();
         assert_eq!(test.ud_slice, 307);
     }
-    fn test_calculate_ud_sorted_slice() {}
+    #[test]
+    // The reason we have a ud_sorted_slice outside of its region is because
+    // it is not a G1 state cube. 
+    fn test_calculate_ud_sorted_slice() {
+        let mut test = test_cube_1();
+        test.calculate_ud_slice();
+        test.calculate_ud_sorted_slice();
+        assert_eq!(test.ud_sorted_slice, 7385);
+    }
     fn test_calculate_phase_two_edge_permutation() {}
     fn test_coordinate_adjustments() {}
 
