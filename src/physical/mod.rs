@@ -97,7 +97,6 @@ impl Cube {
     pub fn calculate_corner_orientation(&mut self) {
         let mut sum = 0;
         for i in 0..7 {
-            println!("{}", i);
             sum = sum + self.corners[i].orientation * 3_i32.pow((6 - i) as u32)
         }
         self.corner_orientation = sum;
@@ -122,12 +121,11 @@ impl Cube {
     }*/
         for i in 1..8 {
             let mut diff = 0_i32;
-            for j in 0..i{
+            for j in 0..i {
                 if self.corners[j].coordinate as i32 > self.corners[i].coordinate as i32 {
                     diff = diff + 1;
                 }
             }
-            println!("Diff: {}, Factorial: {}", diff, i);
             sum = sum + diff * utility::factorial(i as i64) as i32;
         }
         self.corner_permutation = sum;
@@ -162,7 +160,7 @@ impl Cube {
             if diff >= 0 {
                 sum = sum + diff * (utility::factorial(i as i64) as i32);
             };
-        };
+        }
         self.edge_permutation = sum;
     }
 
@@ -179,17 +177,22 @@ impl Cube {
         // four values in our edges array, so we take these values and order
         // them for the algorithm.
         let mut sum = 0;
-        let values = [edge_cubies::Edge::FR, edge_cubies::Edge::FL,edge_cubies::Edge::BL, edge_cubies::Edge::BR];
+        let values = [
+            edge_cubies::Edge::FR,
+            edge_cubies::Edge::FL,
+            edge_cubies::Edge::BL,
+            edge_cubies::Edge::BR,
+        ];
 
         let mut k = -1;
-        for i in 0..12{
-            if values.contains(&self.edges[i].coordinate)== true{
+        for i in 0..12 {
+            if values.contains(&self.edges[i].coordinate) == true {
                 k = k + 1;
-            }else if k >= 0 {
-                sum = sum + utility::binomial(i  as i64, k as i64) as i32;
+            } else if k >= 0 {
+                sum = sum + utility::binomial(i as i64, k as i64) as i32;
             };
-        };
-        
+        }
+
         self.ud_slice = sum;
     }
 
@@ -206,18 +209,16 @@ impl Cube {
             {
                 arr.push(e.coordinate as i32);
             };
-        };
+        }
         for i in (1..4).rev() {
             let mut s = 1;
-            for j in (0..i-1).rev() {
-                if arr[j]>arr[i] {
+            for j in (0..i - 1).rev() {
+                if arr[j] > arr[i] {
                     s = s + 1;
                 };
-            };
-            println!("s: {}, x: {}, i: {}",s,x,i);
-            
+            }
             x = (x + s) * i as i32;
-        };
+        }
         self.ud_sorted_slice = self.ud_slice * 24 + x;
     }
 
@@ -227,8 +228,8 @@ impl Cube {
         let mut x = 0;
         for i in (1..8).rev() {
             let mut k = 0;
-            for j in (0..(i) as i32).rev() {
-                if self.edges[j as usize].coordinate as i32 != j {
+            for j in (0..(i - 1) as i32).rev() {
+                if self.edges[j as usize].coordinate as i32 > self.edges[i].coordinate as i32 {
                     k = k + 1;
                 };
             }
@@ -388,14 +389,21 @@ mod tests {
     }
     #[test]
     // The reason we have a ud_sorted_slice outside of its region is because
-    // it is not a G1 state cube. 
+    // it is not a G1 state cube.
     fn test_calculate_ud_sorted_slice() {
         let mut test = test_cube_1();
         test.calculate_ud_slice();
         test.calculate_ud_sorted_slice();
         assert_eq!(test.ud_sorted_slice, 7385);
     }
-    fn test_calculate_phase_two_edge_permutation() {}
+
+    #[test]
+    fn test_calculate_phase_two_edge_permutation() {
+        let mut test = test_cube_1();
+        test.calculate_phase_two_edge_permutation();
+        assert_eq!(test.phase_two_edge_permutation, 3262);
+    }
+
     fn test_coordinate_adjustments() {}
 
     fn test_f() {}

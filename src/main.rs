@@ -58,10 +58,6 @@ fn main() {
     c.r();
     c.r();*/
     c.r();
-    c.r();
     c.u();
-    c.r();
-    c.f();
-    c.d();
     solver::search(&mut c);
 }

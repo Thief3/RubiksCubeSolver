@@ -31,14 +31,15 @@ pub enum Moves {
     R1,
     R2,
     R3,
+    NONE,
 }
 
 pub static MAX_PHASE_ONE_DEPTH: usize = 18;
 
 pub fn search(rubiks: &mut physical::Cube) {
     let a = Vec::new();
-    //a.push(Moves::NONE);
-    let g1_state_move_list = phase_one::phase_one_search(*rubiks, 12, a);
+    //    a.push(Moves::F1);
+    let g1_state_move_list = phase_one::phase_one_search(*rubiks, a);
     println!("Move list: {:?}", g1_state_move_list);
     //let pristine_state_move_list = phase_two::phase_two_search(rubiks, 5, &a);
     //println!("Move list two: {:?}", pristine_state_move_list);
@@ -106,6 +107,9 @@ pub fn do_move(rubiks: &mut physical::Cube, movement: Moves) {
             rubiks.r();
             rubiks.r()
         }
+        Moves::NONE => {
+            // pass
+        }
     }
 }
 
@@ -129,6 +133,7 @@ pub fn opposite_move(movement: Moves) -> Moves {
         Moves::R1 => Moves::L1,
         Moves::R2 => Moves::L2,
         Moves::R3 => Moves::L3,
+        Moves::NONE => Moves::NONE,
     };
     a
 }
@@ -153,6 +158,7 @@ pub fn cannot_follow(movement: Moves) -> Moves {
         Moves::R1 => Moves::R2,
         Moves::R2 => Moves::R1,
         Moves::R3 => Moves::R2,
+        Moves::NONE => Moves::NONE,
     };
     a
 }

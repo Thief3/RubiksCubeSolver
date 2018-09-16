@@ -34,29 +34,18 @@ static PHASE_ONE_MOVE_LIST: [solver::Moves; 18] = [
 
 pub fn phase_one_search(
     rubiks: physical::Cube,
-    depth: usize,
     move_list: Vec<solver::Moves>,
 ) -> Vec<solver::Moves> {
-    let current_moves = move_list.clone();
-    let c = rubiks.clone();
-    let mut result;
-    let mut current_depth = depth;
-    while !phase_one_subgoal(c) {
-        result = phase_one_tree_search(
-            c,
-            solver::MAX_PHASE_ONE_DEPTH - current_depth,
-            move_list.clone(),
-        );
-        if result.0 == true {
+    for i in 0..solver::MAX_PHASE_ONE_DEPTH {
+        println!("Depth: {}", i);
+        let results = phase_one_tree_search(rubiks, i, move_list.clone());
+        if results.0 == true {
+            println!("OMG IT WORKED.");
             break;
-        } else if current_depth == 0 {
-            println!("No solution was found, so something is very broken");
-            break;
-        } else {
-            current_depth = current_depth - 1;
-        }
+        };
     }
-    current_moves
+    println!("Defo got to the end :(");
+    move_list
 }
 
 //#[cfg_attr(rustfmt, rustfmt_skip)]
@@ -65,47 +54,46 @@ fn phase_one_tree_search(
     depth: usize,
     move_list: Vec<solver::Moves>,
 ) -> (bool, Vec<solver::Moves>) {
-    let mut current_moves = move_list.clone();
-    let mut current_depth = depth;
-    let mut c = rubiks.clone();
-    let mut result = (false, Vec::new());
-    while current_depth > 0 {
-        //let mut last_move = move_list.first().unwrap();
-        let mut last_move: solver::Moves = solver::Moves::F1;
+    let mut found = false;
+    let mut final_list: Vec<solver::Moves> = Vec::new();
+    if depth == 0 {
+        if phase_one_subgoal(rubiks) {
+            found = true
+        } else {
+            found = false
+        }
+    } else if depth > 0 {
         for movement in PHASE_ONE_MOVE_LIST.iter() {
-            //println!("Current Moves: {:?}", current_moves);
-            println!(
-                "************************************\nCurrent Move: {:?}",
-                last_move
-            );
-            println!("Opposite move: {:?}", solver::opposite_move(last_move));
-            // Can't be the same as the last move.
-            // Shouldn't basically reverse last loops call
-            if last_move != *movement
-                && last_move != solver::opposite_move(last_move)
-                && last_move != solver::cannot_follow(last_move)
-            {
+            let mut last_move: solver::Moves;
+            if move_list.len() != 0 {
+                last_move = *move_list.last().unwrap();
+            } else {
+                last_move = solver::Moves::NONE;
+            }
+
+            if *movement != last_move &&
+               *movement != solver::opposite_move(last_move){
+                let mut current_list = move_list.clone();
+                let mut c = rubiks.clone();
                 solver::do_move(&mut c, *movement);
-                last_move = *movement;
-                current_moves.push(*movement);
-                //println!("Is current moves updated locally? {:?}", current_moves);
-                println!(
-                    "Corner Orientation: {:?}\nEdge Orientation: {:?}\nUD Slice: {:?}",
-                    c.corner_orientation, c.edge_orientation, c.ud_slice,
-                );
+                current_list.push(*movement);
 
                 if phase_one_subgoal(c) {
-                    result = (true, current_moves.clone())
+                    found = true;
+                    final_list = current_list;
+                    break;
                 } else {
-                    result = (false, Vec::new())
+                    phase_one_tree_search(c, depth - 1, current_list.clone());
                 }
+                if depth < 8 {
+                    println!("The current move_list is: {:?}", current_list);
+                }
+                
             }
         }
-        println!("Current Depth: {:?}", current_depth);
-        current_depth = current_depth - 1;
     }
-    println!("Depth");
-    result
+    
+    (found, final_list)
 }
 
 fn phase_one_subgoal(rubiks: physical::Cube) -> bool {
