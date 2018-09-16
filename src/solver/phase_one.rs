@@ -36,7 +36,7 @@ pub fn phase_one_search(
     rubiks: physical::Cube,
     move_list: Vec<solver::Moves>,
 ) -> Vec<solver::Moves> {
-    for i in 0..solver::MAX_PHASE_ONE_DEPTH {
+    for i in 0..5{ //solver::MAX_PHASE_ONE_DEPTH {
         println!("Depth: {}", i);
         let results = phase_one_tree_search(rubiks, i, move_list.clone());
         if results.0 == true {
@@ -72,10 +72,11 @@ fn phase_one_tree_search(
             }
 
             if *movement != last_move &&
-               *movement != solver::opposite_move(last_move){
+                *movement != solver::opposite_move(last_move) &&
+                *movement != solver::cannot_follow(last_move){
                 let mut current_list = move_list.clone();
                 let mut c = rubiks.clone();
-                solver::do_move(&mut c, *movement);
+                c = solver::do_move(c, *movement);
                 current_list.push(*movement);
 
                 if phase_one_subgoal(c) {

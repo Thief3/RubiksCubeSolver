@@ -45,7 +45,7 @@ pub fn search(rubiks: &mut physical::Cube) {
     //println!("Move list two: {:?}", pristine_state_move_list);
 }
 
-pub fn do_move(rubiks: &mut physical::Cube, movement: Moves) {
+pub fn do_move(mut rubiks: physical::Cube, movement: Moves)->physical::Cube {
     match movement {
         Moves::F1 => rubiks.f(),
         Moves::F2 => {
@@ -111,6 +111,7 @@ pub fn do_move(rubiks: &mut physical::Cube, movement: Moves) {
             // pass
         }
     }
+    rubiks
 }
 
 pub fn opposite_move(movement: Moves) -> Moves {
