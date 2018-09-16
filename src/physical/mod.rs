@@ -184,7 +184,7 @@ impl Cube {
 
         self.ud_slice = sum;
     }
-    
+
     pub fn calculate_ud_sorted_slice(&mut self) {
         let mut x: i32 = 0;
         let mut arr: Vec<i32> = Vec::new();
@@ -313,42 +313,54 @@ impl Cube {
 mod tests {
     use super::*;
 
-    fn test_cube_1() -> Cube {
+    fn rubiks_dummy(
+        corners: [corner_cubies::Corner; 8],
+        corners_orientation_values: [i32; 8],
+        edges: [edge_cubies::Edge; 12],
+        edge_orientation_values: [i32; 12],
+    ) -> Cube {
         let mut test_rubiks = Cube::new();
-        test_rubiks.edges = [
-            edge_cubies::EdgeCubie::new(edge_cubies::Edge::UR),
-            edge_cubies::EdgeCubie::new(edge_cubies::Edge::UF),
-            edge_cubies::EdgeCubie::new(edge_cubies::Edge::BR),
-            edge_cubies::EdgeCubie::new(edge_cubies::Edge::FL),
-            edge_cubies::EdgeCubie::new(edge_cubies::Edge::DF),
-            edge_cubies::EdgeCubie::new(edge_cubies::Edge::UL),
-            edge_cubies::EdgeCubie::new(edge_cubies::Edge::DB),
-            edge_cubies::EdgeCubie::new(edge_cubies::Edge::UB),
-            edge_cubies::EdgeCubie::new(edge_cubies::Edge::FR),
-            edge_cubies::EdgeCubie::new(edge_cubies::Edge::BL),
-            edge_cubies::EdgeCubie::new(edge_cubies::Edge::DL),
-            edge_cubies::EdgeCubie::new(edge_cubies::Edge::DR),
-        ];
-        let edge_orientation_values = [0, 2, 1, 1, 2, 0, 0, 0, 2, 1, 2, 2];
         for i in 0..12 {
+            test_rubiks.edges[i].coordinate = edges[i];
             test_rubiks.edges[i].orientation = edge_orientation_values[i]
         }
-        test_rubiks.corners = [
-            corner_cubies::CornerCubie::new(corner_cubies::Corner::DRB),
-            corner_cubies::CornerCubie::new(corner_cubies::Corner::ULB),
-            corner_cubies::CornerCubie::new(corner_cubies::Corner::UFL),
-            corner_cubies::CornerCubie::new(corner_cubies::Corner::DFR),
-            corner_cubies::CornerCubie::new(corner_cubies::Corner::DBL),
-            corner_cubies::CornerCubie::new(corner_cubies::Corner::URF),
-            corner_cubies::CornerCubie::new(corner_cubies::Corner::DLF),
-            corner_cubies::CornerCubie::new(corner_cubies::Corner::UBR),
-        ];
-        let corners_orientation_values = [1, 1, 2, 2, 0, 0, 0, 0];
         for i in 0..8 {
+            test_rubiks.corners[i].coordinate = corners[i];
             test_rubiks.corners[i].orientation = corners_orientation_values[i]
         }
 
         test_rubiks
+    }
+
+    fn test_cube_1() -> Cube {
+        rubiks_dummy(
+            [
+                corner_cubies::Corner::DRB,
+                corner_cubies::Corner::ULB,
+                corner_cubies::Corner::UFL,
+                corner_cubies::Corner::DFR,
+                corner_cubies::Corner::DBL,
+                corner_cubies::Corner::URF,
+                corner_cubies::Corner::DLF,
+                corner_cubies::Corner::UBR,
+            ],
+            [1, 1, 2, 2, 0, 0, 0, 0],
+            [
+                edge_cubies::Edge::UR,
+                edge_cubies::Edge::UF,
+                edge_cubies::Edge::BR,
+                edge_cubies::Edge::FL,
+                edge_cubies::Edge::DF,
+                edge_cubies::Edge::UL,
+                edge_cubies::Edge::DB,
+                edge_cubies::Edge::UB,
+                edge_cubies::Edge::FR,
+                edge_cubies::Edge::BL,
+                edge_cubies::Edge::DL,
+                edge_cubies::Edge::DR,
+            ],
+            [0, 2, 1, 1, 2, 0, 0, 0, 2, 1, 2, 2],
+        )
     }
 
     #[test]
@@ -397,40 +409,34 @@ mod tests {
     #[test]
     fn test_f() {
         let mut rubiks = Cube::new();
-
-        let mut test_rubiks = Cube::new();
-        test_rubiks.edges = [
-            edge_cubies::EdgeCubie::new(edge_cubies::Edge::UR),
-            edge_cubies::EdgeCubie::new(edge_cubies::Edge::FL),
-            edge_cubies::EdgeCubie::new(edge_cubies::Edge::UL),
-            edge_cubies::EdgeCubie::new(edge_cubies::Edge::UB),
-            edge_cubies::EdgeCubie::new(edge_cubies::Edge::DR),
-            edge_cubies::EdgeCubie::new(edge_cubies::Edge::FR),
-            edge_cubies::EdgeCubie::new(edge_cubies::Edge::DL),
-            edge_cubies::EdgeCubie::new(edge_cubies::Edge::DB),
-            edge_cubies::EdgeCubie::new(edge_cubies::Edge::UF),
-            edge_cubies::EdgeCubie::new(edge_cubies::Edge::DF),
-            edge_cubies::EdgeCubie::new(edge_cubies::Edge::BL),
-            edge_cubies::EdgeCubie::new(edge_cubies::Edge::BR),
-        ];
-        let edge_orientation_values = [0, 1,0,0,0,1,0,0,1,1,0,1];
-        for i in 0..12 {
-            test_rubiks.edges[i].orientation = edge_orientation_values[i]
-        }
-        test_rubiks.corners = [
-            corner_cubies::CornerCubie::new(corner_cubies::Corner::UFL),
-            corner_cubies::CornerCubie::new(corner_cubies::Corner::DLF),
-            corner_cubies::CornerCubie::new(corner_cubies::Corner::ULB),
-            corner_cubies::CornerCubie::new(corner_cubies::Corner::UBR),
-            corner_cubies::CornerCubie::new(corner_cubies::Corner::URF),
-            corner_cubies::CornerCubie::new(corner_cubies::Corner::DFR),
-            corner_cubies::CornerCubie::new(corner_cubies::Corner::DBL),
-            corner_cubies::CornerCubie::new(corner_cubies::Corner::DRB),
-        ];
-        let corners_orientation_values = [1,2,0,0,2,1,0,0];
-        for i in 0..8 {
-            test_rubiks.corners[i].orientation = corners_orientation_values[i]
-        }
+        let mut test_rubiks = rubiks_dummy(
+            [
+                corner_cubies::Corner::UFL,
+                corner_cubies::Corner::DLF,
+                corner_cubies::Corner::ULB,
+                corner_cubies::Corner::UBR,
+                corner_cubies::Corner::URF,
+                corner_cubies::Corner::DFR,
+                corner_cubies::Corner::DBL,
+                corner_cubies::Corner::DRB,
+            ],
+            [1, 2, 0, 0, 2, 1, 0, 0],
+            [
+                edge_cubies::Edge::UR,
+                edge_cubies::Edge::FL,
+                edge_cubies::Edge::UL,
+                edge_cubies::Edge::UB,
+                edge_cubies::Edge::DR,
+                edge_cubies::Edge::FR,
+                edge_cubies::Edge::DL,
+                edge_cubies::Edge::DB,
+                edge_cubies::Edge::UF,
+                edge_cubies::Edge::DF,
+                edge_cubies::Edge::BL,
+                edge_cubies::Edge::BR,
+            ],
+            [0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1],
+        );
 
         test_rubiks.corner_orientation = 1236;
         test_rubiks.edge_orientation = 1100;
@@ -438,7 +444,10 @@ mod tests {
 
         rubiks.f();
         for i in 0..8 {
-            assert_eq!(rubiks.corners[i].coordinate, test_rubiks.corners[i].coordinate);
+            assert_eq!(
+                rubiks.corners[i].coordinate,
+                test_rubiks.corners[i].coordinate
+            );
             assert_eq!(rubiks.edges[i].coordinate, test_rubiks.edges[i].coordinate);
         }
         for i in 8..12 {
