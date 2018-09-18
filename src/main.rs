@@ -16,39 +16,9 @@ mod utility;
 
 fn main() {
     let mut c = physical::Cube::new();
-    /*
-    println!("C_O: {}, E_O: {}, UD: {}", c.corner_orientation, c.edge_orientation, c.ud_slice);
-    c = solver::do_move(c, solver::Moves::F1);
-    println!("C_O: {}, E_O: {}, UD: {}", c.corner_orientation, c.edge_orientation, c.ud_slice);
-    c = solver::do_move(c, solver::Moves::F1);
-    println!("C_O: {}, E_O: {}, UD: {}", c.corner_orientation, c.edge_orientation, c.ud_slice);
-    c = solver::do_move(c, solver::Moves::F1);
-    println!("C_O: {}, E_O: {}, UD: {}", c.corner_orientation, c.edge_orientation, c.ud_slice);
-    c = solver::do_move(c, solver::Moves::F1);
-    println!("C_O: {}, E_O: {}, UD: {}", c.corner_orientation, c.edge_orientation, c.ud_slice);
-    c = solver::do_move(c, solver::Moves::B1);
-    println!("C_O: {}, E_O: {}, UD: {}", c.corner_orientation, c.edge_orientation, c.ud_slice);
-    c = solver::do_move(c, solver::Moves::B1);
-    println!("C_O: {}, E_O: {}, UD: {}", c.corner_orientation, c.edge_orientation, c.ud_slice);
-    c = solver::do_move(c, solver::Moves::B1);
-    println!("C_O: {}, E_O: {}, UD: {}", c.corner_orientation, c.edge_orientation, c.ud_slice);
-    c = solver::do_move(c, solver::Moves::B1);
-    println!("C_O: {}, E_O: {}, UD: {}", c.corner_orientation, c.edge_orientation, c.ud_slice);
-     */
-    c = solver::do_move(c, solver::Moves::F1);
-    println!(
-        "C_O: {}, E_O: {}, UD: {}",
-        c.corner_orientation, c.edge_orientation, c.ud_slice
-    );
-    c = solver::do_move(c, solver::Moves::U1);
-    println!(
-        "C_O: {}, E_O: {}, UD: {}",
-        c.corner_orientation, c.edge_orientation, c.ud_slice
-    );
-    //c = solver::do_move(c, solver::Moves::U3);
-    //println!("C_O: {}, E_O: {}, UD: {}", c.corner_orientation, c.edge_orientation, c.ud_slice);
-    //c = solver::do_move(c, solver::Moves::F3);
-    //println!("C_O: {}, E_O: {}, UD: {}", c.corner_orientation, c.edge_orientation, c.ud_slice);
-
-    solver::search(&mut c);
+    c.f();
+    c.u();
+    c.r();
+    c.d();
+    solver::complete_search(&mut c);
 }
