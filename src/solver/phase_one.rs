@@ -38,12 +38,11 @@ pub fn phase_one_search(
     rubiks: physical::Cube,
     move_list: Vec<solver::Moves>,
 ) -> Vec<solver::Moves> {
-    //FOUND = false;
+    let mut results = false;
     let mut solution: Vec<solver::Moves> = Vec::new();
     for i in 0..solver::MAX_PHASE_ONE_DEPTH {
         println!("OuterDepth: {}", i);
-        unsafe { 
-            let results = phase_one_tree_search(rubiks, i, move_list.clone());
+        results = phase_one_tree_search(rubiks, i, move_list.clone(), &mut results);
         
         println!("Results: {:?}", results);
         if results == true {
@@ -51,22 +50,23 @@ pub fn phase_one_search(
             //solution = results.1;
             break;
         };
-    }
+    
     }
     println!("Defo got to the end :(");
     solution
 }
 
 //#[cfg_attr(rustfmt, rustfmt_skip)]
-unsafe fn phase_one_tree_search(
+fn phase_one_tree_search(
     rubiks: physical::Cube,
     depth: usize,
     move_list: Vec<solver::Moves>,
+    found: &mut bool,
 ) -> bool {
     let mut final_list: Vec<solver::Moves> = Vec::new();
-    if depth > 0 && FOUND == false {
+    if depth > 0 && *found == false {
         for movement in PHASE_ONE_MOVE_LIST.iter() {
-            if FOUND == false {
+            if *found == false {
                 let mut last_move: solver::Moves;
                 if move_list.len() != 0 {
                     last_move = *move_list.last().unwrap();
@@ -84,21 +84,21 @@ unsafe fn phase_one_tree_search(
                     current_list.push(*movement);
 
                     if phase_one_subgoal(c) {
-                        FOUND = true;
+                        *found = true;
                         println!("I exist");
                         println!("Current List: {:?}", current_list);
                         final_list = current_list.clone();
                         break;
                     } else {
-                        phase_one_tree_search(c, depth - 1, current_list.clone());
+                        phase_one_tree_search(c, depth - 1, current_list.clone(), &mut *found);
                     }
                 }
             }
         }
     }
     
-        println!("InnerFound: {}", FOUND.clone());
-        FOUND.clone()
+        println!("InnerFound: {}", found.clone());
+        true
 }
 
 fn phase_one_subgoal(rubiks: physical::Cube) -> bool {
