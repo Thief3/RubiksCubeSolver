@@ -16,48 +16,39 @@ mod utility;
 
 fn main() {
     let mut c = physical::Cube::new();
-    /*c.d();
-    c.d();
-    c.u();
-    c.u();
-    c.u();
-    c.r();
-    c.r();
-    c.u();
-    c.f();
-    c.f();
-    c.d();
-    c.d();
-    c.u();
-    c.u();
-    c.u();
-    c.r();
-    c.r();
-    c.u();
-    c.u();
-    c.u();
-    c.b();
-    c.b();
-    c.b();
-    c.l();
-    c.l();
-    c.b();
-    c.b();
-    c.b();
-    c.d();
-    c.d();
-    c.u();
-    c.b();
-    c.b();
-    c.l();
-    c.l();
-    c.l();
-    c.d();
-    c.d();
-    c.d();
-    c.r();
-    c.r();*/
-    c.r();
-    c.u();
+    /*
+    println!("C_O: {}, E_O: {}, UD: {}", c.corner_orientation, c.edge_orientation, c.ud_slice);
+    c = solver::do_move(c, solver::Moves::F1);
+    println!("C_O: {}, E_O: {}, UD: {}", c.corner_orientation, c.edge_orientation, c.ud_slice);
+    c = solver::do_move(c, solver::Moves::F1);
+    println!("C_O: {}, E_O: {}, UD: {}", c.corner_orientation, c.edge_orientation, c.ud_slice);
+    c = solver::do_move(c, solver::Moves::F1);
+    println!("C_O: {}, E_O: {}, UD: {}", c.corner_orientation, c.edge_orientation, c.ud_slice);
+    c = solver::do_move(c, solver::Moves::F1);
+    println!("C_O: {}, E_O: {}, UD: {}", c.corner_orientation, c.edge_orientation, c.ud_slice);
+    c = solver::do_move(c, solver::Moves::B1);
+    println!("C_O: {}, E_O: {}, UD: {}", c.corner_orientation, c.edge_orientation, c.ud_slice);
+    c = solver::do_move(c, solver::Moves::B1);
+    println!("C_O: {}, E_O: {}, UD: {}", c.corner_orientation, c.edge_orientation, c.ud_slice);
+    c = solver::do_move(c, solver::Moves::B1);
+    println!("C_O: {}, E_O: {}, UD: {}", c.corner_orientation, c.edge_orientation, c.ud_slice);
+    c = solver::do_move(c, solver::Moves::B1);
+    println!("C_O: {}, E_O: {}, UD: {}", c.corner_orientation, c.edge_orientation, c.ud_slice);
+     */
+    c = solver::do_move(c, solver::Moves::F1);
+    println!(
+        "C_O: {}, E_O: {}, UD: {}",
+        c.corner_orientation, c.edge_orientation, c.ud_slice
+    );
+    c = solver::do_move(c, solver::Moves::U1);
+    println!(
+        "C_O: {}, E_O: {}, UD: {}",
+        c.corner_orientation, c.edge_orientation, c.ud_slice
+    );
+    //c = solver::do_move(c, solver::Moves::U3);
+    //println!("C_O: {}, E_O: {}, UD: {}", c.corner_orientation, c.edge_orientation, c.ud_slice);
+    //c = solver::do_move(c, solver::Moves::F3);
+    //println!("C_O: {}, E_O: {}, UD: {}", c.corner_orientation, c.edge_orientation, c.ud_slice);
+
     solver::search(&mut c);
 }
