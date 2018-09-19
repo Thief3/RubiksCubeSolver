@@ -197,7 +197,7 @@ impl Cube {
         ];
 
         for j in (0 .. 12).rev() {
-            println!("{}",j);
+            //println!("{}",j);
             if self.edges[j as usize].coordinate == edge_cubies::Edge::FR
                 || self.edges[j as usize].coordinate  == edge_cubies::Edge::FL
                 || self.edges[j as usize].coordinate  == edge_cubies::Edge::BL
@@ -223,11 +223,11 @@ impl Cube {
                 k = k + 1;
                     
             }
-            println!("({} + 1)*{} + {}", j,b, k);
+            //println!("({} + 1)*{} + {}", j,b, k);
             b = (j + 1)*b + k;   
         }
 
-        println!("24 * {} + {}", a, b);
+        //println!("24 * {} + {}", a, b);
         self.ud_sorted_slice = 24*a + b as i32
 
     }

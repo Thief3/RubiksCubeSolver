@@ -40,9 +40,12 @@ pub fn complete_search(rubiks: &mut physical::Cube) {
     let a = Vec::new();
     let b = Vec::new();
     //    a.push(Moves::F1);
-    let g1_state_move_list = search(*rubiks, a, MAX_PHASE_ONE_DEPTH, phase_one_subgoal, &PHASE_ONE_MOVE_LIST);
+    let mut c = rubiks.clone();
+    println!("{:?}", c);
+    let g1_state_move_list = search(&mut c, a, MAX_PHASE_ONE_DEPTH, phase_one_subgoal, &PHASE_ONE_MOVE_LIST);
     println!("Move list: {:?}", g1_state_move_list);
-    let pristine_state_move_list = search(*rubiks, b, MAX_PHASE_TWO_DEPTH, phase_two_subgoal, &PHASE_TWO_MOVE_LIST);
+    println!("{:?}", c);
+    let pristine_state_move_list = search(&mut c, b, MAX_PHASE_TWO_DEPTH, phase_two_subgoal, &PHASE_TWO_MOVE_LIST);
     println!("Move list two: {:?}", pristine_state_move_list);
 }
 
@@ -153,18 +156,23 @@ Moves::L3,
 ];
 
 pub fn search(
-    rubiks: physical::Cube,
+    rubiks: &mut physical::Cube,
     move_list: Vec<Moves>,
     max_depth: usize,
     subgoal: fn(physical::Cube) -> bool,
     whole_move_list: &[Moves],
 ) -> Vec<Moves> {
     let mut results:bool= false;
+    let mut c:physical::Cube = rubiks.clone();
     let mut solution: Vec<Moves> = Vec::new();
+    if subgoal(rubiks.clone()) {
+        results = true;
+    }
     for i in 0..max_depth {
         println!("Depth: {}", i);
-        tree_search(rubiks, i, move_list.clone(), &mut results, &mut solution, whole_move_list, subgoal);
+        tree_search(rubiks, &mut c, i, move_list.clone(), &mut results, &mut solution, whole_move_list, subgoal);
         if results == true {
+            //println!("{:?}", c.clone());
             break;
         };
     
@@ -174,7 +182,8 @@ pub fn search(
 
 //#[cfg_attr(rustfmt, rustfmt_skip)]
 fn tree_search(
-    rubiks: physical::Cube,
+    rubiks: &mut physical::Cube,
+    dummy_rubiks: &mut physical::Cube,
     depth: usize,
     move_list: Vec<Moves>,
     found: &mut bool,
@@ -197,17 +206,20 @@ fn tree_search(
                     && *movement != cannot_follow(last_move)
                 {
                     let mut current_list = move_list.clone();
-                    let mut c = rubiks.clone();
+                    let mut c = dummy_rubiks.clone();
                     c = do_move(c, *movement);
-                    println!("C_Permutation: {}, E_2_Permutation: {}, UD_SORTED_SLICE: {}", c.corner_permutation, c.phase_two_edge_permutation, c.ud_sorted_slice);
+                    //                    println!("C_Permutation: {}, E_2_Permutation: {}, UD_SORTED_SLICE: {}", c.corner_permutation, c.phase_two_edge_permutation, c.ud_sorted_slice);
                     current_list.push(*movement);
 
-                    if subgoal(c) {
+                    if subgoal(c){
                         *found = true;
                         *final_list = current_list.clone();
+//                        println!("This one before: {:?}", rubiks.clone());
+                        *rubiks = c.clone();
+//                        println!("This one. {:?}", rubiks.clone());
                         break;
                     } else {
-                        tree_search(c, depth - 1, current_list.clone(), &mut *found, &mut *final_list, whole_move_list, subgoal);
+                        tree_search(&mut *rubiks, &mut c, depth - 1, current_list.clone(), &mut *found, &mut *final_list, whole_move_list, subgoal);
                     }
                 }
             }

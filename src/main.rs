@@ -16,31 +16,14 @@ mod utility;
 
 fn main() {
     let mut c = physical::Cube::new();
-    c.calculate_ud_sorted_slice();
-    println!("{}", c.ud_sorted_slice);
     c.f();
-    println!("{}", c.ud_sorted_slice);
+    c.r();
+    c.u();
     c.f();
-    println!("{}", c.ud_sorted_slice);
+    c.r();
     c.f();
-    println!("{}", c.ud_sorted_slice);
-    c.f();
-    println!("{}", c.ud_sorted_slice);
-    c.f();
-    println!("{}", c.ud_sorted_slice);
-    c.f();
-    println!("{}", c.ud_sorted_slice);
-    c.f();
-    println!("{}", c.ud_sorted_slice);
-    c.f();println!("{}", c.ud_sorted_slice);
-    c.f();
-    println!("{}", c.ud_sorted_slice);
-    c.f();
-    println!("{}", c.ud_sorted_slice);
-    c.f();
-    println!("{}", c.ud_sorted_slice);
-    c.f();
+    c.u();
     //println!("*******************\nEdges: {:?}, \nCorner: {:?}", c.edges, c.corners);
-   // solver::complete_search(&mut c);
-    println!("{}", c.ud_sorted_slice);
+    solver::complete_search(&mut c);
+    //println!("{}", c.ud_sorted_slice);
 }
