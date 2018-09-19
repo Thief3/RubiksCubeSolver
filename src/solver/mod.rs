@@ -169,7 +169,6 @@ pub fn search(
         };
     
     }
-    println!("G1 move list: {:?}", solution);
     solution
 }
 
@@ -200,6 +199,7 @@ fn tree_search(
                     let mut current_list = move_list.clone();
                     let mut c = rubiks.clone();
                     c = do_move(c, *movement);
+                    println!("C_Permutation: {}, E_2_Permutation: {}, UD_SORTED_SLICE: {}", c.corner_permutation, c.phase_two_edge_permutation, c.ud_sorted_slice);
                     current_list.push(*movement);
 
                     if subgoal(c) {

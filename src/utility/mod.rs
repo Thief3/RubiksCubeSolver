@@ -32,5 +32,9 @@ pub fn factorial(n: i64) -> i64 {
 /// # Output
 /// * `i64` - the binomial coefficent
 pub fn binomial(n: i64, k: i64) -> i64 {
+    if n > k {
     factorial(n) / (factorial(k) * factorial(n - k))
+    }else{
+        0
+    }
 }
