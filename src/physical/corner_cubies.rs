@@ -146,7 +146,7 @@ impl CornerCubie {
 /// Obtained from (http://kociemba.org/math/CubeDefs.htm)
 /// ***************************************************************************
 
-static F_CORNER_TRANSFORM: [Corner; 8] = [
+const F_CORNER_TRANSFORM: [Corner; 8] = [
     Corner::UFL,
     Corner::DLF,
     Corner::ULB,
@@ -156,9 +156,9 @@ static F_CORNER_TRANSFORM: [Corner; 8] = [
     Corner::DBL,
     Corner::DRB,
 ];
-static F_CORNER_ORIENTATION_TRANSFORM: [i32; 8] = [1, 2, 0, 0, 2, 1, 0, 0];
+const F_CORNER_ORIENTATION_TRANSFORM: [i32; 8] = [1, 2, 0, 0, 2, 1, 0, 0];
 
-static B_CORNER_TRANSFORM: [Corner; 8] = [
+const B_CORNER_TRANSFORM: [Corner; 8] = [
     Corner::URF,
     Corner::UFL,
     Corner::UBR,
@@ -168,9 +168,9 @@ static B_CORNER_TRANSFORM: [Corner; 8] = [
     Corner::ULB,
     Corner::DBL,
 ];
-static B_CORNER_ORIENTATION_TRANSFORM: [i32; 8] = [0, 0, 1, 2, 0, 0, 2, 1];
+const B_CORNER_ORIENTATION_TRANSFORM: [i32; 8] = [0, 0, 1, 2, 0, 0, 2, 1];
 
-static R_CORNER_TRANSFORM: [Corner; 8] = [
+const R_CORNER_TRANSFORM: [Corner; 8] = [
     Corner::DFR,
     Corner::UFL,
     Corner::ULB,
@@ -180,9 +180,9 @@ static R_CORNER_TRANSFORM: [Corner; 8] = [
     Corner::DBL,
     Corner::UBR,
 ];
-static R_CORNER_ORIENTATION_TRANSFORM: [i32; 8] = [2, 0, 0, 1, 1, 0, 0, 2];
+const R_CORNER_ORIENTATION_TRANSFORM: [i32; 8] = [2, 0, 0, 1, 1, 0, 0, 2];
 
-static L_CORNER_TRANSFORM: [Corner; 8] = [
+const L_CORNER_TRANSFORM: [Corner; 8] = [
     Corner::URF,
     Corner::ULB,
     Corner::DBL,
@@ -192,9 +192,9 @@ static L_CORNER_TRANSFORM: [Corner; 8] = [
     Corner::DLF,
     Corner::DRB,
 ];
-static L_CORNER_ORIENTATION_TRANSFORM: [i32; 8] = [0, 1, 2, 0, 0, 2, 1, 0];
+const L_CORNER_ORIENTATION_TRANSFORM: [i32; 8] = [0, 1, 2, 0, 0, 2, 1, 0];
 
-static U_CORNER_TRANSFORM: [Corner; 8] = [
+const U_CORNER_TRANSFORM: [Corner; 8] = [
     Corner::UBR,
     Corner::URF,
     Corner::UFL,
@@ -204,9 +204,9 @@ static U_CORNER_TRANSFORM: [Corner; 8] = [
     Corner::DBL,
     Corner::DRB,
 ];
-static U_CORNER_ORIENTATION_TRANSFORM: [i32; 8] = [0, 0, 0, 0, 0, 0, 0, 0];
+const U_CORNER_ORIENTATION_TRANSFORM: [i32; 8] = [0, 0, 0, 0, 0, 0, 0, 0];
 
-static D_CORNER_TRANSFORM: [Corner; 8] = [
+const D_CORNER_TRANSFORM: [Corner; 8] = [
     Corner::URF,
     Corner::UFL,
     Corner::ULB,
@@ -216,4 +216,4 @@ static D_CORNER_TRANSFORM: [Corner; 8] = [
     Corner::DRB,
     Corner::DFR,
 ];
-static D_CORNER_ORIENTATION_TRANSFORM: [i32; 8] = [0, 0, 0, 0, 0, 0, 0, 0];
+const D_CORNER_ORIENTATION_TRANSFORM: [i32; 8] = [0, 0, 0, 0, 0, 0, 0, 0];

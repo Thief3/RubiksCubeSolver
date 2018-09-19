@@ -7,6 +7,11 @@
 //!
 //! @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
 //! ***************************************************************************
+//!
+//! A module relating specifically to the edge pieces of the rubiks cube.
+//!
+//! Deals with movements and how they shift the coordinates and orientation
+//! of the edge cubie in question.
 
 use std::cmp::Ordering;
 
@@ -30,6 +35,13 @@ pub enum Edge {
     BR,
 }
 
+/// The main edge cubie.
+///
+/// # Variables
+/// * `orientation` - A value of 0, 1, and 2, where 0 is the default
+///     orientation, 1 a clockwise twist, and 2 an anti-clockwise twist.
+/// * `coordinate` - A `Edge` that represents the cubes current position.
+/// * `old_coordiante` - The `coordinate` that was last held before a move.
 #[derive(Debug, Eq, Copy, Clone)]
 pub struct EdgeCubie {
     pub orientation: i32,
@@ -56,6 +68,12 @@ impl PartialEq for EdgeCubie {
 }
 
 impl EdgeCubie {
+    /// Creates a new `EdgeCubie` with coordinate e.
+    ///
+    /// # Parameters
+    /// * `e` - The default `Edge` to set.
+    /// # Return
+    /// * `EdgeCubie`
     pub fn new(e: Edge) -> EdgeCubie {
         let a = EdgeCubie {
             orientation: 0,
@@ -66,6 +84,13 @@ impl EdgeCubie {
         a
     }
 
+    /// A generic movement function.
+    ///
+    /// # Parameters
+    /// * `edges` - A reference of what each edge should become with this
+    ///     movement.
+    /// * `orientation_change` - An array of 8 `i32` types, each relating to
+    ///     the additional orientation change.
     fn movement(&mut self, edges: &[Edge; 12], orientation_change: &[i32; 12]) {
         self.old_coordinate = self.coordinate;
         match self.coordinate {
@@ -160,7 +185,7 @@ impl EdgeCubie {
 /// Obtained from (http://kociemba.org/math/CubeDefs.htm)
 /// ***************************************************************************
 
-static F_EDGE_TRANSFORM: [Edge; 12] = [
+const F_EDGE_TRANSFORM: [Edge; 12] = [
     Edge::UR,
     Edge::FL,
     Edge::UL,
@@ -174,9 +199,9 @@ static F_EDGE_TRANSFORM: [Edge; 12] = [
     Edge::BL,
     Edge::BR,
 ];
-static F_EDGE_ORIENTATION_TRANSFORM: [i32; 12] = [0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0];
+const F_EDGE_ORIENTATION_TRANSFORM: [i32; 12] = [0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0];
 
-static B_EDGE_TRANSFORM: [Edge; 12] = [
+const B_EDGE_TRANSFORM: [Edge; 12] = [
     Edge::UR,
     Edge::UF,
     Edge::UL,
@@ -190,9 +215,9 @@ static B_EDGE_TRANSFORM: [Edge; 12] = [
     Edge::UB,
     Edge::DB,
 ];
-static B_EDGE_ORIENTATION_TRANSFORM: [i32; 12] = [0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1];
+const B_EDGE_ORIENTATION_TRANSFORM: [i32; 12] = [0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1];
 
-static R_EDGE_TRANSFORM: [Edge; 12] = [
+const R_EDGE_TRANSFORM: [Edge; 12] = [
     Edge::FR,
     Edge::UF,
     Edge::UL,
@@ -206,9 +231,9 @@ static R_EDGE_TRANSFORM: [Edge; 12] = [
     Edge::BL,
     Edge::UR,
 ];
-static R_EDGE_ORIENTATION_TRANSFORM: [i32; 12] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+const R_EDGE_ORIENTATION_TRANSFORM: [i32; 12] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
-static L_EDGE_TRANSFORM: [Edge; 12] = [
+const L_EDGE_TRANSFORM: [Edge; 12] = [
     Edge::UR,
     Edge::UF,
     Edge::BL,
@@ -222,9 +247,9 @@ static L_EDGE_TRANSFORM: [Edge; 12] = [
     Edge::DL,
     Edge::BR,
 ];
-static L_EDGE_ORIENTATION_TRANSFORM: [i32; 12] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+const L_EDGE_ORIENTATION_TRANSFORM: [i32; 12] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
-static U_EDGE_TRANSFORM: [Edge; 12] = [
+const U_EDGE_TRANSFORM: [Edge; 12] = [
     Edge::UB,
     Edge::UR,
     Edge::UF,
@@ -238,9 +263,9 @@ static U_EDGE_TRANSFORM: [Edge; 12] = [
     Edge::BL,
     Edge::BR,
 ];
-static U_EDGE_ORIENTATION_TRANSFORM: [i32; 12] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+const U_EDGE_ORIENTATION_TRANSFORM: [i32; 12] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
-static D_EDGE_TRANSFORM: [Edge; 12] = [
+const D_EDGE_TRANSFORM: [Edge; 12] = [
     Edge::UR,
     Edge::UF,
     Edge::UL,
@@ -254,4 +279,4 @@ static D_EDGE_TRANSFORM: [Edge; 12] = [
     Edge::BL,
     Edge::BR,
 ];
-static D_EDGE_ORIENTATION_TRANSFORM: [i32; 12] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+const D_EDGE_ORIENTATION_TRANSFORM: [i32; 12] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];

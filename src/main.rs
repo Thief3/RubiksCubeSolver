@@ -8,8 +8,6 @@
 //! @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
 //! ***************************************************************************
 
-//mod notation;
-
 mod physical;
 mod solver;
 mod utility;
@@ -18,7 +16,5 @@ fn main() {
     let mut c = physical::Cube::new();
     c.u();
     c.u();
-    //println!("*******************\nEdges: {:?}, \nCorner: {:?}", c.edges, c.corners);
     solver::complete_search(&mut c);
-    //println!("{}", c.ud_sorted_slice);
 }

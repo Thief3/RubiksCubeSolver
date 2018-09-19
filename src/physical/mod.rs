@@ -53,6 +53,8 @@ pub struct Cube {
 
 impl Cube {
     /// Creates a new `Cube` object with all values set at start positions.
+    /// # Return
+    /// * `Cube`
     pub fn new() -> Cube {
         Cube {
             corner_orientation: 0,
@@ -134,25 +136,6 @@ impl Cube {
         self.edge_orientation = sum
     }
 
-    /// Calculates the edge permutation.
-    ///
-    /// Should be called after every movement. Calculates a tenary value used
-    /// to represent the edge permutation of the whole cube. Further
-    /// explanation at (http://kociemba.org/math/coordlevel.htm)
-    pub fn calculate_edge_permutation(&mut self) {
-        let mut sum = 0;
-        for i in 1..12 {
-            let mut diff = self.edges[i].old_coordinate as i32 - self.edges[i].coordinate as i32;
-            if diff == 0 {
-                diff = diff + 1
-            };
-            if diff >= 0 {
-                sum = sum + diff * (utility::factorial(i as i64) as i32);
-            };
-        }
-        self.edge_permutation = sum;
-    }
-
     /// Calculates the UD Slice.
     ///
     /// This is best explained at the link. Essentially we take the positions
@@ -185,9 +168,11 @@ impl Cube {
         self.ud_slice = sum;
     }
 
+    /// Calculates the UD sorted slice.
+    ///
+    /// The permutation and location of the UD-Slice edges.
     pub fn calculate_ud_sorted_slice(&mut self) {
         let mut x: i32 = 0;
-        let mut arr: Vec<i32> = Vec::new();
         let mut a = 0;
         let mut edge4: [edge_cubies::Edge; 4] = [
             edge_cubies::Edge::UB,
@@ -196,67 +181,62 @@ impl Cube {
             edge_cubies::Edge::UB,
         ];
 
-        for j in (0 .. 12).rev() {
-            //println!("{}",j);
+        for j in (0..12).rev() {
             if self.edges[j as usize].coordinate == edge_cubies::Edge::FR
-                || self.edges[j as usize].coordinate  == edge_cubies::Edge::FL
-                || self.edges[j as usize].coordinate  == edge_cubies::Edge::BL
-                || self.edges[j as usize].coordinate  == edge_cubies::Edge::BR {
-                        a = a + utility::binomial(11 - j  as i64, x as i64 + 1) as i32;
-                    edge4[3-x as usize] = self.edges[j as usize].coordinate;
-                    x = x + 1
-                } 
+                || self.edges[j as usize].coordinate == edge_cubies::Edge::FL
+                || self.edges[j as usize].coordinate == edge_cubies::Edge::BL
+                || self.edges[j as usize].coordinate == edge_cubies::Edge::BR
+            {
+                a = a + utility::binomial(11 - j as i64, x as i64 + 1) as i32;
+                edge4[3 - x as usize] = self.edges[j as usize].coordinate;
+                x = x + 1
+            }
         }
 
         let mut b = 0;
 
-        for j in (0.. 4).rev(){
+        for j in (0..4).rev() {
             let mut k = 0;
             while edge4[j] as i32 != j as i32 + 8 {
-                //rotateleft 0, j
                 let temp = edge4[0];
                 for i in 0..j {
-                    edge4[i as usize] = edge4[i as usize+1]
+                    edge4[i as usize] = edge4[i as usize + 1]
                 }
                 edge4[j as usize] = temp;
-                
+
                 k = k + 1;
-                    
             }
-            //println!("({} + 1)*{} + {}", j,b, k);
-            b = (j + 1)*b + k;   
+            b = (j + 1) * b + k;
         }
-
-        //println!("24 * {} + {}", a, b);
-        self.ud_sorted_slice = 24*a + b as i32
-
+        self.ud_sorted_slice = 24 * a + b as i32
     }
 
-    /// Include 0.
+    /// Calculates the phase two edge permutation.
+    ///
+    /// Calculates a description of the edge coordinates, but is only valid
+    /// in phase two of the algorithm.
     pub fn calculate_phase_two_edge_permutation(&mut self) {
         let mut x = 0_i32;
         let mut edges: Vec<i32> = Vec::new();
 
         for i in 0..12 {
-            if self.edges[i].coordinate != edge_cubies::Edge::FL &&
-                self.edges[i].coordinate != edge_cubies::Edge::FR &&
-                self.edges[i].coordinate != edge_cubies::Edge::BL &&
-                self.edges[i].coordinate != edge_cubies::Edge::BR {
-                    edges.push(self.edges[i].coordinate as i32);
-                }              
+            if self.edges[i].coordinate != edge_cubies::Edge::FL
+                && self.edges[i].coordinate != edge_cubies::Edge::FR
+                && self.edges[i].coordinate != edge_cubies::Edge::BL
+                && self.edges[i].coordinate != edge_cubies::Edge::BR
+            {
+                edges.push(self.edges[i].coordinate as i32);
+            }
         }
-        
-        for i in (1..8_i32).rev(){
-            //println!("{:?}",self.edges[i as usize].coordinate);
+
+        for i in (1..8_i32).rev() {
             let mut s = 0_i32;
-            for j in (0..(i)).rev(){
+            for j in (0..(i)).rev() {
                 if (edges[j as usize]) > (edges[i as usize]) {
                     s = s + 1;
                 }
-                
             }
-            //print!("+ {}) * {})", s, edges[i as usize]+ 1);
-            x = (x+s)*(edges[i as usize] + 1);
+            x = (x + s) * (edges[i as usize] + 1);
         }
         self.phase_two_edge_permutation = x;
     }
@@ -269,8 +249,6 @@ impl Cube {
         self.calculate_corner_orientation();
         self.calculate_corner_permutation();
         self.calculate_edge_orientation();
-        // Removed for now as its not needed for anything?
-        //self.calculate_edge_permutation();
         self.calculate_ud_slice();
         self.calculate_ud_sorted_slice();
         self.calculate_phase_two_edge_permutation();
@@ -443,7 +421,7 @@ mod tests {
 
     fn test_coordinate_adjustments() {}
 
-    //#[test]
+    #[test]
     fn test_f() {
         let mut rubiks = Cube::new();
         let mut test_rubiks = rubiks_dummy(
