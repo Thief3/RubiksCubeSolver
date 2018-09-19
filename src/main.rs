@@ -16,12 +16,7 @@ mod utility;
 
 fn main() {
     let mut c = physical::Cube::new();
-    c.f();
-    c.r();
     c.u();
-    c.f();
-    c.r();
-    c.f();
     c.u();
     //println!("*******************\nEdges: {:?}, \nCorner: {:?}", c.edges, c.corners);
     solver::complete_search(&mut c);

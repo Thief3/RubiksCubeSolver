@@ -8,8 +8,6 @@
 //! @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
 //! ***************************************************************************
 
-pub mod phase_one;
-pub mod phase_two;
 use physical;
 #[derive(PartialEq, Debug, Copy, Clone)]
 pub enum Moves {
@@ -50,11 +48,15 @@ pub fn complete_search(rubiks: &mut physical::Cube) {
 }
 
 const MAX_PHASE_TWO_DEPTH: usize = 12;
-const PHASE_TWO_MOVE_LIST: [Moves; 6] = [
+const PHASE_TWO_MOVE_LIST: [Moves; 10] = [
     Moves::U1,
+    Moves::U2,
+    Moves::U3,
     Moves::B2,
     Moves::F2,
     Moves::D1,
+    Moves::D2,
+    Moves::D3,
     Moves::L2,
     Moves::R2,
 ];
