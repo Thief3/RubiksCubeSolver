@@ -12,11 +12,13 @@ extern crate gtk;
 use gtk::prelude::*;
 use gtk::{Button, Window, WindowType};
 
+mod facelets;
 mod physical;
 mod solver;
 mod utility;
 
 fn main() {
+    /*
     if gtk::init().is_err() {
         println!("Failed to initialize GTK.");
         return;
@@ -39,6 +41,7 @@ fn main() {
     });
 
     gtk::main();
+*/
 }
 
 /*

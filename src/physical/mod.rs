@@ -15,8 +15,8 @@
 //! the two-phase algorithm.
 
 use utility;
-mod corner_cubies;
-mod edge_cubies;
+pub mod corner_cubies;
+pub mod edge_cubies;
 
 /// The main struct of the program.
 ///

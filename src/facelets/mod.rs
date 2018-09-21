@@ -11,12 +11,12 @@
 //! Module regulates the face values and handles converting facelet input into
 //! cubie form so that we can solve the problem.
 
-use edge_cubies::{Edges};
-use corner_cubies::{Corners};
-use physical::{Cube};
+use physical::corner_cubies::Corner;
+use physical::edge_cubies::Edge;
+use physical::Cube;
 
 /// A enum of the different possible face values.
-#[derive(Copy, Clone, Debug)]
+#[derive(PartialEq, Copy, Clone, Debug)]
 pub enum Facelets {
     U = 0,
     R,
@@ -39,43 +39,51 @@ pub enum Facelets {
 ///     The reason for the split is regarding the debug trait not working for
 ///     "large" arrays.
 
-#[derive (Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug)]
 pub struct Face {
     facelets_first_half: [Facelets; 27],
     facelets_second_half: [Facelets; 27],
 }
 
-impl Face{
+impl Face {
     pub fn new() -> Face {
-        let face = Face {
-        let facelets_vals = [Facelets::U, Facelets::R, Facelets::F, Facelets::D, Facelets::L, Facelets::B,];
+        let mut new_face = Face {
+            facelets_first_half: [Facelets::U; 27],
+            facelets_second_half: [Facelets::D; 27],
+        };
+        let facelets_vals = [
+            Facelets::U,
+            Facelets::R,
+            Facelets::F,
+            Facelets::D,
+            Facelets::L,
+            Facelets::B,
+        ];
         for i in 0..3 {
             for j in 0..9 {
-                face.facelets_first_half[i * 9 + j] = facelets_vals[i];
+                new_face.facelets_first_half[i * 9 + j] = facelets_vals[i];
             }
         }
         for i in 3..6 {
             for j in 0..9 {
-                face.facelets_second_half[i * 9 + j] = facelets_vals[i];
+                new_face.facelets_second_half[i * 9 + j] = facelets_vals[i];
             }
         }
-        }
-
+        new_face
     }
-    
+
     /// A setter method for the facelets arrays in `Cube`. This allows us to
     /// manage the two halfs of the array as one.
     ///
     /// # Parameters
     /// * `index` - The index of which you wish to change. Between 0 and 53
     /// * `val` - The value you wish to change the specific face to.
-    pub fn set_facelets(&mut self, index: usize, val: Facelets){
+    pub fn set_facelets(&mut self, index: usize, val: Facelets) {
         if index < 27 && index >= 0 {
             self.facelets_first_half[index] = val;
-        }else if index > 27 && index <= 53 {
-
-           self.facelets_second_half[53 - index] = val;
-        }else {
+        } else if index > 27 && index <= 53 {
+            self.facelets_second_half[53 - index] = val;
+        } else {
             panic!("set_facelets: Outside the index range for facelets. Keep index within 0 and 53. Index found: {}", index);
         }
     }
@@ -86,28 +94,168 @@ impl Face{
     /// # Parameters
     /// * `index` - The index of the facelets arrays you wish to access, must
     ///    be between 0 and 53 or the function will panic.
-    pub fn get_facelets(& self, index:usize) -> Facelets{
+    pub fn get_facelets(&self, index: usize) -> Facelets {
         if index < 27 && index >= 0 {
-            return self.facelets_first_half[index]
-        }else if index > 27 && index <= 53 {
-            return self.facelets_second_half[53 - index]
-        }else {
+            return self.facelets_first_half[index];
+        } else if index > 27 && index <= 53 {
+            return self.facelets_second_half[53 - index];
+        } else {
             panic!("get_facelets: Outside the index range for facelets. Keep index within 0 and 53. Index found: {}", index);
         }
     }
 
     /// A method that checks that the current face is solveable.
     /// # Returns
-    /// * `bool` - True if solveable, false is not.
-    pub fn check_if_can_be_solved(&self) -> bool{
-        
+    /// * `usize` - Returns an error code. Errors can stack and the lower
+    ///    number errors take precedance. Can hold multiple values:
+    ///
+    ///      0 -> `Face` can be solved.
+    ///      1 -> Not 9 facelets of each colour
+    ///      2 -> Edges aren't the right colours
+    ///      3 -> Corners aren't the right colours.
+    fn check_if_can_be_solved(&self) -> usize {
+        let mut return_code = 99;
+        if !self.check_all_colours_present() {
+            return_code = 1
+        } else if !self.check_edges_colours() {
+            return_code = 2
+        } else if !self.check_corners_colours() {
+            return_code = 3
+        } else {
+            return_code = 0
+        }
+
+        return_code
+    }
+
+    /// A method that checks if all 6 colours have 9 facelets representing them.
+    ///
+    /// # Returns
+    /// * `bool` - Returns true if all 6 colours have 9 facelets representing
+    ///   them.
+    fn check_all_colours_present(&self) -> bool {
+        let mut colour_counts = [0, 0, 0, 0, 0, 0];
+        let mut return_bool = false;
+        for i in 0..54 {
+            if self.get_facelets(i) == Facelets::U {
+                colour_counts[0] = colour_counts[0] + 1
+            } else if self.get_facelets(i) == Facelets::R {
+                colour_counts[1] = colour_counts[1] + 1
+            } else if self.get_facelets(i) == Facelets::F {
+                colour_counts[2] = colour_counts[2] + 1
+            } else if self.get_facelets(i) == Facelets::L {
+                colour_counts[3] = colour_counts[3] + 1
+            } else if self.get_facelets(i) == Facelets::D {
+                colour_counts[4] = colour_counts[4] + 1
+            } else if self.get_facelets(i) == Facelets::B {
+                colour_counts[5] = colour_counts[5] + 1
+            }
+        }
+        if colour_counts[0] != 9
+            || colour_counts[1] != 9
+            || colour_counts[2] != 9
+            || colour_counts[3] != 9
+            || colour_counts[4] != 9
+            || colour_counts[5] != 9
+        {
+            return_bool = false
+        } else {
+            return_bool = true
+        }
+        return_bool
+    }
+
+    /// A method to test if the corners are all present in some form with the
+    /// the correct colours.
+    ///
+    /// # Returns
+    /// * `bool` -> True if all corners exist with the right colours.
+    fn check_corners_colours(&self) -> bool {
+        let enum_list = [
+            Corner::URF,
+            Corner::UFL,
+            Corner::ULB,
+            Corner::UBR,
+            Corner::DFR,
+            Corner::DLF,
+            Corner::DBL,
+            Corner::DRB,
+        ];
+        let mut master_count = 0;
+        let mut return_bool = true;
+        for i in 0..8 {
+            let mut current_colours: Vec<Facelets> = Vec::new();
+            for j in 0..3 {
+                current_colours.push(self.get_facelets(corner_index_positions[i][j] as usize));
+            }
+            for k in 0..8 {
+                let mut count = 0;
+                for l in current_colours.iter() {
+                    if corner_colours(enum_list[k]).contains(l) {
+                        count = count + 1;
+                    }
+                }
+                if count == 3 {
+                    master_count = master_count + 1;
+                }
+            }
+        }
+        if master_count == 8 {
+            return_bool = true
+        } else {
+            return_bool = false
+        }
+        return_bool
+    }
+
+    /// A method to test
+    fn check_edges_colours(&self) -> bool {
+        let enum_list = [
+            Edge::UR,
+            Edge::UF,
+            Edge::UL,
+            Edge::UB,
+            Edge::DR,
+            Edge::DF,
+            Edge::DL,
+            Edge::DB,
+            Edge::FR,
+            Edge::FL,
+            Edge::BL,
+            Edge::BR,
+        ];
+        let mut master_count = 0;
+        let mut return_bool = true;
+        for i in 0..8 {
+            let mut current_colours: Vec<Facelets> = Vec::new();
+            for j in 0..2 {
+                current_colours.push(self.get_facelets(corner_index_positions[i][j] as usize));
+            }
+            for k in 0..12 {
+                let mut count = 0;
+                for l in current_colours.iter() {
+                    if edge_colours(enum_list[k]).contains(l) {
+                        count = count + 1;
+                    }
+                }
+                if count == 2 {
+                    master_count = master_count + 1;
+                }
+            }
+        }
+        if master_count == 8 {
+            return_bool = true
+        } else {
+            return_bool = false
+        }
+        return_bool
     }
 
     /// A method to turn a face into a cube.
     /// # Returns
     /// * `Cube` - A `Cube` with values homomorphic to this face.
-    pub fn turn_into_cube(&self) -> Cube{
-        
+    pub fn turn_into_cube(&self) -> Cube {
+        Cube::new()
     }
 }
 
@@ -115,17 +263,21 @@ impl Face{
 /// * Definitions
 /// ****************************************************************************
 
-/// A pattern matching method that takes an `Edges` and returns the two
-/// `Face` index positions that belong to that edge.
-///
-/// # Parameters
-/// * `e` - An edge to get the corresponding `Face` index positions.
-/// # Returns
-/// * `[usize; 2]` - The two index positions connected to `e`.
-pub fn edge_indexes (e: Edges) -> [usize; 2]{
-    
-}
-
+/// A list of all the edges and their index in face.
+const edge_indexes: [[i32; 2]; 12] = [
+    [5, 10],
+    [7, 19],
+    [3, 37],
+    [1, 46],
+    [32, 16],
+    [28, 25],
+    [30, 43],
+    [34, 52],
+    [23, 12],
+    [21, 41],
+    [48, 14],
+    [50, 39],
+];
 /// A pattern matching method that takes an `Edges` and returns the two
 /// `Facelets` that belong to that edge.
 ///
@@ -133,33 +285,34 @@ pub fn edge_indexes (e: Edges) -> [usize; 2]{
 /// * `e` - An edge to get the corresponding `Facelets`.
 /// # Returns
 /// * `[Facelets; 2]` - The two `Facelets` connected to `e`.
-pub fn edge_colours (e: Edges) -> [Facelets; 2]{
-    match ref e {
-        Edges::UR => [Facelets::U,Facelets::R,],
-        Edges::UF => [Facelets::U,Facelets::F,],
-        Edges::UL => [Facelets::U,Facelets::L,],
-        Edges::UB => [Facelets::U,Facelets::B,],
-        Edges::DR => [Facelets::D,Facelets::R,],
-        Edges::DF => [Facelets::D,Facelets::F,],
-        Edges::DL => [Facelets::D,Facelets::L,],
-        Edges::DB => [Facelets::D,Facelets::B,],
-        Edges::FR => [Facelets::F,Facelets::R,],
-        Edges::FL => [Facelets::F,Facelets::L,],
-        Edges::BL => [Facelets::B,Facelets::L,],
-        Edges::BR => [Facelets::B,Facelets::R,],
+pub fn edge_colours(e: Edge) -> [Facelets; 2] {
+    match e {
+        Edge::UR => [Facelets::U, Facelets::R],
+        Edge::UF => [Facelets::U, Facelets::F],
+        Edge::UL => [Facelets::U, Facelets::L],
+        Edge::UB => [Facelets::U, Facelets::B],
+        Edge::DR => [Facelets::D, Facelets::R],
+        Edge::DF => [Facelets::D, Facelets::F],
+        Edge::DL => [Facelets::D, Facelets::L],
+        Edge::DB => [Facelets::D, Facelets::B],
+        Edge::FR => [Facelets::F, Facelets::R],
+        Edge::FL => [Facelets::F, Facelets::L],
+        Edge::BL => [Facelets::B, Facelets::L],
+        Edge::BR => [Facelets::B, Facelets::R],
     }
 }
 
-/// A pattern matching method that takes a `Corners` and returns the three
-/// `Face` index positions that belong to that corner.
-///
-/// # Parameters
-/// * `c` - A corner to get the corresponding `Face` index positions.
-/// # Returns
-/// * `[usize; 3]` - The three index positions connected to `c`.
-pub fn corner_indexes (c: Corners) -> [usize; 3]{
-    
-}
+/// A list of all the corners and their indexes in `Face`
+const corner_index_positions: [[i32; 3]; 8] = [
+    [8, 9, 20],
+    [6, 18, 38],
+    [0, 36, 47],
+    [2, 45, 11],
+    [29, 26, 15],
+    [27, 44, 24],
+    [33, 53, 42],
+    [35, 17, 51],
+];
 
 /// A pattern matching method that takes a `Corners` and returns the three
 /// `Facelets` that belong to that corner.
@@ -168,13 +321,15 @@ pub fn corner_indexes (c: Corners) -> [usize; 3]{
 /// * `c` - An corner to get the corresponding `Facelets`.
 /// # Returns
 /// * `[Facelets; 3]` - The two `Facelets` connected to `c`.
-pub fn corner_colours (c: Corners) - [Facelets; 3]{
-    Corners::URF => [Corners::U, Corners::R, Corners::F,],
-    Corners::UFL => [Corners::U, Corners::F, Corners::L,],
-    Corners::ULB => [Corners::U, Corners::L, Corners::B,],
-    Corners::UBR => [Corners::U, Corners::B, Corners::R,],
-    Corners::DFR => [Corners::D, Corners::F, Corners::R,],
-    Corners::DLF => [Corners::D, Corners::L, Corners::F,],
-    Corners::DBL => [Corners::D, Corners::B, Corners::L,],
-    Corners::DRB => [Corners::D, Corners::R, Corners::B,],
+pub fn corner_colours(c: Corner) -> [Facelets; 3] {
+    match c {
+        Corner::URF => [Facelets::U, Facelets::R, Facelets::F],
+        Corner::UFL => [Facelets::U, Facelets::F, Facelets::L],
+        Corner::ULB => [Facelets::U, Facelets::L, Facelets::B],
+        Corner::UBR => [Facelets::U, Facelets::B, Facelets::R],
+        Corner::DFR => [Facelets::D, Facelets::F, Facelets::R],
+        Corner::DLF => [Facelets::D, Facelets::L, Facelets::F],
+        Corner::DBL => [Facelets::D, Facelets::B, Facelets::L],
+        Corner::DRB => [Facelets::D, Facelets::R, Facelets::B],
+    }
 }
