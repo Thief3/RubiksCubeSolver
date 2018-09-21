@@ -18,6 +18,17 @@ use utility;
 mod corner_cubies;
 mod edge_cubies;
 
+#[derive(Copy, Clone, Debug)]
+pub enum Facelets {
+    U = 0,
+    R,
+    F,
+    D,
+    L,
+    B,
+}
+
+
 /// The main struct of the program.
 ///
 /// Defines a representation of a physical rubiks cube using a group theory
@@ -38,7 +49,15 @@ mod edge_cubies;
 ///     slice edges.
 /// * `corners` - An array of the 8 `CornerCubies`.
 /// * `edges` - An array of the 12 `EdgeCubies`.
-#[derive(PartialEq, Debug, Clone, Copy)]
+/// * `faclets_first_half` - An array of all the faces on a cube arranged such
+///     that the first 9 values represent the upper face. The next 9 the right
+///     face, and so on in th order upper, right and front. Within each nine
+///     values, the first is the top left, the next middle top and we carry
+///     accross and down tothe bottom right.
+/// * `facelets_second_half` - As above but for the faces down, left and back
+///     The reason for the split is regarding the debug trait not working for
+///     "large" arrays.
+#[derive(Debug, Clone, Copy)]
 pub struct Cube {
     pub corner_orientation: i32,
     pub edge_orientation: i32,
@@ -49,6 +68,8 @@ pub struct Cube {
     pub ud_sorted_slice: i32,
     pub corners: [corner_cubies::CornerCubie; 8],
     pub edges: [edge_cubies::EdgeCubie; 12],
+    pub facelets_first_half: [Facelets; 27],
+    pub facelets_second_half: [Facelets; 27],
 }
 
 impl Cube {
@@ -56,7 +77,7 @@ impl Cube {
     /// # Return
     /// * `Cube`
     pub fn new() -> Cube {
-        Cube {
+        let mut new_cube = Cube {
             corner_orientation: 0,
             edge_orientation: 0,
             corner_permutation: 0,
@@ -88,9 +109,55 @@ impl Cube {
                 edge_cubies::EdgeCubie::new(edge_cubies::Edge::BL),
                 edge_cubies::EdgeCubie::new(edge_cubies::Edge::BR),
             ],
+            facelets_first_half: [Facelets::U; 27],
+            facelets_second_half: [Facelets::L; 27]
+        };
+        let facelets_vals = [Facelets::U, Facelets::R, Facelets::F, Facelets::D, Facelets::L, Facelets::B,];
+        for i in 0..3 {
+            for j in 0..9 {
+                new_cube.facelets_first_half[i * 9 + j] = facelets_vals[i];
+            }
+        }
+        for i in 3..6 {
+            for j in 0..9 {
+                new_cube.facelets_second_half[i * 9 + j] = facelets_vals[i];
+            }
+        }
+        new_cube
+    }
+
+    /// A setter method for the facelets arrays in `Cube`. This allows us to
+    /// manage the two halfs of the array as one.
+    ///
+    /// # Parameters
+    /// * `index` - The index of which you wish to change. Between 0 and 53
+    /// * `val` - The value you wish to change the specific face to.
+    pub fn set_facelets(&mut self, index: usize, val: Facelets){
+        if index < 27 && index >= 0 {
+            self.facelets_first_half[index] = val;
+        }else if index > 27 && index <= 53 {
+            self.facelets_second_half[53 - index] = val;
+        }else {
+            panic!("set_facelets: Outside the index range for facelets. Keep index within 0 and 53. Index found: {}", index);
         }
     }
 
+    /// A getter method fo rthe facelet arrays in `Cube`. This allows us to
+    /// manage the two halfs of the array as one.
+    ///
+    /// # Parameters
+    /// * `index` - The index of the facelets arrays you wish to access, must
+    ///    be between 0 and 53 or the function will panic.
+    pub fn get_facelets(& self, index:usize)->Facelets{
+        if index < 27 && index >= 0 {
+            return self.facelets_first_half[index]
+        }else if index > 27 && index <= 53 {
+            return self.facelets_second_half[53 - index]
+        }else {
+            panic!("get_facelets: Outside the index range for facelets. Keep index within 0 and 53. Index found: {}", index);
+        }
+    }
+    
     /// Calculates the corner orientation.
     ///
     /// Should be called after every movement. Calculates a tenary value used
