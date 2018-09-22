@@ -32,8 +32,11 @@ pub mod edge_cubies;
 ///     orientation of the edges overall.
 /// * `corner_permutation` - A value between 0 and 40319, representing the
 ///     permutation of the cubes corners.
-/// * `edge_permutation` - A value between 0 and 479001599, representing
-///     the permutation of the cubes edges.
+/// * `phase_two_edge_permutaion` - A value between 0 and 40320, but between
+///     0 and 24 for a G1 state `Cube` the permutation of the cubes edges, only
+///     valid in phase 2..
+/// * `corner_parity` - The parity of the corner permutation.
+/// * `edge_parity` - The parity of the edge permutation.
 /// * `ud_slice` - A value between 0 and 494, representing the front UD
 ///     slice edges.
 /// * `corners` - An array of the 8 `CornerCubies`.
@@ -43,8 +46,9 @@ pub struct Cube {
     pub corner_orientation: i32,
     pub edge_orientation: i32,
     pub corner_permutation: i32,
-    pub edge_permutation: i32,
     pub phase_two_edge_permutation: i32,
+    pub corner_parity: i32,
+    pub edge_parity: i32,
     pub ud_slice: i32,
     pub ud_sorted_slice: i32,
     pub corners: [corner_cubies::CornerCubie; 8],
@@ -56,12 +60,13 @@ impl Cube {
     /// # Return
     /// * `Cube`
     pub fn new() -> Cube {
-        Cube {
+        let mut new_cube = Cube {
             corner_orientation: 0,
             edge_orientation: 0,
             corner_permutation: 0,
-            edge_permutation: 0,
             phase_two_edge_permutation: 0,
+            corner_parity: 0,
+            edge_parity: 0,
             ud_slice: 0,
             ud_sorted_slice: 0,
             corners: [
@@ -88,7 +93,9 @@ impl Cube {
                 edge_cubies::EdgeCubie::new(edge_cubies::Edge::BL),
                 edge_cubies::EdgeCubie::new(edge_cubies::Edge::BR),
             ],
-        }
+        };
+        new_cube.coordinate_adjustments();
+        new_cube
     }
 
     /// Calculates the corner orientation.
@@ -147,7 +154,7 @@ impl Cube {
     pub fn calculate_ud_slice(&mut self) {
         // FR, FL, BL, BR are the UD slice edges. This corresponds to the last
         // four values in our edges array, so we take these values and order
-        // them for the algorithm.
+       // them for the algorithm.
         let mut sum = 0;
         let values = [
             edge_cubies::Edge::FR,
@@ -241,6 +248,34 @@ impl Cube {
         self.phase_two_edge_permutation = x;
     }
 
+    /// Calculates the parity of the corner permutation.
+    /// Used only for testing if the cube can be solved.
+    pub fn calculate_corner_parity(&mut self){
+        let mut s = 0;
+        for i in (1..8).rev(){
+            for j in (0..(i-1)).rev(){
+                if self.corners[j].coordinate as i32 > self.corners[i].coordinate as i32 {
+                    s = s + 1
+                }
+            }
+        }
+        self.corner_parity = s % 2;
+    }
+
+    /// Calculates the parity of the edge permutation.
+    /// Used only for testing if the cube can be solved.
+    pub fn calculate_edge_parity(&mut self){
+        let mut s = 0;
+        for i in (1..12).rev(){
+            for j in (0..(i-1)).rev(){
+                if self.edges[j].coordinate as i32 > self.edges[i].coordinate as i32 {
+                    s = s + 1
+                }
+            }
+        }
+        self.edge_parity = s % 2
+    }
+
     /// Functions to be called after each move.c
     ///
     /// Used to update the internal state of the variables in the struct
@@ -249,6 +284,8 @@ impl Cube {
         self.calculate_corner_orientation();
         self.calculate_corner_permutation();
         self.calculate_edge_orientation();
+        self.calculate_corner_parity();
+        self.calculate_edge_parity();
         self.calculate_ud_slice();
         self.calculate_ud_sorted_slice();
         self.calculate_phase_two_edge_permutation();

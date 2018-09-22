@@ -11,8 +11,8 @@
 //! Module regulates the face values and handles converting facelet input into
 //! cubie form so that we can solve the problem.
 
-use physical::corner_cubies::Corner;
-use physical::edge_cubies::Edge;
+use physical::corner_cubies::*;
+use physical::edge_cubies::*;
 use physical::Cube;
 
 /// A enum of the different possible face values.
@@ -46,7 +46,52 @@ pub struct Face {
 }
 
 impl Face {
-    pub fn new() -> Face {
+    /// Creates a new `Face` from a string of 54 characters. Panics is
+    /// string is invalid.
+    ///
+    /// # Returns
+    /// * `Face` - Create a mixed up face with the string provided.
+    pub fn new(s: &str) -> Face {
+        let mut new_face = Face {
+           facelets_first_half: [Facelets::U; 27],
+           facelets_second_half: [Facelets::D; 27],
+        };
+        if s.chars().count() < 54 {
+            panic!("Error creating face. Passed string is too short at {}.", s.chars().count())
+        } else if s.chars().count() > 54 {
+            panic!("Error creating face. Passed string is too long at {}.", s.chars().count())
+        }
+        for (i,c) in s.chars().enumerate() {
+            if c.to_ascii_lowercase() == 'u'{
+                new_face.set_facelets(i, Facelets::U);
+            }
+            else if c.to_ascii_lowercase() == 'd'{
+                new_face.set_facelets(i, Facelets::D);
+            }
+            else if c.to_ascii_lowercase() == 'l'{
+                new_face.set_facelets(i, Facelets::L);
+            }
+            else if c.to_ascii_lowercase() == 'r'{
+                new_face.set_facelets(i, Facelets::R);
+            }
+            else if c.to_ascii_lowercase() == 'f'{
+                new_face.set_facelets(i, Facelets::F);
+            }
+            else if c.to_ascii_lowercase() == 'b'{
+                new_face.set_facelets(i, Facelets::B);
+            }
+            else {
+                panic!("Error creating face. Contains weird characters: {}", c)
+            }
+        }
+        new_face
+    }
+
+    /// Creates a new face with default pristine cube values.
+    ///
+    /// # Returns
+    /// * `Face` - A pristine cube face.
+    pub fn new_clean() -> Face {
         let mut new_face = Face {
             facelets_first_half: [Facelets::U; 27],
             facelets_second_half: [Facelets::D; 27],
@@ -81,8 +126,8 @@ impl Face {
     pub fn set_facelets(&mut self, index: usize, val: Facelets) {
         if index < 27 && index >= 0 {
             self.facelets_first_half[index] = val;
-        } else if index > 27 && index <= 53 {
-            self.facelets_second_half[53 - index] = val;
+        } else if index >= 27 && index <= 53 {
+            self.facelets_second_half[index - 27] = val;
         } else {
             panic!("set_facelets: Outside the index range for facelets. Keep index within 0 and 53. Index found: {}", index);
         }
@@ -97,8 +142,8 @@ impl Face {
     pub fn get_facelets(&self, index: usize) -> Facelets {
         if index < 27 && index >= 0 {
             return self.facelets_first_half[index];
-        } else if index > 27 && index <= 53 {
-            return self.facelets_second_half[53 - index];
+        } else if index >= 27 && index <= 53 {
+            return self.facelets_second_half[index - 27];
         } else {
             panic!("get_facelets: Outside the index range for facelets. Keep index within 0 and 53. Index found: {}", index);
         }
@@ -113,14 +158,20 @@ impl Face {
     ///      1 -> Not 9 facelets of each colour
     ///      2 -> Edges aren't the right colours
     ///      3 -> Corners aren't the right colours.
-    fn check_if_can_be_solved(&self) -> usize {
+    ///      4 -> Corner and Edge Parity aren't equal.
+    ///      5 -> Total Edge Flip is wrong.
+    ///      6 -> Total Corner Twist is wrong.
+    pub fn check_if_can_be_solved(&self) -> usize {
         let mut return_code = 99;
+        let my_cube = self.turn_into_cube();
         if !self.check_all_colours_present() {
             return_code = 1
         } else if !self.check_edges_colours() {
             return_code = 2
         } else if !self.check_corners_colours() {
             return_code = 3
+        } else if my_cube.edge_parity != my_cube.corner_parity{
+            return_code = 4
         } else {
             return_code = 0
         }
@@ -186,7 +237,7 @@ impl Face {
         for i in 0..8 {
             let mut current_colours: Vec<Facelets> = Vec::new();
             for j in 0..3 {
-                current_colours.push(self.get_facelets(corner_index_positions[i][j] as usize));
+                current_colours.push(self.get_facelets(corner_indexes[i][j] as usize));
             }
             for k in 0..8 {
                 let mut count = 0;
@@ -208,7 +259,10 @@ impl Face {
         return_bool
     }
 
-    /// A method to test
+    /// A method to test that edges are all there with the right colours.
+    ///
+    /// # Returns
+    /// * `bool` - True if all the right colours are indeed there.
     fn check_edges_colours(&self) -> bool {
         let enum_list = [
             Edge::UR,
@@ -229,7 +283,7 @@ impl Face {
         for i in 0..8 {
             let mut current_colours: Vec<Facelets> = Vec::new();
             for j in 0..2 {
-                current_colours.push(self.get_facelets(corner_index_positions[i][j] as usize));
+                current_colours.push(self.get_facelets(edge_indexes[i][j] as usize));
             }
             for k in 0..12 {
                 let mut count = 0;
@@ -255,7 +309,58 @@ impl Face {
     /// # Returns
     /// * `Cube` - A `Cube` with values homomorphic to this face.
     pub fn turn_into_cube(&self) -> Cube {
-        Cube::new()
+        let mut new_cube = Cube::new();
+        let mut edge_count = 0;
+        let mut corner_count = 0;
+        
+        let edges = [
+            Edge::UR,
+            Edge::UF,
+            Edge::UL,
+            Edge::UB,
+            Edge::DR,
+            Edge::DF,
+            Edge::DL,
+            Edge::DB,
+            Edge::FR,
+            Edge::FL,
+            Edge::BL,
+            Edge::BR,
+        ];
+
+        let corners = [
+            Corner::URF,
+            Corner::UFL,
+            Corner::ULB,
+            Corner::UBR,
+            Corner::DFR,
+            Corner::DLF,
+            Corner::DBL,
+            Corner::DRB,
+        ];
+        
+        for ei in edge_indexes.iter() {
+            let mut tuple_of_col = (self.get_facelets(ei[0]), self.get_facelets(ei[1]));
+            for e in edges.iter(){
+                let col = edge_colours(*e);
+                if col.contains(&tuple_of_col.0) && col.contains(&tuple_of_col.1) {
+                    new_cube.edges[edge_count] = EdgeCubie::new(*e);
+                    edge_count = edge_count + 1;
+                }
+            }
+        }
+        for ci in corner_indexes.iter() {
+            let mut tuple_of_col = (self.get_facelets(ci[0]), self.get_facelets(ci[1]), self.get_facelets(ci[2]));
+            for c in corners.iter(){
+                let col = corner_colours(*c);
+                if col.contains(&tuple_of_col.0) && col.contains(&tuple_of_col.1) && col.contains(&tuple_of_col.2){
+                    new_cube.corners[corner_count] = CornerCubie::new(*c);
+                    corner_count = corner_count + 1;
+                }
+            }
+        }
+        
+        new_cube
     }
 }
 
@@ -263,8 +368,8 @@ impl Face {
 /// * Definitions
 /// ****************************************************************************
 
-/// A list of all the edges and their index in face.
-const edge_indexes: [[i32; 2]; 12] = [
+/// A list of all the edges and their index in face. Already in order.
+const edge_indexes: [[usize; 2]; 12] = [
     [5, 10],
     [7, 19],
     [3, 37],
@@ -302,8 +407,8 @@ pub fn edge_colours(e: Edge) -> [Facelets; 2] {
     }
 }
 
-/// A list of all the corners and their indexes in `Face`
-const corner_index_positions: [[i32; 3]; 8] = [
+/// A list of all the corners and their indexes in `Face`. Already in order.
+const corner_indexes: [[usize; 3]; 8] = [
     [8, 9, 20],
     [6, 18, 38],
     [0, 36, 47],

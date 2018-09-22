@@ -18,6 +18,8 @@ mod solver;
 mod utility;
 
 fn main() {
+    let mut test = facelets::Face::new("UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB");
+    println!("Bool: {}", test.check_if_can_be_solved());
     /*
     if gtk::init().is_err() {
         println!("Failed to initialize GTK.");
