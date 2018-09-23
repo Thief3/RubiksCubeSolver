@@ -30,7 +30,7 @@ fn main() {
         println!("Orientation Real: {}    Test: {}  Original: {}", real_cube.corners[i].orientation, my_cube.corners[i].orientation, origin_cube.corners[i].orientation);
     }
    
-    //solver::complete_search(&mut real_cube);
+    solver::complete_search(&mut my_cube);
     println!("Return Code: {}", test.check_if_can_be_solved());
    
 }

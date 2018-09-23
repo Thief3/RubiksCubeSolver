@@ -346,7 +346,7 @@ impl Face {
     }
     
     /// A method to turn a face into a cube.
-    ///
+    /// A heavy amount of the code was ported from (https://github.com/hkociemba/RubiksCube-TwophaseSolver/blob/master/face.py).
     /// # Returns
     /// * `Cube` - A `Cube` with values homomorphic to this face.
     pub fn turn_into_cube(&self) -> Cube {
@@ -377,39 +377,49 @@ impl Face {
             Corner::DBL,
             Corner::DRB,
         ];
-        
-        for (i , ei) in edge_indexes.iter().enumerate() {
-            let mut tuple_of_col = (self.get_facelets(ei[0]), self.get_facelets(ei[1]));
-            for e in edges.iter(){
-                let col = edge_colours(*e);
-                if col.contains(&tuple_of_col.0) && col.contains(&tuple_of_col.1) {
-                    new_cube.edges[i] = EdgeCubie::new(*e);
-                    new_cube.edges[i].orientation = (((i as i32 - *e as  i32) % 3) + 3) % 3;
 
-                    if new_cube.edges[i].orientation == 0
-                        && new_cube.edges[i].coordinate != edges[i] {
+        // Basically this entire algorithm was recreated from
+        // https://github.com/hkociemba/RubiksCube-TwophaseSolver/blob/master/face.py
+        for (i, dud) in corners.iter().enumerate() {
+            let fac = corner_indexes[i];
+            let mut col1: Facelets;
+            let mut col2: Facelets;
+            let mut o: usize = 0;
+            for ori in 0..3 {
+                if self.get_facelets(fac[ori]) == Facelets::U
+                    || self.get_facelets(fac[ori]) == Facelets::D {
+                        o = ori;
+                        break;
+                    }
+            }
+            col1 = self.get_facelets(fac[(o + 1) % 3]);
+            col2 = self.get_facelets(fac[(o + 2) % 3]);
+            
+            for c in corners.iter() {
+                let col = corner_colours(*c);
+                if col1 == col[1] && col2 == col[2] {
+                    new_cube.corners[i] = CornerCubie::new(*c);
+                    new_cube.corners[i].orientation = o as i32;
+                    break;
+                }
+            }
+
+            for (i, dud) in edges.iter().enumerate() {
+                for e in edges.iter(){
+                    if self.get_facelets(edge_indexes[i][0]) == edge_colours(*e)[0]
+                    && self.get_facelets(edge_indexes[i][1]) == edge_colours(*e)[1]{
+                            new_cube.edges[i] = EdgeCubie::new(*e);
+                            new_cube.edges[i].orientation = 0;
+                        }
+                    else if self.get_facelets(edge_indexes[i][0]) == edge_colours(*e)[1]
+                    && self.get_facelets(edge_indexes[i][1]) == edge_colours(*e)[0]{
+                            new_cube.edges[i] = EdgeCubie::new(*e);
                             new_cube.edges[i].orientation = 1;
                         }
-                }       
-            }
-        }
-
-        for (i, ci) in corner_indexes.iter().enumerate() {
-            let mut tuple_of_col = (self.get_facelets(ci[0]), self.get_facelets(ci[1]), self.get_facelets(ci[2]));
-            for c in corners.iter(){
-                let col = corner_colours(*c);
-                if col.contains(&tuple_of_col.0) && col.contains(&tuple_of_col.1) && col.contains(&tuple_of_col.2){
-                    new_cube.corners[i] = CornerCubie::new(*c);
-                    new_cube.corners[i].orientation = (((i as i32 - *c as  i32) % 3) + 3) % 3;
-                    if new_cube.corners[i].orientation == 0
-                        && new_cube.corners[i].coordinate != corners[i] {
-                            new_cube.corners[i].orientation = 1;
-                        }
-                    new_cube.corners[i].orientation = new_cube.corners[i].orientation % 3
                 }
             }
         }
-        //new_cube.calculate_orientations_init();
+
         new_cube.coordinate_adjustments();
         new_cube
     }
