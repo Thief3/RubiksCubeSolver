@@ -53,34 +53,34 @@ impl Face {
     /// * `Face` - Create a mixed up face with the string provided.
     pub fn new(s: &str) -> Face {
         let mut new_face = Face {
-           facelets_first_half: [Facelets::U; 27],
-           facelets_second_half: [Facelets::D; 27],
+            facelets_first_half: [Facelets::U; 27],
+            facelets_second_half: [Facelets::D; 27],
         };
         if s.chars().count() < 54 {
-            panic!("Error creating face. Passed string is too short at {}.", s.chars().count())
+            panic!(
+                "Error creating face. Passed string is too short at {}.",
+                s.chars().count()
+            )
         } else if s.chars().count() > 54 {
-            panic!("Error creating face. Passed string is too long at {}.", s.chars().count())
+            panic!(
+                "Error creating face. Passed string is too long at {}.",
+                s.chars().count()
+            )
         }
-        for (i,c) in s.chars().enumerate() {
-            if c.to_ascii_lowercase() == 'u'{
+        for (i, c) in s.chars().enumerate() {
+            if c.to_ascii_lowercase() == 'u' {
                 new_face.set_facelets(i, Facelets::U);
-            }
-            else if c.to_ascii_lowercase() == 'd'{
+            } else if c.to_ascii_lowercase() == 'd' {
                 new_face.set_facelets(i, Facelets::D);
-            }
-            else if c.to_ascii_lowercase() == 'l'{
+            } else if c.to_ascii_lowercase() == 'l' {
                 new_face.set_facelets(i, Facelets::L);
-            }
-            else if c.to_ascii_lowercase() == 'r'{
+            } else if c.to_ascii_lowercase() == 'r' {
                 new_face.set_facelets(i, Facelets::R);
-            }
-            else if c.to_ascii_lowercase() == 'f'{
+            } else if c.to_ascii_lowercase() == 'f' {
                 new_face.set_facelets(i, Facelets::F);
-            }
-            else if c.to_ascii_lowercase() == 'b'{
+            } else if c.to_ascii_lowercase() == 'b' {
                 new_face.set_facelets(i, Facelets::B);
-            }
-            else {
+            } else {
                 panic!("Error creating face. Contains weird characters: {}", c)
             }
         }
@@ -170,13 +170,13 @@ impl Face {
             return_code = 2
         } else if !self.check_corners_colours() {
             return_code = 3
-        } else if my_cube.edge_parity != my_cube.corner_parity{
+        } else if my_cube.edge_parity != my_cube.corner_parity {
             return_code = 4
-        } else if !self.check_edge_flip(my_cube){
+        } else if !self.check_edge_flip(my_cube) {
             return_code = 5
-        } else if !self.check_corner_twist(my_cube){
+        } else if !self.check_corner_twist(my_cube) {
             return_code = 6
-        }else {
+        } else {
             return_code = 0
         }
 
@@ -315,7 +315,7 @@ impl Face {
     /// * `c` - A `Cube` to check the flip of.
     /// # Returns
     /// * `bool` - Returns true if the cube has a solveable flip.
-    fn check_edge_flip (&self, c: Cube) -> bool {
+    fn check_edge_flip(&self, c: Cube) -> bool {
         let mut s = 0;
         let mut return_bool = true;
         for e in c.edges.iter() {
@@ -333,7 +333,7 @@ impl Face {
     /// * `c` - A `Cube` to check the twist of.
     /// # Returns
     /// * `bool` - Returns true if the cube has a solveable twist.
-    fn check_corner_twist (&self, c: Cube) -> bool {
+    fn check_corner_twist(&self, c: Cube) -> bool {
         let mut s = 0;
         let mut return_bool = true;
         for cor in c.corners.iter() {
@@ -344,14 +344,14 @@ impl Face {
         }
         return_bool
     }
-    
+
     /// A method to turn a face into a cube.
     /// A heavy amount of the code was ported from (https://github.com/hkociemba/RubiksCube-TwophaseSolver/blob/master/face.py).
     /// # Returns
     /// * `Cube` - A `Cube` with values homomorphic to this face.
     pub fn turn_into_cube(&self) -> Cube {
         let mut new_cube = Cube::new();
-        
+
         let edges = [
             Edge::UR,
             Edge::UF,
@@ -387,14 +387,15 @@ impl Face {
             let mut o: usize = 0;
             for ori in 0..3 {
                 if self.get_facelets(fac[ori]) == Facelets::U
-                    || self.get_facelets(fac[ori]) == Facelets::D {
-                        o = ori;
-                        break;
-                    }
+                    || self.get_facelets(fac[ori]) == Facelets::D
+                {
+                    o = ori;
+                    break;
+                }
             }
             col1 = self.get_facelets(fac[(o + 1) % 3]);
             col2 = self.get_facelets(fac[(o + 2) % 3]);
-            
+
             for c in corners.iter() {
                 let col = corner_colours(*c);
                 if col1 == col[1] && col2 == col[2] {
@@ -405,17 +406,18 @@ impl Face {
             }
 
             for (i, dud) in edges.iter().enumerate() {
-                for e in edges.iter(){
+                for e in edges.iter() {
                     if self.get_facelets(edge_indexes[i][0]) == edge_colours(*e)[0]
-                    && self.get_facelets(edge_indexes[i][1]) == edge_colours(*e)[1]{
-                            new_cube.edges[i] = EdgeCubie::new(*e);
-                            new_cube.edges[i].orientation = 0;
-                        }
-                    else if self.get_facelets(edge_indexes[i][0]) == edge_colours(*e)[1]
-                    && self.get_facelets(edge_indexes[i][1]) == edge_colours(*e)[0]{
-                            new_cube.edges[i] = EdgeCubie::new(*e);
-                            new_cube.edges[i].orientation = 1;
-                        }
+                        && self.get_facelets(edge_indexes[i][1]) == edge_colours(*e)[1]
+                    {
+                        new_cube.edges[i] = EdgeCubie::new(*e);
+                        new_cube.edges[i].orientation = 0;
+                    } else if self.get_facelets(edge_indexes[i][0]) == edge_colours(*e)[1]
+                        && self.get_facelets(edge_indexes[i][1]) == edge_colours(*e)[0]
+                    {
+                        new_cube.edges[i] = EdgeCubie::new(*e);
+                        new_cube.edges[i].orientation = 1;
+                    }
                 }
             }
         }

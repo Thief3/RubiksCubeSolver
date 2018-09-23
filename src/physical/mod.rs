@@ -98,15 +98,15 @@ impl Cube {
         new_cube
     }
 
-    pub fn calculate_orientations_init(&mut self){
-        for (i,c) in self.corners.iter_mut().enumerate() {
+    pub fn calculate_orientations_init(&mut self) {
+        for (i, c) in self.corners.iter_mut().enumerate() {
             c.orientation = (((i as i32 - c.coordinate as i32) % 3) + 3) % 3;
         }
-        for (i,e) in self.edges.iter_mut().enumerate() {
-            e.orientation = (((i as i32 - e.coordinate as i32) % 4) + 4) % 4; 
+        for (i, e) in self.edges.iter_mut().enumerate() {
+            e.orientation = (((i as i32 - e.coordinate as i32) % 4) + 4) % 4;
         }
     }
-    
+
     /// Calculates the corner orientation.
     ///
     /// Should be called after every movement. Calculates a tenary value used
@@ -163,7 +163,7 @@ impl Cube {
     pub fn calculate_ud_slice(&mut self) {
         // FR, FL, BL, BR are the UD slice edges. This corresponds to the last
         // four values in our edges array, so we take these values and order
-       // them for the algorithm.
+        // them for the algorithm.
         let mut sum = 0;
         let values = [
             edge_cubies::Edge::FR,
@@ -259,10 +259,10 @@ impl Cube {
 
     /// Calculates the parity of the corner permutation.
     /// Used only for testing if the cube can be solved.
-    pub fn calculate_corner_parity(&mut self){
+    pub fn calculate_corner_parity(&mut self) {
         let mut s = 0;
-        for i in (1..8).rev(){
-            for j in (0..(i-1)).rev(){
+        for i in (1..8).rev() {
+            for j in (0..(i - 1)).rev() {
                 if self.corners[j].coordinate as i32 > self.corners[i].coordinate as i32 {
                     s = s + 1
                 }
@@ -273,10 +273,10 @@ impl Cube {
 
     /// Calculates the parity of the edge permutation.
     /// Used only for testing if the cube can be solved.
-    pub fn calculate_edge_parity(&mut self){
+    pub fn calculate_edge_parity(&mut self) {
         let mut s = 0;
-        for i in (1..12).rev(){
-            for j in (0..(i-1)).rev(){
+        for i in (1..12).rev() {
+            for j in (0..(i - 1)).rev() {
                 if self.edges[j].coordinate as i32 > self.edges[i].coordinate as i32 {
                     s = s + 1
                 }
