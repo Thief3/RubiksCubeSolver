@@ -8,48 +8,29 @@
 //! @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
 //! ***************************************************************************
 
-extern crate gtk;
-use gtk::prelude::*;
-use gtk::{Button, Window, WindowType};
-
 mod facelets;
 mod physical;
 mod solver;
 mod utility;
 
 fn main() {
-    let mut test = facelets::Face::new("UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB");
-    println!("Bool: {}", test.check_if_can_be_solved());
-    /*
-    if gtk::init().is_err() {
-        println!("Failed to initialize GTK.");
-        return;
+    let mut test = facelets::Face::new("UUUUUULLLURRURRURRFFFFFFFFFRRRDDDDDDLLDLLDLLDBBBBBBBBB");
+    let mut my_cube = test.turn_into_cube();
+    let mut origin_cube = physical::Cube::new();
+    let mut real_cube = physical::Cube::new();
+    real_cube.f();
+    println!("*************EDGES************");
+    for i in 0..12 {
+        println!("Coordinate  Real: {:?}  Test: {:?}  Original: {:?}", real_cube.edges[i].coordinate, my_cube.edges[i].coordinate, origin_cube.edges[i].coordinate);
+        println!("Orientation Real: {}   Test: {}   Original: {}", real_cube.edges[i].orientation, my_cube.edges[i].orientation, origin_cube.edges[i].orientation);
     }
-
-    let window = Window::new(WindowType::Toplevel);
-    window.set_title("First GTK+ Program");
-    window.set_default_size(350, 70);
-    let button = Button::new_with_label("Click me!");
-    window.add(&button);
-    window.show_all();
-
-    window.connect_delete_event(|_, _| {
-        gtk::main_quit();
-        Inhibit(false)
-    });
-
-    button.connect_clicked(|_| {
-        println!("Clicked!");
-    });
-
-    gtk::main();
-*/
+    println!("@@@@@@@@@@@@@CORNERS@@@@@@@@@@@@@@");
+    for i in 0..8 {
+        println!("Coordinate  Real: {:?}  Test: {:?}  Original: {:?}", real_cube.corners[i].coordinate, my_cube.corners[i].coordinate, origin_cube.corners[i].coordinate);
+        println!("Orientation Real: {}    Test: {}  Original: {}", real_cube.corners[i].orientation, my_cube.corners[i].orientation, origin_cube.corners[i].orientation);
+    }
+   
+    //solver::complete_search(&mut real_cube);
+    println!("Return Code: {}", test.check_if_can_be_solved());
+   
 }
-
-/*
-fn main() {
-    let mut c = physical::Cube::new();
-    c.u();
-    c.u();
-    solver::complete_search(&mut c);
-}*/

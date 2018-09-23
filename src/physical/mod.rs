@@ -98,6 +98,15 @@ impl Cube {
         new_cube
     }
 
+    pub fn calculate_orientations_init(&mut self){
+        for (i,c) in self.corners.iter_mut().enumerate() {
+            c.orientation = (((i as i32 - c.coordinate as i32) % 3) + 3) % 3;
+        }
+        for (i,e) in self.edges.iter_mut().enumerate() {
+            e.orientation = (((i as i32 - e.coordinate as i32) % 4) + 4) % 4; 
+        }
+    }
+    
     /// Calculates the corner orientation.
     ///
     /// Should be called after every movement. Calculates a tenary value used
