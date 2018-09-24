@@ -7,7 +7,6 @@
 //!
 //! @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
 //! ***************************************************************************
-
 use std::io::{self, Read};
 
 mod facelets;
@@ -17,9 +16,8 @@ mod utility;
 
 fn main() {
     let mut not_exit = true;
-
-    println!("Please insert your cube, press Q to exit and H for help: ");
     loop {
+        println!("Please insert your cube, press Q to exit and H for help: ");
         let mut line = String::new();
         std::io::stdin().read_line(&mut line).unwrap();
         let option: Result<String, _> = line.trim().parse();
@@ -42,22 +40,18 @@ fn main() {
                             let mut my_cube = face.turn_into_cube();
                             solver::complete_search(&mut my_cube);
                         },
-                           1 => println!("You don't have 9 facelets of each colour."),
-          2 => println!("Not all the edges exist (there may be multiple edges with the same two colours.)"),
-          3 => println!("Not all the corners exist (there may be multiple corners with the same three colours.)"),
-          4 => println!("Edge and Corner parities aren't equal."),
-          5 => println!("The total Edge flip is wrong."),
-          6 => println!("The total Corner twist is wrong."),
-          _ => panic!("How on earth did you get a different return code????"),
+                        1 => println!("You don't have 9 facelets of each colour."),
+                        2 => println!("Not all the edges exist (there may be multiple edges with the same two colours.)"),
+                        3 => println!("Not all the corners exist (there may be multiple corners with the same three colours.)"),
+                        4 => println!("Edge and Corner parities aren't equal."),
+                        5 => println!("The total Edge flip is wrong."),
+                        6 => println!("The total Corner twist is wrong."),
+                        _ => panic!("How on earth did you get a different return code????"),
                     }
                 }
             }
             Err(_) => println!("Invalid input; try again."),
         }
     }
-
-    let mut test = facelets::Face::new("UUUUUULLLURRURRURRFFFFFFFFFRRRDDDDDDLLDLLDLLDBBBBBBBBB");
-    let mut my_cube = test.turn_into_cube();
-    solver::complete_search(&mut my_cube);
-    println!("Return Code: {}", test.check_if_can_be_solved());
+    println!("Goodbye!");
 }

@@ -96,51 +96,51 @@ impl EdgeCubie {
         match self.coordinate {
             Edge::UR => {
                 self.coordinate = edges[0];
-                self.orientation = (self.orientation + orientation_change[0]) % 3;
+                self.orientation = (self.orientation + orientation_change[0]) % 2;
             }
             Edge::UF => {
                 self.coordinate = edges[1];
-                self.orientation = (self.orientation + orientation_change[1]) % 3;
+                self.orientation = (self.orientation + orientation_change[1]) % 2;
             }
             Edge::UL => {
                 self.coordinate = edges[2];
-                self.orientation = (self.orientation + orientation_change[2]) % 3;
+                self.orientation = (self.orientation + orientation_change[2]) % 2;
             }
             Edge::UB => {
                 self.coordinate = edges[3];
-                self.orientation = (self.orientation + orientation_change[3]) % 3;
+                self.orientation = (self.orientation + orientation_change[3]) % 2;
             }
             Edge::DR => {
                 self.coordinate = edges[4];
-                self.orientation = (self.orientation + orientation_change[4]) % 3;
+                self.orientation = (self.orientation + orientation_change[4]) % 2;
             }
             Edge::DF => {
                 self.coordinate = edges[5];
-                self.orientation = (self.orientation + orientation_change[5]) % 3;
+                self.orientation = (self.orientation + orientation_change[5]) % 2;
             }
             Edge::DL => {
                 self.coordinate = edges[6];
-                self.orientation = (self.orientation + orientation_change[6]) % 3;
+                self.orientation = (self.orientation + orientation_change[6]) % 2;
             }
             Edge::DB => {
                 self.coordinate = edges[7];
-                self.orientation = (self.orientation + orientation_change[7]) % 3;
+                self.orientation = (self.orientation + orientation_change[7]) % 2;
             }
             Edge::FR => {
                 self.coordinate = edges[8];
-                self.orientation = (self.orientation + orientation_change[8]) % 3;
+                self.orientation = (self.orientation + orientation_change[8]) % 2;
             }
             Edge::FL => {
                 self.coordinate = edges[9];
-                self.orientation = (self.orientation + orientation_change[9]) % 3;
+                self.orientation = (self.orientation + orientation_change[9]) % 2;
             }
             Edge::BL => {
                 self.coordinate = edges[10];
-                self.orientation = (self.orientation + orientation_change[10]) % 3;
+                self.orientation = (self.orientation + orientation_change[10]) % 2;
             }
             Edge::BR => {
                 self.coordinate = edges[11];
-                self.orientation = (self.orientation + orientation_change[11]) % 3;
+                self.orientation = (self.orientation + orientation_change[11]) % 2;
             }
         }
     }

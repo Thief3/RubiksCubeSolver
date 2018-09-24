@@ -261,13 +261,14 @@ impl Cube {
     /// Used only for testing if the cube can be solved.
     pub fn calculate_corner_parity(&mut self) {
         let mut s = 0;
-        for i in (1..8).rev() {
-            for j in (0..(i - 1)).rev() {
-                if self.corners[j].coordinate as i32 > self.corners[i].coordinate as i32 {
-                    s = s + 1
+        for i in (0..8).rev() {
+            for j in (0..i).rev() {
+                if (self.corners[j].coordinate) > self.corners[i].coordinate {
+                    s = s + 1;
                 }
             }
         }
+
         self.corner_parity = s % 2;
     }
 
@@ -275,10 +276,10 @@ impl Cube {
     /// Used only for testing if the cube can be solved.
     pub fn calculate_edge_parity(&mut self) {
         let mut s = 0;
-        for i in (1..12).rev() {
-            for j in (0..(i - 1)).rev() {
+        for i in (0..12).rev() {
+            for j in (0..i).rev() {
                 if self.edges[j].coordinate as i32 > self.edges[i].coordinate as i32 {
-                    s = s + 1
+                    s = s + 1;
                 }
             }
         }
@@ -459,9 +460,7 @@ mod tests {
     #[test]
     fn test_calculate_phase_two_edge_permutation() {
         let mut test = test_cube_1();
-        println!("Just f");
         test.calculate_phase_two_edge_permutation();
-        println!("Fuck");
         assert_eq!(test.phase_two_edge_permutation, 131364);
     }
 
