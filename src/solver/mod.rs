@@ -51,6 +51,7 @@ pub fn complete_search(rubiks: &mut physical::Cube) {
     let a = Vec::new();
     let b = Vec::new();
     let mut c = rubiks.clone();
+    //println!("We got to the cloning.");///RM
     let mut g1_state_move_list = search(
         &mut c,
         a,
@@ -58,6 +59,7 @@ pub fn complete_search(rubiks: &mut physical::Cube) {
         phase_one_subgoal,
         &PHASE_ONE_MOVE_LIST,
     );
+    //println!("We State Move list complete.");///RM
     let mut pristine_state_move_list = search(
         &mut c,
         b,
@@ -120,6 +122,7 @@ pub fn search(
         results = true;
     }
     for i in 0..max_depth {
+        //println!("{} out of {}", i, max_depth);
         tree_search(
             rubiks,
             &mut c,

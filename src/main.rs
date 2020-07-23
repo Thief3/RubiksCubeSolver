@@ -33,8 +33,10 @@ fn main() {
                 } else if cube.len() < 54 {
                     println!("Your input has less facelets than in a 3x3 rubiks cube at: {}. Please insure you have 54 facelets", cube.len())
                 } else {
+                    println!("Valid input; looking for moves now!");
                     let face = facelets::Face::new(&cube);
                     let return_code = face.check_if_can_be_solved();
+                    println!("Return code is: {}", return_code);
                     match return_code {
                         0 => {
                             let mut my_cube = face.turn_into_cube();

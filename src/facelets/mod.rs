@@ -58,7 +58,7 @@ impl Face {
         };
         if s.chars().count() < 54 {
             panic!(
-                "Error creating face. Passed string is too short at {}.",
+               "Error creating face. Passed string is too short at {}.",
                 s.chars().count()
             )
         } else if s.chars().count() > 54 {
@@ -84,6 +84,7 @@ impl Face {
                 panic!("Error creating face. Contains weird characters: {}", c)
             }
         }
+        //println!("Face Created!");
         new_face
     }
 
@@ -164,6 +165,7 @@ impl Face {
     pub fn check_if_can_be_solved(&self) -> usize {
         let mut return_code = 99;
         let my_cube = self.turn_into_cube();
+        //println!("Can be solved? {:?}", my_cube);
         if !self.check_all_colours_present() {
             return_code = 1
         } else if !self.check_edges_colours() {
@@ -381,6 +383,7 @@ impl Face {
         // Basically this entire algorithm was recreated from
         // https://github.com/hkociemba/RubiksCube-TwophaseSolver/blob/master/face.py
         for (i, dud) in corners.iter().enumerate() {
+
             let fac = corner_indexes[i];
             let mut col1: Facelets;
             let mut col2: Facelets;
@@ -423,6 +426,7 @@ impl Face {
         }
 
         new_cube.coordinate_adjustments();
+        //println!("New cube coordinates adjusted.");
         new_cube
     }
 }
