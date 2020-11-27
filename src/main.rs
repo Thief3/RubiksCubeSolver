@@ -59,9 +59,9 @@ fn create_window(){
             Color::Green.get(),
             Color::Yellow.get(),
         ],
-        current: [0.0, 0.0, 0.0, 1.0],
+        current: Color::White.get(),
         rubiks: [[0.0, 0.0, 0.0, 0.0]; 54],
-        //notify_text: "",
+        notify_text: "",
     };
 
     for i in 0..6{
@@ -76,15 +76,34 @@ fn create_window(){
     });
 }
 
+/*
+fn imgui_str_dynamic(x: String) -> &ImStr{
+    return unsafe { ImStr::from_utf8_with_nul_unchecked(format!("{}\0", x).as_bytes()) }
+}*/
+
+macro_rules! ig_dynamic_str {
+    ($x:expr) => {
+        unsafe { ImStr::from_utf8_with_nul_unchecked(format!("{}\0", $x).as_bytes()) }
+    }
+}
+
+macro_rules! ig_make_label {
+    ( $x:expr, $y:expr ) => {
+        ig_dynamic_str!(format!("{}::{}", $x, $y))
+    }
+}
+
 fn row_buttons(ui: &Ui, width: i32, row: i32, state: &mut State){
     for x in 0..width{
-        if ColorButton::new(im_str!(""), state.rubiks[(row + x) as usize])
+        if ColorButton::new(ig_make_label!("Rubiks", (row + x).to_string()),
+                            state.rubiks[(row + x) as usize])
             .size([30.0,30.0])
             .tooltip(false)
             .build(ui){
-                state.rubiks[(row + x) as usize] = state.current;                
+                state.rubiks[(row + x) as usize] = state.current;
+                state.notify_text = "Facelet Clicked";
             }
-        ui.same_line_with_spacing(0.0, 5.0);       
+        ui.same_line_with_spacing(0.0, 5.0);
     }
     
     ui.new_line();
@@ -110,21 +129,22 @@ fn rubiks_cube_flat(ui: &Ui, state: &mut State) {
         .position([20.0, 140.0], Condition::FirstUseEver);
     w.build(ui, || {
 
-        //ui.text(state.notify_text as str);
+        ui.text(state.notify_text);
 
         // Set colour.
         for i in 0..5 {
-            if ColorButton::new(im_str!(""), state.colors[i])
+            if ColorButton::new(ig_make_label!("Selector", i.to_string()), state.colors[i])
                 .size([30.0,30.0])
                 .tooltip(false)
                 .build(ui){
                     state.current = state.colors[i];
+                    state.notify_text = "Selector Clicked.";
                 }
-            ui.same_line_with_spacing(0.0, 0.5);
+            ui.same_line_with_spacing(0.0, 5.0);
         }
         ui.new_line();
         ui.new_line();
-        
+
         block_buttons(&ui, 3, 3, 0, state);
         ui.new_line();
 
@@ -140,6 +160,14 @@ fn rubiks_cube_flat(ui: &Ui, state: &mut State) {
         
         block_buttons(&ui, 3, 3, 5, state);
         ui.new_line();
+
+        ui.text("This button changes colour when you click it");
+        if ColorButton::new(im_str!("Changing Colour"), state.col).build(ui)
+        {
+            let dum: [f32; 4] = state.col;
+            state.col = state.switch;
+            state.switch = dum;
+        }
     });
 }
 
@@ -154,7 +182,7 @@ struct State {
     // 1 2 3 4
     // 5
     rubiks: [[f32; 4]; 54],
-    //notify_text: u32,
+    notify_text: &'static str,
 }
 
 impl State {
