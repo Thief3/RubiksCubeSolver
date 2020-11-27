@@ -433,6 +433,23 @@ impl Face {
         //println!("New cube coordinates adjusted.");
         new_cube
     }
+
+    pub fn return_code_matcher(&self) -> (&'static str, bool) {
+        let return_code = self.check_if_can_be_solved();
+        println!("Return code is: {}", return_code);
+        match return_code {
+            0 => {
+                return ("Attempting solve...", true);
+            },
+            1 => return ("You don't have 9 facelets of each colour.", false),
+            2 => return ("Not all the edges exist (there may be multiple edges with the same two colours.)", false),
+            3 => return ("Not all the corners exist (there may be multiple corners with the same three colours.)", false),
+            4 => return ("Edge and Corner parities aren't equal.", false),
+            5 => return ("The total Edge flip is wrong.", false),
+            6 => return ("The total Corner twist is wrong.", false),
+            _ => panic!("How on earth did you get a different return code????"),
+        }
+    }
 }
 
 /// ****************************************************************************
