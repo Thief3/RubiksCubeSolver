@@ -58,7 +58,7 @@ impl Face {
         };
         if s.chars().count() < 54 {
             panic!(
-               "Error creating face. Passed string is too short at {}.",
+                "Error creating face. Passed string is too short at {}.",
                 s.chars().count()
             )
         } else if s.chars().count() > 54 {
@@ -383,7 +383,6 @@ impl Face {
         // Basically this entire algorithm was recreated from
         // https://github.com/hkociemba/RubiksCube-TwophaseSolver/blob/master/face.py
         for (i, dud) in corners.iter().enumerate() {
-
             let fac = corner_indexes[i];
             let mut col1: Facelets;
             let mut col2: Facelets;

@@ -9,12 +9,148 @@
 //! ***************************************************************************
 use std::io::{self, Read};
 
+#[macro_use]
+extern crate imgui;
+#[macro_use]
+extern crate glium;
+extern crate imgui_glium_renderer;
+extern crate imgui_winit_support;
+extern crate clipboard;
+
+use imgui::*;
+
 mod facelets;
 mod physical;
 mod solver;
 mod utility;
+mod ui_support;
 
-fn main() {
+struct MyState {
+    col: [f32; 4],
+    switch: [f32; 4],
+    colors: [[f32; 4]; 6],
+    current: [f32; 4]
+}
+
+fn create_window(){
+    let mut state = State::default();
+    let mut my_state = MyState{
+        col: [1.0,0.0,0.0,1.0],
+        switch: [0.0,1.0,0.0,1.0],
+        colors: [
+            [1.0, 0.0, 0.0, 1.0],
+            [0.0, 1.0, 0.0, 1.0],
+            [0.0, 0.0, 1.0, 1.0],
+            [1.0, 1.0, 1.0, 1.0],
+            [1.0, 1.0, 0.0, 1.0],
+            [1.0, 0.0, 1.0, 1.0]
+        ],
+        current: [1.0, 0.0, 0.0, 1.0]
+    };
+    let system = ui_support::init(file!());
+    system.main_loop(move |run, ui| {
+        rubiks_cube_flat(ui, &mut state, &mut my_state);
+    });
+}
+
+
+fn row_buttons(ui: &Ui, width: i32, my_state: &mut MyState){
+    for x in 0..width{
+        if ColorButton::new(im_str!(""), [1.0,0.0,0.0, 0.0])
+            .size([30.0,30.0])
+            .tooltip(false)
+            .build(ui){
+                
+            }
+        ui.same_line_with_spacing(0.0, 5.0);
+    }
+    
+    ui.new_line();
+}
+
+fn block_buttons(ui: &Ui, width: i32, height: i32, my_state: &mut MyState){
+    unsafe{
+        sys::igBeginGroup();
+    }
+    for y in 0..height{
+        row_buttons(ui, width, my_state);
+    }
+    unsafe{
+        sys::igEndGroup();
+    }
+}
+
+fn rubiks_cube_flat(ui: &Ui, state: &mut State, my_state: &mut MyState) {
+    let w = Window::new(im_str!("Example 1: Basics"))
+        .size([700.0, 550.0], Condition::FirstUseEver)
+        .position([20.0, 140.0], Condition::FirstUseEver);
+    w.build(ui, || {
+        ui.text_wrapped(im_str!(
+            "Color button is a widget that displays a color value as a clickable rectangle. \
+             It also supports a tooltip with detailed information about the color value. \
+             Try hovering over and clicking these buttons!"
+        ));
+        ui.text(state.notify_text);
+
+        // Set colour.
+        for i in &my_state.colors {
+            if ColorButton::new(im_str!(""), *i)
+                .size([30.0,30.0])
+                .tooltip(false)
+                .build(ui){
+                    my_state.current = *i;
+                }
+            ui.same_line_with_spacing(0.0, 0.5);
+        }
+        ui.new_line();
+        ui.new_line();
+        
+        //ui.columns(2, im_str!("statscols"), false);
+
+        block_buttons(&ui, 3, 3, my_state);
+        ui.new_line();
+
+        let row_width: f32 = 30.0 * 3.0 + 0.5 * 3.0;
+        let padding: f32 = 20.0;
+        for i in 0..5{
+            block_buttons(&ui, 3, 3, my_state);
+            ui.same_line_with_spacing(ui.cursor_pos()[0], (row_width + padding) * i as f32);
+        }
+
+        ui.new_line();
+        ui.new_line();
+        
+        block_buttons(&ui, 3, 3, my_state);
+        ui.new_line();
+        
+        
+        //ui.columns(1, im_str!("Main"), false);
+        
+        ui.text("This button changes colour when you click it");
+        if ColorButton::new(im_str!("Changing Colour"), my_state.col).build(ui)
+        {
+            state.notify_text = "*** Colour Change";
+            let dum: [f32; 4] = my_state.col;
+            my_state.col = my_state.switch;
+            my_state.switch = dum;
+        }
+    });
+}
+
+#[derive(Default)]
+struct State {
+    example: u32,
+    notify_text: &'static str,
+}
+
+impl State {
+    fn reset(&mut self) {
+        self.notify_text = "";
+    }
+}
+
+fn create_terminal(){
+    // Command line
     let mut not_exit = true;
     loop {
         println!("Please insert your cube, press Q to exit and H for help: ");
@@ -56,4 +192,9 @@ fn main() {
         }
     }
     println!("Goodbye!");
+}
+
+fn main() {
+    create_window();
+    //create_terminal();
 }

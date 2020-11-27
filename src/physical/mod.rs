@@ -208,13 +208,14 @@ impl Cube {
                 x = x + 1
             }
         }
-        
+
         let mut b = 0;
 
         for j in (0..4).rev() {
             //println!("{} out of {:?}", j, (0..4).rev());
             let mut k = 0;
-            while edge4[j] as i32 != j as i32 + 8{ //+8
+            while edge4[j] as i32 != j as i32 + 8 {
+                //+8
                 //println!("k: {:1}, j: {:2}, edge4: {:?}", k, (j + 8) as i32, edge4[j] as i32);
                 let temp = edge4[0];
                 for i in 0..j {
@@ -228,7 +229,7 @@ impl Cube {
             //println!("Finished {}", j);
             b = (j + 1) * b + k;
         }
-        
+
         self.ud_sorted_slice = 24 * a + b as i32
     }
     //uuuuuuuuubffbrfdbdlbrlfllfbflrdddfflflbblddrdrrlrbrbdr
@@ -295,7 +296,7 @@ impl Cube {
     ///
     /// Used to update the internal state of the variables in the struct
     /// after movements.
-    pub fn coordinate_adjustments(&mut self){
+    pub fn coordinate_adjustments(&mut self) {
         self.calculate_corner_orientation();
         self.calculate_corner_permutation();
         self.calculate_edge_orientation();
