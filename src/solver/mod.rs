@@ -46,13 +46,13 @@ pub enum Moves {
 /// * `rubiks` - A `Cube` struct that we are trying to solve. Is mutable
 ///     and a reference so other functions can use it from main.
 /// # Returns
-/// * `()` - Void return but prints move list to complete.
-pub fn complete_search(rubiks: &mut physical::Cube) {
+/// * `&'static str` - Returns move list.
+pub fn complete_search(rubiks: &mut physical::Cube) -> String{
     let a = Vec::new();
     let b = Vec::new();
     let mut c = rubiks.clone();
     //println!("We got to the cloning.");///RM
-    let mut g1_state_move_list = search(
+    let g1_state_move_list = search(
         &mut c,
         a,
         MAX_PHASE_ONE_DEPTH,
@@ -60,14 +60,14 @@ pub fn complete_search(rubiks: &mut physical::Cube) {
         &PHASE_ONE_MOVE_LIST,
     );
     //println!("We State Move list complete.");///RM
-    let mut pristine_state_move_list = search(
+    let pristine_state_move_list = search(
         &mut c,
         b,
         MAX_PHASE_TWO_DEPTH,
         phase_two_subgoal,
         &PHASE_TWO_MOVE_LIST,
     );
-    println!(
+    return format!(
         "Move list: {:?}",
         [&g1_state_move_list[..], &pristine_state_move_list[..]].concat()
     );
@@ -170,7 +170,7 @@ fn tree_search(
     if depth > 0 && *found == false {
         for movement in whole_move_list.iter() {
             if *found == false {
-                let mut last_move: Moves;
+                let last_move: Moves;
                 if move_list.len() != 0 {
                     last_move = *move_list.last().unwrap();
                 } else {
@@ -352,7 +352,7 @@ fn cannot_follow(movement: Moves) -> Moves {
 ///* Constant values.
 ///****************************************************************************
 
-const MAX_PHASE_ONE_DEPTH: usize = 18;
+const MAX_PHASE_ONE_DEPTH: usize = 21;//18;
 const PHASE_ONE_MOVE_LIST: [Moves; 18] = [
     Moves::F1,
     Moves::F2,
@@ -373,17 +373,16 @@ const PHASE_ONE_MOVE_LIST: [Moves; 18] = [
     Moves::R2,
     Moves::R3,
 ];
-
-const MAX_PHASE_TWO_DEPTH: usize = 12;
-const PHASE_TWO_MOVE_LIST: [Moves; 10] = [
+const MAX_PHASE_TWO_DEPTH: usize = 10;//12;
+const PHASE_TWO_MOVE_LIST: [Moves; 6] = [
     Moves::U1,
-    Moves::U2,
-    Moves::U3,
+    //Moves::U2,
+    //Moves::U3,
     Moves::B2,
     Moves::F2,
     Moves::D1,
-    Moves::D2,
-    Moves::D3,
+    //Moves::D2,
+    //Moves::D3,
     Moves::L2,
     Moves::R2,
 ];

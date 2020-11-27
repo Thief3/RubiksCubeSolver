@@ -98,6 +98,7 @@ impl Cube {
         new_cube
     }
 
+    #[allow(dead_code)]
     pub fn calculate_orientations_init(&mut self) {
         for (i, c) in self.corners.iter_mut().enumerate() {
             c.orientation = (((i as i32 - c.coordinate as i32) % 3) + 3) % 3;

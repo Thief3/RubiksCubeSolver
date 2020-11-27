@@ -92,6 +92,7 @@ impl Face {
         new_face
     }
 
+    #[allow(dead_code)]
     /// Creates a new face with default pristine cube values.
     ///
     /// # Returns
@@ -129,7 +130,7 @@ impl Face {
     /// * `index` - The index of which you wish to change. Between 0 and 53
     /// * `val` - The value you wish to change the specific face to.
     pub fn set_facelets(&mut self, index: usize, val: Facelets) {
-        if index < 27 && index >= 0 {
+        if index < 27 {
             self.facelets_first_half[index] = val;
         } else if index >= 27 && index <= 53 {
             self.facelets_second_half[index - 27] = val;
@@ -145,7 +146,7 @@ impl Face {
     /// * `index` - The index of the facelets arrays you wish to access, must
     ///    be between 0 and 53 or the function will panic.
     pub fn get_facelets(&self, index: usize) -> Facelets {
-        if index < 27 && index >= 0 {
+        if index < 27{
             return self.facelets_first_half[index];
         } else if index >= 27 && index <= 53 {
             return self.facelets_second_half[index - 27];
@@ -167,7 +168,7 @@ impl Face {
     ///      5 -> Total Edge Flip is wrong.
     ///      6 -> Total Corner Twist is wrong.
     pub fn check_if_can_be_solved(&self) -> usize {
-        let mut return_code = 99;
+        let return_code;
         let my_cube = self.turn_into_cube();
         //println!("Can be solved? {:?}", my_cube);
         if !self.check_all_colours_present() {
@@ -196,7 +197,7 @@ impl Face {
     ///   them.
     fn check_all_colours_present(&self) -> bool {
         let mut colour_counts = [0, 0, 0, 0, 0, 0];
-        let mut return_bool = false;
+        let return_bool;
         for i in 0..54 {
             if self.get_facelets(i) == Facelets::U {
                 colour_counts[0] = colour_counts[0] + 1
@@ -243,11 +244,11 @@ impl Face {
             Corner::DRB,
         ];
         let mut master_count = 0;
-        let mut return_bool = true;
+        let return_bool;
         for i in 0..8 {
             let mut current_colours: Vec<Facelets> = Vec::new();
             for j in 0..3 {
-                current_colours.push(self.get_facelets(corner_indexes[i][j] as usize));
+                current_colours.push(self.get_facelets(CORNER_INDEXES[i][j] as usize));
             }
             for k in 0..8 {
                 let mut count = 0;
@@ -289,11 +290,11 @@ impl Face {
             Edge::BR,
         ];
         let mut master_count = 0;
-        let mut return_bool = true;
+        let return_bool;
         for i in 0..8 {
             let mut current_colours: Vec<Facelets> = Vec::new();
             for j in 0..2 {
-                current_colours.push(self.get_facelets(edge_indexes[i][j] as usize));
+                current_colours.push(self.get_facelets(EDGE_INDEXES[i][j] as usize));
             }
             for k in 0..12 {
                 let mut count = 0;
@@ -386,10 +387,10 @@ impl Face {
 
         // Basically this entire algorithm was recreated from
         // https://github.com/hkociemba/RubiksCube-TwophaseSolver/blob/master/face.py
-        for (i, dud) in corners.iter().enumerate() {
-            let fac = corner_indexes[i];
-            let mut col1: Facelets;
-            let mut col2: Facelets;
+        for (i, _dud) in corners.iter().enumerate() {
+            let fac = CORNER_INDEXES[i];
+            let col1: Facelets;
+            let col2: Facelets;
             let mut o: usize = 0;
             for ori in 0..3 {
                 if self.get_facelets(fac[ori]) == Facelets::U
@@ -411,15 +412,15 @@ impl Face {
                 }
             }
 
-            for (i, dud) in edges.iter().enumerate() {
+            for (i, _dud) in edges.iter().enumerate() {
                 for e in edges.iter() {
-                    if self.get_facelets(edge_indexes[i][0]) == edge_colours(*e)[0]
-                        && self.get_facelets(edge_indexes[i][1]) == edge_colours(*e)[1]
+                    if self.get_facelets(EDGE_INDEXES[i][0]) == edge_colours(*e)[0]
+                        && self.get_facelets(EDGE_INDEXES[i][1]) == edge_colours(*e)[1]
                     {
                         new_cube.edges[i] = EdgeCubie::new(*e);
                         new_cube.edges[i].orientation = 0;
-                    } else if self.get_facelets(edge_indexes[i][0]) == edge_colours(*e)[1]
-                        && self.get_facelets(edge_indexes[i][1]) == edge_colours(*e)[0]
+                    } else if self.get_facelets(EDGE_INDEXES[i][0]) == edge_colours(*e)[1]
+                        && self.get_facelets(EDGE_INDEXES[i][1]) == edge_colours(*e)[0]
                     {
                         new_cube.edges[i] = EdgeCubie::new(*e);
                         new_cube.edges[i].orientation = 1;
@@ -438,7 +439,7 @@ impl Face {
 /// * Definitions
 /// ****************************************************************************
 /// A list of all the edges and their index in face. Already in order.
-const edge_indexes: [[usize; 2]; 12] = [
+const EDGE_INDEXES: [[usize; 2]; 12] = [
     [5, 10],
     [7, 19],
     [3, 37],
@@ -477,7 +478,7 @@ pub fn edge_colours(e: Edge) -> [Facelets; 2] {
 }
 
 /// A list of all the corners and their indexes in `Face`. Already in order.
-const corner_indexes: [[usize; 3]; 8] = [
+const CORNER_INDEXES: [[usize; 3]; 8] = [
     [8, 9, 20],
     [6, 18, 38],
     [0, 36, 47],

@@ -7,11 +7,11 @@
 //!
 //! @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
 //! ***************************************************************************
-use std::io::{self, Read};
 
-#[macro_use]
+#[allow(unused_imports)]
+use std::io;
+
 extern crate imgui;
-#[macro_use]
 extern crate glium;
 extern crate imgui_glium_renderer;
 extern crate imgui_winit_support;
@@ -25,6 +25,7 @@ mod solver;
 mod utility;
 mod ui_support;
 
+#[derive(PartialEq, Copy, Clone, Debug)]
 pub enum Color {
     White,
     Red,
@@ -45,7 +46,7 @@ impl Color {
             
         }
     }
-
+    #[allow(dead_code)]
     fn get_facelet(&self) -> facelets::Facelets{
         match self {
             Self::White  => facelets::Facelets::U,
@@ -76,6 +77,7 @@ fn convert_color_rubiks_to_chars(rubiks: [Color; 54]) -> facelets::RubiksChar{
     return a;
 }
 
+#[allow(dead_code)]
 fn convert_color_rubiks_to_facelets(rubiks: [Color; 54]) -> facelets::RubiksFacelets{
     let mut a: facelets::RubiksFacelets = [facelets::Facelets::U; 54];
     for i in 0..54{
@@ -86,18 +88,16 @@ fn convert_color_rubiks_to_facelets(rubiks: [Color; 54]) -> facelets::RubiksFace
 
 fn create_window(){
     let mut state = State{
-        col: [1.0,0.0,0.0,1.0],
-        switch: [0.0,1.0,0.0,1.0],
         colors: [
-            Color::White.get_vec(),
-            Color::Red.get_vec(),
-            Color::Blue.get_vec(),
-            Color::Orange.get_vec(),
-            Color::Green.get_vec(),
-            Color::Yellow.get_vec(),
+            Color::White,
+            Color::Red,
+            Color::Blue,
+            Color::Orange,
+            Color::Green,
+            Color::Yellow,
         ],
-        current: Color::White.get_vec(),
-        rubiks: [[0.0, 0.0, 0.0, 0.0]; 54],
+        current: Color::White,
+        rubiks: [Color::White; 54],
         notify_text: "",
     };
 
@@ -108,7 +108,7 @@ fn create_window(){
     }
     
     let system = ui_support::init(file!());
-    system.main_loop(move |run, ui| {
+    system.main_loop(move |_run, ui| {
         rubiks_cube_flat(ui, &mut state);
     });
 }
@@ -133,7 +133,7 @@ macro_rules! ig_make_label {
 fn row_buttons(ui: &Ui, width: i32, row: i32, state: &mut State){
     for x in 0..width{
         if ColorButton::new(ig_make_label!("Rubiks", (row + x).to_string()),
-                            state.rubiks[(row + x) as usize])
+                            state.rubiks[(row + x) as usize].get_vec())
             .size([30.0,30.0])
             .tooltip(false)
             .build(ui){
@@ -161,16 +161,18 @@ fn block_buttons(ui: &Ui, width: i32, height: i32, block: i32, state: &mut State
 }
 
 fn rubiks_cube_flat(ui: &Ui, state: &mut State) {
-    let w = Window::new(im_str!("Example 1: Basics"))
-        .size([700.0, 550.0], Condition::FirstUseEver)
+    let w = Window::new(im_str!("Rubiks Cube Solver"))
+        .size([600.0, 450.0], Condition::FirstUseEver)
         .position([20.0, 140.0], Condition::FirstUseEver);
     w.build(ui, || {
 
+        // Start search
+        
         ui.text(state.notify_text);
 
         // Set colour.
         for i in 0..5 {
-            if ColorButton::new(ig_make_label!("Selector", i.to_string()), state.colors[i])
+            if ColorButton::new(ig_make_label!("Selector", i.to_string()), state.colors[i].get_vec())
                 .size([30.0,30.0])
                 .tooltip(false)
                 .build(ui){
@@ -198,39 +200,45 @@ fn rubiks_cube_flat(ui: &Ui, state: &mut State) {
         block_buttons(&ui, 3, 3, 5, state);
         ui.new_line();
 
-        ui.text("This button changes colour when you click it");
-        if ColorButton::new(im_str!("Changing Colour"), state.col).build(ui)
+        if ui.button(im_str!("Solve!"), [90.0, 30.0]) {
+            let r = convert_color_rubiks_to_chars(state.rubiks).iter().cloned().collect::<String>();
+            let face = facelets::Face::new(&r);
+            let (a, b) = return_code_matcher(face);
+            state.notify_text = a;
+            if b {
+                let mut cube = face.turn_into_cube();
+                let moves = solver::complete_search(&mut cube);
+                //state.notify_text = &moves;
+                print!("{}", moves);
+            }
+        }
+        
+        /*ui.text("This button changes colour when you click it");
+        if ColorButton::new(im_str!("Changing Colour"), state.col.get_vec()).build(ui)
         {
             let dum: [f32; 4] = state.col;
             state.col = state.switch;
             state.switch = dum;
-        }
+        }*/
     });
 }
 
 //#[derive(Default)]
 struct State {
-    col: [f32; 4],
-    switch: [f32; 4],
-    colors: [[f32; 4]; 6],
-    current: [f32; 4],
+    colors: [Color; 6],
+    current: Color,
     // Rubiks cube array.
     // 0
     // 1 2 3 4
     // 5
-    rubiks: [[f32; 4]; 54],
+    rubiks: [Color; 54],
     notify_text: &'static str,
 }
 
-impl State {
-    fn reset(&mut self) {
-        //self.notify_text = "";
-    }
-}
-
+#[allow(dead_code)]
 fn create_terminal(){
     // Command line
-    let mut not_exit = true;
+    //let not_exit = true; // Used to be mut
     loop {
         println!("Please insert your cube, press Q to exit and H for help: ");
         let mut line = String::new();
@@ -250,20 +258,11 @@ fn create_terminal(){
                 } else {
                     println!("Valid input; looking for moves now!");
                     let face = facelets::Face::new(&cube);
-                    let return_code = face.check_if_can_be_solved();
-                    println!("Return code is: {}", return_code);
-                    match return_code {
-                        0 => {
-                            let mut my_cube = face.turn_into_cube();
-                            solver::complete_search(&mut my_cube);
-                        },
-                        1 => println!("You don't have 9 facelets of each colour."),
-                        2 => println!("Not all the edges exist (there may be multiple edges with the same two colours.)"),
-                        3 => println!("Not all the corners exist (there may be multiple corners with the same three colours.)"),
-                        4 => println!("Edge and Corner parities aren't equal."),
-                        5 => println!("The total Edge flip is wrong."),
-                        6 => println!("The total Corner twist is wrong."),
-                        _ => panic!("How on earth did you get a different return code????"),
+                    let (msg, success) = return_code_matcher(face);
+                    print!("{}", msg);
+                    if success {
+                        let mut c_cube = face.turn_into_cube();
+                        print!("{}", solver::complete_search(&mut c_cube))
                     }
                 }
             }
@@ -271,6 +270,24 @@ fn create_terminal(){
         }
     }
     println!("Goodbye!");
+}
+
+fn return_code_matcher(face: facelets::Face) -> (&'static str, bool) {
+    let return_code = face.check_if_can_be_solved();
+    println!("Return code is: {}", return_code);
+    match return_code {
+        0 => {
+            return ("Attempting solve...", true);
+        },
+        1 => return ("You don't have 9 facelets of each colour.", false),
+        2 => return ("Not all the edges exist (there may be multiple edges with the same two colours.)", false),
+        3 => return ("Not all the corners exist (there may be multiple corners with the same three colours.)", false),
+        4 => return ("Edge and Corner parities aren't equal.", false),
+        5 => return ("The total Edge flip is wrong.", false),
+        6 => return ("The total Corner twist is wrong.", false),
+        _ => panic!("How on earth did you get a different return code????"),
+    }
+
 }
 
 fn main() {
