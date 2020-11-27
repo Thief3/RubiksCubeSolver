@@ -25,117 +25,141 @@ mod solver;
 mod utility;
 mod ui_support;
 
-struct MyState {
-    col: [f32; 4],
-    switch: [f32; 4],
-    colors: [[f32; 4]; 6],
-    current: [f32; 4]
+pub enum Color {
+    White,
+    Red,
+    Blue,
+    Orange,
+    Green,
+    Yellow
+}
+impl Color {
+    fn get(&self) -> [f32; 4] {
+        match self {
+            Self::White  => [1.0, 1.0, 1.0, 1.0],
+            Self::Red    => [1.0, 0.0, 0.0, 1.0],
+            Self::Blue   => [0.0, 0.0, 1.0, 1.0],
+            Self::Orange => [1.0, 0.64, 0.0, 1.0],
+            Self::Green  => [0.0, 1.0, 0.0, 1.0],
+            Self::Yellow => [1.0, 1.0, 0.0, 1.0],
+            
+        }
+    }
 }
 
 fn create_window(){
-    let mut state = State::default();
-    let mut my_state = MyState{
+    let mut state = State{
         col: [1.0,0.0,0.0,1.0],
         switch: [0.0,1.0,0.0,1.0],
         colors: [
-            [1.0, 0.0, 0.0, 1.0],
-            [0.0, 1.0, 0.0, 1.0],
-            [0.0, 0.0, 1.0, 1.0],
-            [1.0, 1.0, 1.0, 1.0],
-            [1.0, 1.0, 0.0, 1.0],
-            [1.0, 0.0, 1.0, 1.0]
+            Color::White.get(),
+            Color::Red.get(),
+            Color::Blue.get(),
+            Color::Orange.get(),
+            Color::Green.get(),
+            Color::Yellow.get(),
         ],
-        current: [1.0, 0.0, 0.0, 1.0]
+        current: [0.0, 0.0, 0.0, 1.0],
+        rubiks: [[0.0, 0.0, 0.0, 0.0]; 54],
+        //notify_text: "",
     };
+
+    for i in 0..6{
+        for j in 0..9 {
+            state.rubiks[i * 9 + j] = state.colors[i];
+        }
+    }
+    
     let system = ui_support::init(file!());
     system.main_loop(move |run, ui| {
-        rubiks_cube_flat(ui, &mut state, &mut my_state);
+        rubiks_cube_flat(ui, &mut state);
     });
 }
 
-
-fn row_buttons(ui: &Ui, width: i32, my_state: &mut MyState){
+fn row_buttons(ui: &Ui, width: i32, row: i32, state: &mut State){
     for x in 0..width{
-        if ColorButton::new(im_str!(""), [1.0,0.0,0.0, 0.0])
+        if ColorButton::new(im_str!(""), state.rubiks[(row + x) as usize])
             .size([30.0,30.0])
             .tooltip(false)
             .build(ui){
-                
+                state.rubiks[(row + x) as usize] = state.current;                
             }
-        ui.same_line_with_spacing(0.0, 5.0);
+        ui.same_line_with_spacing(0.0, 5.0);       
     }
     
     ui.new_line();
 }
 
-fn block_buttons(ui: &Ui, width: i32, height: i32, my_state: &mut MyState){
+fn block_buttons(ui: &Ui, width: i32, height: i32, block: i32, state: &mut State){
     unsafe{
         sys::igBeginGroup();
     }
     for y in 0..height{
-        row_buttons(ui, width, my_state);
+        // 0 * 9 + 0 * 3 = 0
+        // 1 * 9 + 0 * 3 = 9
+        row_buttons(ui, width, block * (width * height) + y * width, state);
     }
     unsafe{
         sys::igEndGroup();
     }
 }
 
-fn rubiks_cube_flat(ui: &Ui, state: &mut State, my_state: &mut MyState) {
+fn rubiks_cube_flat(ui: &Ui, state: &mut State) {
     let w = Window::new(im_str!("Example 1: Basics"))
         .size([700.0, 550.0], Condition::FirstUseEver)
         .position([20.0, 140.0], Condition::FirstUseEver);
     w.build(ui, || {
 
+        //ui.text(state.notify_text as str);
+
         // Set colour.
-        for i in &my_state.colors {
-            if ColorButton::new(im_str!(""), *i)
+        for i in 0..5 {
+            if ColorButton::new(im_str!(""), state.colors[i])
                 .size([30.0,30.0])
                 .tooltip(false)
                 .build(ui){
-                    my_state.current = *i;
+                    state.current = state.colors[i];
                 }
             ui.same_line_with_spacing(0.0, 0.5);
         }
         ui.new_line();
         ui.new_line();
         
-        //ui.columns(2, im_str!("statscols"), false);
-
-        block_buttons(&ui, 3, 3, my_state);
+        block_buttons(&ui, 3, 3, 0, state);
         ui.new_line();
 
         let row_width: f32 = 30.0 * 3.0 + 0.5 * 3.0;
         let padding: f32 = 20.0;
-        for i in 0..5{
-            block_buttons(&ui, 3, 3, my_state);
-            ui.same_line_with_spacing(ui.cursor_pos()[0], (row_width + padding) * i as f32);
+        for i in 0..4{
+            block_buttons(&ui, 3, 3, i + 1, state);
+            ui.same_line_with_spacing(ui.cursor_pos()[0], (row_width + padding) * (i + 1) as f32);
         }
 
         ui.new_line();
         ui.new_line();
         
-        block_buttons(&ui, 3, 3, my_state);
+        block_buttons(&ui, 3, 3, 5, state);
         ui.new_line();
-                
-        ui.text("This button changes colour when you click it");
-        if ColorButton::new(im_str!("Changing Colour"), my_state.col).build(ui)
-        {
-            let dum: [f32; 4] = my_state.col;
-            my_state.col = my_state.switch;
-            my_state.switch = dum;
-        }
     });
 }
 
-#[derive(Default)]
+//#[derive(Default)]
 struct State {
-    example: u32,
-    notify_text: &'static str,
+    col: [f32; 4],
+    switch: [f32; 4],
+    colors: [[f32; 4]; 6],
+    current: [f32; 4],
+    // Rubiks cube array.
+    // 0
+    // 1 2 3 4
+    // 5
+    rubiks: [[f32; 4]; 54],
+    //notify_text: u32,
 }
 
 impl State {
     fn reset(&mut self) {
-        self.notify_text = "";
+        //self.notify_text = "";
     }
 }
 
