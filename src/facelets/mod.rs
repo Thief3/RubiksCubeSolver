@@ -45,6 +45,10 @@ pub struct Face {
     facelets_second_half: [Facelets; 27],
 }
 
+pub type RubiksChar = [char; 54];
+pub type RubiksFacelets = [Facelets; 54];
+
+
 impl Face {
     /// Creates a new `Face` from a string of 54 characters. Panics is
     /// string is invalid.

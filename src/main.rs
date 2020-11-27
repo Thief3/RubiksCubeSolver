@@ -34,7 +34,7 @@ pub enum Color {
     Yellow
 }
 impl Color {
-    fn get(&self) -> [f32; 4] {
+    fn get_vec(&self) -> [f32; 4] {
         match self {
             Self::White  => [1.0, 1.0, 1.0, 1.0],
             Self::Red    => [1.0, 0.0, 0.0, 1.0],
@@ -45,6 +45,43 @@ impl Color {
             
         }
     }
+
+    fn get_facelet(&self) -> facelets::Facelets{
+        match self {
+            Self::White  => facelets::Facelets::U,
+            Self::Red    => facelets::Facelets::F,
+            Self::Blue   => facelets::Facelets::R,
+            Self::Orange => facelets::Facelets::B,
+            Self::Green  => facelets::Facelets::L,
+            Self::Yellow => facelets::Facelets::D,
+        }        
+    }
+    fn get_char(&self) -> char{
+        match self {
+            Self::White  => 'u',
+            Self::Red    => 'f',
+            Self::Blue   => 'r',
+            Self::Orange => 'b',
+            Self::Green  => 'l',
+            Self::Yellow => 'd',
+        }        
+    }
+}
+
+fn convert_color_rubiks_to_chars(rubiks: [Color; 54]) -> facelets::RubiksChar{
+    let mut a: facelets::RubiksChar = [' '; 54];
+    for i in 0..54{
+        a[i] = rubiks[i].get_char();
+    }
+    return a;
+}
+
+fn convert_color_rubiks_to_facelets(rubiks: [Color; 54]) -> facelets::RubiksFacelets{
+    let mut a: facelets::RubiksFacelets = [facelets::Facelets::U; 54];
+    for i in 0..54{
+        a[i] = rubiks[i].get_facelet();
+    }
+    return a;
 }
 
 fn create_window(){
@@ -52,14 +89,14 @@ fn create_window(){
         col: [1.0,0.0,0.0,1.0],
         switch: [0.0,1.0,0.0,1.0],
         colors: [
-            Color::White.get(),
-            Color::Red.get(),
-            Color::Blue.get(),
-            Color::Orange.get(),
-            Color::Green.get(),
-            Color::Yellow.get(),
+            Color::White.get_vec(),
+            Color::Red.get_vec(),
+            Color::Blue.get_vec(),
+            Color::Orange.get_vec(),
+            Color::Green.get_vec(),
+            Color::Yellow.get_vec(),
         ],
-        current: Color::White.get(),
+        current: Color::White.get_vec(),
         rubiks: [[0.0, 0.0, 0.0, 0.0]; 54],
         notify_text: "",
     };
