@@ -85,12 +85,6 @@ fn rubiks_cube_flat(ui: &Ui, state: &mut State, my_state: &mut MyState) {
         .size([700.0, 550.0], Condition::FirstUseEver)
         .position([20.0, 140.0], Condition::FirstUseEver);
     w.build(ui, || {
-        ui.text_wrapped(im_str!(
-            "Color button is a widget that displays a color value as a clickable rectangle. \
-             It also supports a tooltip with detailed information about the color value. \
-             Try hovering over and clicking these buttons!"
-        ));
-        ui.text(state.notify_text);
 
         // Set colour.
         for i in &my_state.colors {
@@ -122,14 +116,10 @@ fn rubiks_cube_flat(ui: &Ui, state: &mut State, my_state: &mut MyState) {
         
         block_buttons(&ui, 3, 3, my_state);
         ui.new_line();
-        
-        
-        //ui.columns(1, im_str!("Main"), false);
-        
+                
         ui.text("This button changes colour when you click it");
         if ColorButton::new(im_str!("Changing Colour"), my_state.col).build(ui)
         {
-            state.notify_text = "*** Colour Change";
             let dum: [f32; 4] = my_state.col;
             my_state.col = my_state.switch;
             my_state.switch = dum;
