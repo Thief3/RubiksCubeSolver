@@ -223,16 +223,6 @@ impl IFace for Face {
     /// # Returns
     /// * `bool` -> True if all corners exist with the right colours.
     fn check_corners_colours(&self) -> bool {
-        let enum_list = [
-            Corner::URF,
-            Corner::UFL,
-            Corner::ULB,
-            Corner::UBR,
-            Corner::DFR,
-            Corner::DLF,
-            Corner::DBL,
-            Corner::DRB,
-        ];
         let mut master_count = 0;
         let return_bool;
         for i in 0..8 {
@@ -243,7 +233,7 @@ impl IFace for Face {
             for k in 0..8 {
                 let mut count = 0;
                 for l in current_colours.iter() {
-                    if corner_colours(enum_list[k]).contains(l) {
+                    if corner_colours(CORNER_LIST[k]).contains(l) {
                         count = count + 1;
                     }
                 }
@@ -265,20 +255,6 @@ impl IFace for Face {
     /// # Returns
     /// * `bool` - True if all the right colours are indeed there.
     fn check_edges_colours(&self) -> bool {
-        let enum_list = [
-            Edge::UR,
-            Edge::UF,
-            Edge::UL,
-            Edge::UB,
-            Edge::DR,
-            Edge::DF,
-            Edge::DL,
-            Edge::DB,
-            Edge::FR,
-            Edge::FL,
-            Edge::BL,
-            Edge::BR,
-        ];
         let mut master_count = 0;
         let return_bool;
         for i in 0..8 {
@@ -289,7 +265,7 @@ impl IFace for Face {
             for k in 0..12 {
                 let mut count = 0;
                 for l in current_colours.iter() {
-                    if edge_colours(enum_list[k]).contains(l) {
+                    if edge_colours(EDGE_LIST[k]).contains(l) {
                         count = count + 1;
                     }
                 }
@@ -503,57 +479,83 @@ pub fn corner_colours(c: Corner) -> [Facelets; 3] {
     }
 }
 
-const U1: usize = 0;
-const U2: usize = 1;
-const U3: usize = 2;
-const U4: usize = 3;
-const U5: usize = 4;
-const U6: usize = 5;
-const U7: usize = 6;
-const U8: usize = 7;
-const U9: usize = 8;
-const R1: usize = 9;
-const R2: usize = 10;
-const R3: usize = 11;
-const R4: usize = 12;
-const R5: usize = 13;
-const R6: usize = 14;
-const R7: usize = 15;
-const R8: usize = 16;
-const R9: usize = 17;
-const F1: usize = 18;
-const F2: usize = 19;
-const F3: usize = 20;
-const F4: usize = 21;
-const F5: usize = 22;
-const F6: usize = 23;
-const F7: usize = 24;
-const F8: usize = 25;
-const F9: usize = 26;
-const D1: usize = 27;
-const D2: usize = 28;
-const D3: usize = 29;
-const D4: usize = 30;
-const D5: usize = 31;
-const D6: usize = 32;
-const D7: usize = 33;
-const D8: usize = 34;
-const D9: usize = 35;
-const L1: usize = 36;
-const L2: usize = 37;
-const L3: usize = 38;
-const L4: usize = 39;
-const L5: usize = 40;
-const L6: usize = 41;
-const L7: usize = 42;
-const L8: usize = 43;
-const L9: usize = 44;
-const B1: usize = 45;
-const B2: usize = 46;
-const B3: usize = 47;
-const B4: usize = 48;
-const B5: usize = 49;
-const B6: usize = 50;
-const B7: usize = 51;
-const B8: usize = 52;
-const B9: usize = 53;
+const CORNER_LIST: [Corner; 8] = [
+    Corner::URF,
+    Corner::UFL,
+    Corner::ULB,
+    Corner::UBR,
+    Corner::DFR,
+    Corner::DLF,
+    Corner::DBL,
+    Corner::DRB,
+];
+
+const EDGE_LIST: [Edge; 12] = [
+    Edge::UR,
+    Edge::UF,
+    Edge::UL,
+    Edge::UB,
+    Edge::DR,
+    Edge::DF,
+    Edge::DL,
+    Edge::DB,
+    Edge::FR,
+    Edge::FL,
+    Edge::BL,
+    Edge::BR,
+];
+
+pub const U1: usize = 0;
+pub const U2: usize = 1;
+pub const U3: usize = 2;
+pub const U4: usize = 3;
+pub const U5: usize = 4;
+pub const U6: usize = 5;
+pub const U7: usize = 6;
+pub const U8: usize = 7;
+pub const U9: usize = 8;
+pub const R1: usize = 9;
+pub const R2: usize = 10;
+pub const R3: usize = 11;
+pub const R4: usize = 12;
+pub const R5: usize = 13;
+pub const R6: usize = 14;
+pub const R7: usize = 15;
+pub const R8: usize = 16;
+pub const R9: usize = 17;
+pub const F1: usize = 18;
+pub const F2: usize = 19;
+pub const F3: usize = 20;
+pub const F4: usize = 21;
+pub const F5: usize = 22;
+pub const F6: usize = 23;
+pub const F7: usize = 24;
+pub const F8: usize = 25;
+pub const F9: usize = 26;
+pub const D1: usize = 27;
+pub const D2: usize = 28;
+pub const D3: usize = 29;
+pub const D4: usize = 30;
+pub const D5: usize = 31;
+pub const D6: usize = 32;
+pub const D7: usize = 33;
+pub const D8: usize = 34;
+pub const D9: usize = 35;
+pub const L1: usize = 36;
+pub const L2: usize = 37;
+pub const L3: usize = 38;
+pub const L4: usize = 39;
+pub const L5: usize = 40;
+pub const L6: usize = 41;
+pub const L7: usize = 42;
+pub const L8: usize = 43;
+pub const L9: usize = 44;
+pub const B1: usize = 45;
+pub const B2: usize = 46;
+pub const B3: usize = 47;
+pub const B4: usize = 48;
+pub const B5: usize = 49;
+pub const B6: usize = 50;
+pub const B7: usize = 51;
+pub const B8: usize = 52;
+pub const B9: usize = 53;

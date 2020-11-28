@@ -56,9 +56,9 @@ impl Color {
     fn get_facelet(&self) -> facelets::Facelets{
         match self {
             Self::White  => facelets::Facelets::U,
-            Self::Red    => facelets::Facelets::R,
+            Self::Red    => facelets::Facelets::L,
             Self::Blue   => facelets::Facelets::F,
-            Self::Orange => facelets::Facelets::L,
+            Self::Orange => facelets::Facelets::R,
             Self::Green  => facelets::Facelets::B,
             Self::Yellow => facelets::Facelets::D,
         }        
@@ -66,9 +66,9 @@ impl Color {
     fn get_char(&self) -> char{
         match self {
             Self::White  => 'u',
-            Self::Red    => 'r',
+            Self::Red    => 'l',
             Self::Blue   => 'f',
-            Self::Orange => 'l',
+            Self::Orange => 'r',
             Self::Green  => 'b',
             Self::Yellow => 'd',
         }        
@@ -77,8 +77,30 @@ impl Color {
 
 fn convert_color_rubiks_to_chars(rubiks: [Color; 54]) -> facelets::RubiksChar{
     let mut a: facelets::RubiksChar = [' '; 54];
-    for i in 0..54{
+    // Remap the way they are in the gui to the old order required for the algo.
+    // Upper
+    for i in 0..9{
         a[i] = rubiks[i].get_char();
+    }
+    // Left
+    for i in 9..18{
+        a[i + 3 * 9] = rubiks[i].get_char();
+    }
+    // Front
+    for i in 18..27{
+        a[i] = rubiks[i].get_char();
+    }
+    // Right
+    for i in 27..36{
+        a[i - 9 * 2] = rubiks[i].get_char();
+    }
+    // Back
+    for i in 36..45{
+        a[i + 9] = rubiks[i].get_char();
+    }
+    // Down
+    for i in 45..54{
+        a[i - 9 * 2] = rubiks[i].get_char();
     }
     return a;
 }
@@ -86,9 +108,33 @@ fn convert_color_rubiks_to_chars(rubiks: [Color; 54]) -> facelets::RubiksChar{
 #[allow(dead_code)]
 fn convert_color_rubiks_to_facelets(rubiks: [Color; 54]) -> facelets::Face{
     let mut a: facelets::Face = [facelets::Facelets::U; 54];
-    for i in 0..54{
+    // Remap the way they are in the gui to the old order required for the algo.
+    // Upper
+    for i in 0..9{
+        // 0 - 8
         a[i] = rubiks[i].get_facelet();
     }
+    // Left
+    for i in 9..18{
+        a[i + 3 * 9] = rubiks[i].get_facelet();
+    }
+    // Front
+    for i in 18..27{
+        a[i] = rubiks[i].get_facelet();
+    }
+    // Right
+    for i in 27..36{
+        a[i - 9 * 2] = rubiks[i].get_facelet();
+    }
+    // Back
+    for i in 36..45{
+        a[i + 9] = rubiks[i].get_facelet();
+    }
+    // Down
+    for i in 45..54{
+        a[i - 9 * 2] = rubiks[i].get_facelet();
+    }
+
     return a;
 }
 

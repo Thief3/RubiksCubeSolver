@@ -189,7 +189,6 @@ impl Cube {
     ///
     /// The permutation and location of the UD-Slice edges.
     pub fn calculate_ud_sorted_slice(&mut self) {
-        /*
         let mut x: i32 = 0;
         let mut a = 0;
         let mut edge4: [edge_cubies::Edge; 4] = [
@@ -233,7 +232,6 @@ impl Cube {
         }
 
         self.ud_sorted_slice = 24 * a + b as i32
-         */
     }
     //uuuuuuuuubffbrfdbdlbrlfllfbflrdddfflflbblddrdrrlrbrbdr
     /// Calculates the phase two edge permutation.
