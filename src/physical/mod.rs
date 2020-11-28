@@ -198,6 +198,7 @@ impl Cube {
             edge_cubies::Edge::UB,
         ];
 
+        // range 
         for j in (0..12).rev() {
             if self.edges[j as usize].coordinate == edge_cubies::Edge::FR
                 || self.edges[j as usize].coordinate == edge_cubies::Edge::FL
@@ -211,26 +212,23 @@ impl Cube {
         }
 
         let mut b = 0;
-
-        for j in (0..4).rev() {
-            //println!("{} out of {:?}", j, (0..4).rev());
+        print!("edge4: {:?}\n {}:{}:{}:{}\n", edge4, edge4[0] as usize, edge4[1] as usize, edge4[2] as usize, edge4[3] as usize);
+        for j in (0..3).rev(){
             let mut k = 0;
-            while edge4[j] as i32 != j as i32 + 8 {
-                //+8
-                //println!("k: {:1}, j: {:2}, edge4: {:?}", k, (j + 8) as i32, edge4[j] as i32);
+            while edge4[j] as usize != j + 8 {
+                //print!("edge4: {}, j: {}, j + 8: {} \n", edge4[j] as usize, j, j + 8);
+                //rotate_left(edge4, 0, j);
                 let temp = edge4[0];
                 for i in 0..j {
-                    edge4[i as usize] = edge4[i as usize + 1];
-                    //println!("edge4: {:?}", edge4[i as usize] as i32);
+                    edge4[i] = edge4[i + 1];
                 }
-                edge4[j as usize] = temp;
-
+                edge4[j] = temp;
+                //
                 k = k + 1;
             }
-            //println!("Finished {}", j);
             b = (j + 1) * b + k;
         }
-
+        
         self.ud_sorted_slice = 24 * a + b as i32
     }
     //uuuuuuuuubffbrfdbdlbrlfllfbflrdddfflflbblddrdrrlrbrbdr
@@ -304,9 +302,10 @@ impl Cube {
         self.calculate_corner_parity();
         self.calculate_edge_parity();
         self.calculate_ud_slice();
-        self.calculate_ud_sorted_slice();
+        // This shouldn't run before phase two anyway?;
+        //self.calculate_ud_sorted_slice();
         //println!("Ud sorted done.");
-        self.calculate_phase_two_edge_permutation();
+        //self.calculate_phase_two_edge_permutation();
         //println!("Phase two edge perm done.");
     }
 

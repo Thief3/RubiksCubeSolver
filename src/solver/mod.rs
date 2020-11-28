@@ -48,18 +48,25 @@ pub enum Moves {
 /// # Returns
 /// * `&'static str` - Returns move list.
 pub fn complete_search(rubiks: &mut physical::Cube) -> String{
-    let a = Vec::new();
+    //let a = Vec::new();
     //let b = Vec::new();
     let mut c = rubiks.clone();
     //println!("We got to the cloning.");///RM
     println!("Phase one starting");
-    let g1_state_move_list = search(
+    // Mutable for error
+    let mut g1_state_move_list: Vec<Moves> = Vec::new();
+    let b: bool;
+    for depth in 0..25{
+        let (g1_state_move_list, c, b) = phase_one_search(Vec::new(), c, depth);
+        if b {break;}
+    }
+    /*let g1_state_move_list = search(
         &mut c,
         a,
         MAX_PHASE_ONE_DEPTH,
         phase_one_subgoal,
         &PHASE_ONE_MOVE_LIST,
-    );
+    );*/
     return format!("Phase1 move list: {:?}", &g1_state_move_list[..]);
     
     //println!("We State Move list complete.");///RM
@@ -75,7 +82,56 @@ pub fn complete_search(rubiks: &mut physical::Cube) -> String{
     return format!(
         "Move list: {:?}",
         [&g1_state_move_list[..], &pristine_state_move_list[..]].concat()
-    );*/
+);*/
+    //return "Fine".to_string();
+}
+
+pub fn phase_one_search(moves: Vec<Moves>, rubiks: physical::Cube, depth: usize) -> (Vec<Moves>, physical::Cube, bool){
+    if depth == 0 {
+        if phase_one_subgoal(rubiks){
+            if moves.len()  == 0 {
+                return (moves, rubiks, true);
+            }
+            else{
+                let mut last_move = moves[moves.len() - 1];
+                if last_move == Moves::R1
+                    || last_move == Moves::R3
+                    || last_move == Moves::L1
+                    || last_move == Moves::L3
+                    || last_move == Moves::F1
+                    || last_move == Moves::F3
+                    || last_move == Moves::B1
+                    || last_move == Moves::B3{
+
+                        print!("Phase one solution found: {:?}", moves);
+                        return (moves, rubiks, true);
+                }
+            }
+        }
+    }
+    else if depth > 0 {
+        if phase_one_prune(rubiks) <= depth {
+            for i in PHASE_ONE_MOVE_LIST.iter() {
+                let mut move_list = moves.clone();
+                if move_list.len() >= 1
+                    && (cannot_follow(move_list[move_list.len() - 1]) == *i
+                        || opposite_move(move_list[move_list.len() - 1]) == *i) {
+                        continue;
+                    }
+                move_list.push(*i);
+                let (m, c, b) = phase_one_search(move_list, do_move(rubiks, *i), depth - 1);
+                if b {
+                    return (m, c, b);
+                }
+            }
+        }
+    }
+
+    return (moves, rubiks, false);
+}
+
+fn phase_one_prune(rubiks: physical::Cube) -> usize {
+    return 0;
 }
 
 /// Checks if the conditions for a G1 state cube have been achieved.
@@ -85,7 +141,9 @@ pub fn complete_search(rubiks: &mut physical::Cube) -> String{
 /// # Returns
 /// * `bool` - True or false depending if the cube is in a G1 state.
 fn phase_one_subgoal(rubiks: physical::Cube) -> bool {
-    (rubiks.corner_orientation == 0) && (rubiks.edge_orientation == 0) && (rubiks.ud_slice == 0)
+    (rubiks.corner_orientation == 0)
+        && (rubiks.edge_orientation == 0)
+        && (rubiks.ud_slice == 0)
 }
 
 /// Checks if the conditions for a pristine state cube have been achieved.

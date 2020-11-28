@@ -156,25 +156,25 @@ impl IFace for Face {
         let my_cube = self.turn_into_cube();
         //println!("Can be solved? {:?}", my_cube);
         if !self.check_all_colours_present() {
-            return_code = 1
+            return_code = 1;
         }
         else if !self.check_edges_colours() {
-            return_code = 2
+            return_code = 2;
         }
         else if !self.check_corners_colours() {
-            return_code = 3
+            return_code = 3;
         }
         else if my_cube.edge_parity != my_cube.corner_parity {
-            return_code = 4
+            return_code = 4;
         }
         else if !self.check_edge_flip(my_cube) {
-            return_code = 5
+            return_code = 5;
         }
         else if !self.check_corner_twist(my_cube) {
-            return_code = 6
+            return_code = 6;
         }
         else {
-            return_code = 0
+            return_code = 0;
         }
 
         return_code
@@ -256,30 +256,26 @@ impl IFace for Face {
     /// * `bool` - True if all the right colours are indeed there.
     fn check_edges_colours(&self) -> bool {
         let mut master_count = 0;
-        let return_bool;
-        for i in 0..8 {
-            let mut current_colours: Vec<Facelets> = Vec::new();
-            for j in 0..2 {
-                current_colours.push(self.get_facelets(EDGE_INDEXES[i][j] as usize));
-            }
-            for k in 0..12 {
-                let mut count = 0;
-                for l in current_colours.iter() {
-                    if edge_colours(EDGE_LIST[k]).contains(l) {
-                        count = count + 1;
-                    }
-                }
-                if count == 2 {
-                    master_count = master_count + 1;
-                }
-            }
+        let return_bool: bool;
+        let mut cur_edges: [[Facelets; 2]; 12] = [[Facelets::U, Facelets::U]; 12];
+
+        for edge in 0..EDGE_INDEXES.len() {
+            cur_edges[edge] = [self.get_facelets(EDGE_INDEXES[edge][0] as usize), self.get_facelets(EDGE_INDEXES[edge][1] as usize)];
         }
-        if master_count == 8 {
-            return_bool = true
-        } else {
-            return_bool = false
+        
+        print!("Edges: {:?}\n", cur_edges);
+
+        for i in 0..EDGE_INDEXES.len(){
+            if !cur_edges.iter()
+                .any(|v|
+                     (v[0] == edge_colours(EDGE_LIST[i])[0] && v[1] == edge_colours(EDGE_LIST[i])[1]) ||
+                     (v[0] == edge_colours(EDGE_LIST[i])[1] && v[1] == edge_colours(EDGE_LIST[i])[0])){
+                    print!("Missing {:?}\n", EDGE_LIST[i]);
+                    return false;
+                }
         }
-        return_bool
+        
+        true
     }
 
     /// Checks the edge flip of `c`.
@@ -353,6 +349,7 @@ impl IFace for Face {
 
         // Basically this entire algorithm was recreated from
         // https://github.com/hkociemba/RubiksCube-TwophaseSolver/blob/master/face.py
+        print!("Start Cubing.");
         for (i, _dud) in corners.iter().enumerate() {
             let fac = CORNER_INDEXES[i];
             let col1: Facelets;
@@ -368,7 +365,6 @@ impl IFace for Face {
             }
             col1 = self.get_facelets(fac[(o + 1) % 3]);
             col2 = self.get_facelets(fac[(o + 2) % 3]);
-
             for c in corners.iter() {
                 let col = corner_colours(*c);
                 if col1 == col[1] && col2 == col[2] {
@@ -377,30 +373,32 @@ impl IFace for Face {
                     break;
                 }
             }
+        }
+        
+        for (i, _dud) in edges.iter().enumerate() {
+            for e in edges.iter() {
+                if self.get_facelets(EDGE_INDEXES[i][0]) == edge_colours(*e)[0]
+                    && self.get_facelets(EDGE_INDEXES[i][1]) == edge_colours(*e)[1]
+                {
+                    new_cube.edges[i] = EdgeCubie::new(*e);
+                    new_cube.edges[i].orientation = 0;
+                }
 
-            for (i, _dud) in edges.iter().enumerate() {
-                for e in edges.iter() {
-                    if self.get_facelets(EDGE_INDEXES[i][0]) == edge_colours(*e)[0]
-                        && self.get_facelets(EDGE_INDEXES[i][1]) == edge_colours(*e)[1]
-                    {
-                        new_cube.edges[i] = EdgeCubie::new(*e);
-                        new_cube.edges[i].orientation = 0;
-                    } else if self.get_facelets(EDGE_INDEXES[i][0]) == edge_colours(*e)[1]
-                        && self.get_facelets(EDGE_INDEXES[i][1]) == edge_colours(*e)[0]
-                    {
-                        new_cube.edges[i] = EdgeCubie::new(*e);
-                        new_cube.edges[i].orientation = 1;
-                    }
+                if self.get_facelets(EDGE_INDEXES[i][0]) == edge_colours(*e)[1]
+                    && self.get_facelets(EDGE_INDEXES[i][1]) == edge_colours(*e)[0]
+                {
+                    new_cube.edges[i] = EdgeCubie::new(*e);
+                    new_cube.edges[i].orientation = 1;
                 }
             }
         }
-
         // This is the problem
         new_cube.coordinate_adjustments();
         //println!("New cube coordinates adjusted.");
+        
         new_cube
     }
-
+    
     fn return_code_matcher(&self) -> (&'static str, bool) {
         let return_code = self.check_if_can_be_solved();
         println!("Return code is: {}", return_code);
