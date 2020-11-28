@@ -52,7 +52,7 @@ pub fn complete_search(rubiks: &mut physical::Cube) -> String{
     //let b = Vec::new();
     let mut c = rubiks.clone();
     //println!("We got to the cloning.");///RM
-    /*
+    
     let g1_state_move_list = search(
         &mut c,
         a,
@@ -61,8 +61,7 @@ pub fn complete_search(rubiks: &mut physical::Cube) -> String{
         &PHASE_ONE_MOVE_LIST,
     );
     return format!("Phase1 move list: {:?}", &g1_state_move_list[..]);
-     */
-    return "Search function".to_string();
+    
     //println!("We State Move list complete.");///RM
     /*
     let pristine_state_move_list = search(

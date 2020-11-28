@@ -157,17 +157,23 @@ impl IFace for Face {
         //println!("Can be solved? {:?}", my_cube);
         if !self.check_all_colours_present() {
             return_code = 1
-        } else if !self.check_edges_colours() {
+        }
+        else if !self.check_edges_colours() {
             return_code = 2
-        } else if !self.check_corners_colours() {
+        }
+        else if !self.check_corners_colours() {
             return_code = 3
-        } else if my_cube.edge_parity != my_cube.corner_parity {
+        }
+        else if my_cube.edge_parity != my_cube.corner_parity {
             return_code = 4
-        } else if !self.check_edge_flip(my_cube) {
+        }
+        else if !self.check_edge_flip(my_cube) {
             return_code = 5
-        } else if !self.check_corner_twist(my_cube) {
+        }
+        else if !self.check_corner_twist(my_cube) {
             return_code = 6
-        } else {
+        }
+        else {
             return_code = 0
         }
 
@@ -413,6 +419,7 @@ impl IFace for Face {
             }
         }
 
+        // This is the problem
         new_cube.coordinate_adjustments();
         //println!("New cube coordinates adjusted.");
         new_cube
@@ -436,23 +443,15 @@ impl IFace for Face {
     }
 }
 
+
+
 /// ****************************************************************************
 /// * Definitions
 /// ****************************************************************************
 /// A list of all the edges and their index in face. Already in order.
 const EDGE_INDEXES: [[usize; 2]; 12] = [
-    [5, 10],
-    [7, 19],
-    [3, 37],
-    [1, 46],
-    [32, 16],
-    [28, 25],
-    [30, 43],
-    [34, 52],
-    [23, 12],
-    [21, 41],
-    [50, 39],
-    [48, 14],
+        [ U6, R2 ], [ U8, F2 ], [ U4, L2 ], [ U2, B2 ], [ D6, R8 ], [ D2, F8 ],
+        [ D4, L8 ], [ D8, B8 ], [ F6, R4 ], [ F4, L6 ], [ B6, L4 ], [ B4, R6 ],
 ];
 /// A pattern matching method that takes an `Edges` and returns the two
 /// `Facelets` that belong to that edge.
@@ -480,14 +479,8 @@ pub fn edge_colours(e: Edge) -> [Facelets; 2] {
 
 /// A list of all the corners and their indexes in `Face`. Already in order.
 const CORNER_INDEXES: [[usize; 3]; 8] = [
-    [8, 9, 20],
-    [6, 18, 38],
-    [0, 36, 47],
-    [2, 45, 11],
-    [29, 26, 15],
-    [27, 44, 24],
-    [33, 53, 42],
-    [35, 17, 51],
+    [ U9, R1, F3 ], [ U7, F1, L3 ], [ U1, L1, B3 ], [ U3, B1, R3 ],
+    [ D3, F9, R7 ], [ D1, L9, F7 ], [ D7, B9, L7 ], [ D9, R9, B7 ],
 ];
 
 /// A pattern matching method that takes a `Corners` and returns the three
@@ -509,3 +502,58 @@ pub fn corner_colours(c: Corner) -> [Facelets; 3] {
         Corner::DRB => [Facelets::D, Facelets::R, Facelets::B],
     }
 }
+
+const U1: usize = 0;
+const U2: usize = 1;
+const U3: usize = 2;
+const U4: usize = 3;
+const U5: usize = 4;
+const U6: usize = 5;
+const U7: usize = 6;
+const U8: usize = 7;
+const U9: usize = 8;
+const R1: usize = 9;
+const R2: usize = 10;
+const R3: usize = 11;
+const R4: usize = 12;
+const R5: usize = 13;
+const R6: usize = 14;
+const R7: usize = 15;
+const R8: usize = 16;
+const R9: usize = 17;
+const F1: usize = 18;
+const F2: usize = 19;
+const F3: usize = 20;
+const F4: usize = 21;
+const F5: usize = 22;
+const F6: usize = 23;
+const F7: usize = 24;
+const F8: usize = 25;
+const F9: usize = 26;
+const D1: usize = 27;
+const D2: usize = 28;
+const D3: usize = 29;
+const D4: usize = 30;
+const D5: usize = 31;
+const D6: usize = 32;
+const D7: usize = 33;
+const D8: usize = 34;
+const D9: usize = 35;
+const L1: usize = 36;
+const L2: usize = 37;
+const L3: usize = 38;
+const L4: usize = 39;
+const L5: usize = 40;
+const L6: usize = 41;
+const L7: usize = 42;
+const L8: usize = 43;
+const L9: usize = 44;
+const B1: usize = 45;
+const B2: usize = 46;
+const B3: usize = 47;
+const B4: usize = 48;
+const B5: usize = 49;
+const B6: usize = 50;
+const B7: usize = 51;
+const B8: usize = 52;
+const B9: usize = 53;
