@@ -250,13 +250,12 @@ pub fn rubiks_cube_flat(ui: &Ui, state: &mut State) {
         if ui.button(im_str!("Solve!"), [90.0, 30.0]) {
             let r = convert_color_rubiks_to_chars(state.rubiks).iter().cloned().collect::<String>();
             let face = facelets::Face::new(&r);
-            face.f();
             print!("{:?}", face);
             let (a, b) = face.return_code_matcher();
             state.notify_text = a;
             if b {
-                //let mut cube = face.turn_into_cube();
-                //let moves = solver::complete_search(&mut cube);
+                let mut cube = face.turn_into_cube();
+                let moves = solver::complete_search(&mut cube);
                 //state.notify_text = &moves;
                 print!("{}", moves);
             }

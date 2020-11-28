@@ -56,33 +56,19 @@ pub fn complete_search(rubiks: &mut physical::Cube) -> String{
     // Mutable for error
     let mut g1_state_move_list: Vec<Moves> = Vec::new();
     let b: bool;
-    for depth in 0..25{
+    let mut max_depth = 25;
+
+    while depth < max_depth {
         let (g1_state_move_list, c, b) = phase_one_search(Vec::new(), c, depth);
         if b {break;}
+        depth = depth + 1;
     }
-    /*let g1_state_move_list = search(
-        &mut c,
-        a,
-        MAX_PHASE_ONE_DEPTH,
-        phase_one_subgoal,
-        &PHASE_ONE_MOVE_LIST,
-    );*/
-    return format!("Phase1 move list: {:?}", &g1_state_move_list[..]);
-    
-    //println!("We State Move list complete.");///RM
-    /*
-    let pristine_state_move_list = search(
-        &mut c,
-        b,
-        MAX_PHASE_TWO_DEPTH,
-        phase_two_subgoal,
-        &PHASE_TWO_MOVE_LIST,
-    );
 
+    //return format!("Phase1 move list: {:?}", &g1_state_move_list[..]);
+    
     return format!(
         "Move list: {:?}",
-        [&g1_state_move_list[..], &pristine_state_move_list[..]].concat()
-);*/
+        [&g1_state_move_list[..], &pristine_state_move_list[..]].concat());
     //return "Fine".to_string();
 }
 
@@ -102,8 +88,6 @@ pub fn phase_one_search(moves: Vec<Moves>, rubiks: physical::Cube, depth: usize)
                     || last_move == Moves::F3
                     || last_move == Moves::B1
                     || last_move == Moves::B3{
-
-                        print!("Phase one solution found: {:?}", moves);
                         return (moves, rubiks, true);
                 }
             }
@@ -132,6 +116,47 @@ pub fn phase_one_search(moves: Vec<Moves>, rubiks: physical::Cube, depth: usize)
 
 fn phase_one_prune(rubiks: physical::Cube) -> usize {
     return 0;
+}
+
+fn phase_two_start(moves: Vec<Moves>, rubiks: physical::Cube, max_depth: usize) -> (Vec<Moves>, physical::cube, bool){
+    for depth from 0..max_depth{
+        let (m, r, b) = phase_two_search(moves, rubiks, depth);
+        if b { return (m, r, b); }
+    }
+
+    (moves, rubiks, false);
+}
+
+fn phase_two_search(moves: Vec<Moves>, rubiks: physical::Cube, depth: usize) -> (Vec<Moves>, physical::cube, bool){
+    if depth == 0 {
+        if phase_two_subgoal(rubiks) {
+            // Solved!!
+            // Update Max depth later.
+            return (moves, rubiks, true)
+        }
+    }
+    else if depth > 0 {
+        if phase_two_prune(rubiks) <= depth {
+            for i in PHASE_TWO_MOVE_LIST.iter() {
+                let mut move_list = moves.clone();
+                if move_list.len() >= 1
+                    && (cannot_follow(move_list[move_list.len() - 1]) == *i
+                        || opposite_move(move_list[move_list.len() - 1]) == *i) {
+                        continue;
+                    }
+                move_list.push(*i);
+                let (m, c, b) = phase_two_search(move_list, do_move(rubiks, *i), depth - 1);
+                if b {
+                    return (m, c, b);
+                }
+            }
+
+        }
+    }
+}
+
+fn phase_two_prune(rubiks: physical::Cube){
+    0
 }
 
 /// Checks if the conditions for a G1 state cube have been achieved.

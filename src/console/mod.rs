@@ -15,7 +15,7 @@ use facelets::IFace;
 use crate::solver;
 
 #[allow(dead_code)]
-fn create_terminal(){
+pub fn create_terminal(){
     // Command line
     //let not_exit = true; // Used to be mut
     loop {
