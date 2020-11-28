@@ -49,9 +49,10 @@ pub enum Moves {
 /// * `&'static str` - Returns move list.
 pub fn complete_search(rubiks: &mut physical::Cube) -> String{
     let a = Vec::new();
-    let b = Vec::new();
+    //let b = Vec::new();
     let mut c = rubiks.clone();
     //println!("We got to the cloning.");///RM
+    /*
     let g1_state_move_list = search(
         &mut c,
         a,
@@ -59,7 +60,11 @@ pub fn complete_search(rubiks: &mut physical::Cube) -> String{
         phase_one_subgoal,
         &PHASE_ONE_MOVE_LIST,
     );
+    return format!("Phase1 move list: {:?}", &g1_state_move_list[..]);
+     */
+    return "Search function".to_string();
     //println!("We State Move list complete.");///RM
+    /*
     let pristine_state_move_list = search(
         &mut c,
         b,
@@ -67,10 +72,11 @@ pub fn complete_search(rubiks: &mut physical::Cube) -> String{
         phase_two_subgoal,
         &PHASE_TWO_MOVE_LIST,
     );
+
     return format!(
         "Move list: {:?}",
         [&g1_state_move_list[..], &pristine_state_move_list[..]].concat()
-    );
+    );*/
 }
 
 /// Checks if the conditions for a G1 state cube have been achieved.

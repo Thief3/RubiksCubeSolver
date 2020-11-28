@@ -11,6 +11,7 @@
 //! Console based user interface.
 
 use crate::facelets;
+use facelets::IFace;
 use crate::solver;
 
 #[allow(dead_code)]
@@ -28,7 +29,7 @@ fn create_terminal(){
                     break;
                 } else if cube.to_ascii_uppercase() == "H" {
                     // Might redo this and make it a better interface in general. @@TODO@@
-                    println!("Insert your U, D, L, R, F or B (each repressenting a different colour of the cube.)The first nine values should represent the Upper face, the next the right face, then the front face, down, left and finally back. Each face should describe the top left to bottom right facelets. ")
+                    println!("Insert your U, D, L, R, F or B (each repressenting a different colour of the cube.)The first nine values should represent the Upper face, the next the right face, then the front face, left, back, and finally down. Each face should describe the top left to bottom right facelets. ")
                 } else if cube.len() > 54 {
                     println!("Your input has more facelets than in a 3x3 rubiks cube at: {}. Please insure you have 54 facelets", cube.len())
                 } else if cube.len() < 54 {

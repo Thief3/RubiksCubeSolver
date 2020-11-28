@@ -15,6 +15,7 @@
 use imgui::*;
 
 use crate::facelets;
+use facelets::IFace;
 use crate::solver;
 use crate::ui_support;
 
@@ -50,24 +51,25 @@ impl Color {
             
         }
     }
+    // @@TODO:: 
     #[allow(dead_code)]
     fn get_facelet(&self) -> facelets::Facelets{
         match self {
             Self::White  => facelets::Facelets::U,
-            Self::Red    => facelets::Facelets::F,
-            Self::Blue   => facelets::Facelets::R,
-            Self::Orange => facelets::Facelets::B,
-            Self::Green  => facelets::Facelets::L,
+            Self::Red    => facelets::Facelets::R,
+            Self::Blue   => facelets::Facelets::F,
+            Self::Orange => facelets::Facelets::L,
+            Self::Green  => facelets::Facelets::B,
             Self::Yellow => facelets::Facelets::D,
         }        
     }
     fn get_char(&self) -> char{
         match self {
             Self::White  => 'u',
-            Self::Red    => 'f',
-            Self::Blue   => 'r',
-            Self::Orange => 'b',
-            Self::Green  => 'l',
+            Self::Red    => 'r',
+            Self::Blue   => 'f',
+            Self::Orange => 'l',
+            Self::Green  => 'b',
             Self::Yellow => 'd',
         }        
     }
@@ -82,8 +84,8 @@ fn convert_color_rubiks_to_chars(rubiks: [Color; 54]) -> facelets::RubiksChar{
 }
 
 #[allow(dead_code)]
-fn convert_color_rubiks_to_facelets(rubiks: [Color; 54]) -> facelets::RubiksFacelets{
-    let mut a: facelets::RubiksFacelets = [facelets::Facelets::U; 54];
+fn convert_color_rubiks_to_facelets(rubiks: [Color; 54]) -> facelets::Face{
+    let mut a: facelets::Face = [facelets::Facelets::U; 54];
     for i in 0..54{
         a[i] = rubiks[i].get_facelet();
     }
@@ -202,6 +204,7 @@ pub fn rubiks_cube_flat(ui: &Ui, state: &mut State) {
         if ui.button(im_str!("Solve!"), [90.0, 30.0]) {
             let r = convert_color_rubiks_to_chars(state.rubiks).iter().cloned().collect::<String>();
             let face = facelets::Face::new(&r);
+            print!("{:?}", face);
             let (a, b) = face.return_code_matcher();
             state.notify_text = a;
             if b {

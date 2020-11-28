@@ -26,40 +26,35 @@ pub enum Facelets {
     B,
 }
 
-/// A struct to regulate the facelets of the cube before they are converted into
-/// cube form.
-///
-/// # Parameters
-/// * `faclets_first_half` - An array of all the faces on a cube arranged such
-///     that the first 9 values represent the upper face. The next 9 the right
-///     face, and so on in th order upper, right and front. Within each nine
-///     values, the first is the top left, the next middle top and we carry
-///     accross and down tothe bottom right.
-/// * `facelets_second_half` - As above but for the faces down, left and back
-///     The reason for the split is regarding the debug trait not working for
-///     "large" arrays.
-
-#[derive(Copy, Clone, Debug)]
-pub struct Face {
-    facelets_first_half: [Facelets; 27],
-    facelets_second_half: [Facelets; 27],
-}
 
 pub type RubiksChar = [char; 54];
 pub type RubiksFacelets = [Facelets; 54];
+pub type Face = RubiksFacelets;
 
+pub trait IFace {
+    fn new(&str) -> Face;
+    fn new_clean() -> Face;
+    fn set_facelets(&mut self, index: usize, val: Facelets);
+    fn get_facelets(&self, index: usize) -> Facelets;
+    fn check_if_can_be_solved(&self) -> usize;
+    fn check_all_colours_present(&self) -> bool;
+    fn check_corners_colours(&self) -> bool;
+    fn check_edges_colours(&self) -> bool;
+    fn check_edge_flip(&self, c: Cube) -> bool;
+    fn check_corner_twist(&self, c: Cube) -> bool;
+    fn turn_into_cube(&self) -> Cube;
+    fn return_code_matcher(&self) -> (&'static str, bool);
+}
 
-impl Face {
+impl IFace for Face {
     /// Creates a new `Face` from a string of 54 characters. Panics is
     /// string is invalid.
     ///
     /// # Returns
     /// * `Face` - Create a mixed up face with the string provided.
-    pub fn new(s: &str) -> Face {
-        let mut new_face = Face {
-            facelets_first_half: [Facelets::U; 27],
-            facelets_second_half: [Facelets::D; 27],
-        };
+    fn new(s: &str) -> Face {
+        let mut new_face: Face = [Facelets::U; 54];
+
         if s.chars().count() < 54 {
             panic!(
                 "Error creating face. Passed string is too short at {}.",
@@ -97,27 +92,20 @@ impl Face {
     ///
     /// # Returns
     /// * `Face` - A pristine cube face.
-    pub fn new_clean() -> Face {
-        let mut new_face = Face {
-            facelets_first_half: [Facelets::U; 27],
-            facelets_second_half: [Facelets::D; 27],
-        };
+    fn new_clean() -> Face {
+        let mut new_face: Face = [Facelets::U; 54];
+        
         let facelets_vals = [
             Facelets::U,
             Facelets::R,
             Facelets::F,
-            Facelets::D,
             Facelets::L,
             Facelets::B,
+            Facelets::D,
         ];
-        for i in 0..3 {
+        for i in 0..6 {
             for j in 0..9 {
-                new_face.facelets_first_half[i * 9 + j] = facelets_vals[i];
-            }
-        }
-        for i in 3..6 {
-            for j in 0..9 {
-                new_face.facelets_second_half[i * 9 + j] = facelets_vals[i];
+                new_face[i * 9 + j] = facelets_vals[i];
             }
         }
         new_face
@@ -129,27 +117,23 @@ impl Face {
     /// # Parameters
     /// * `index` - The index of which you wish to change. Between 0 and 53
     /// * `val` - The value you wish to change the specific face to.
-    pub fn set_facelets(&mut self, index: usize, val: Facelets) {
-        if index < 27 {
-            self.facelets_first_half[index] = val;
-        } else if index >= 27 && index <= 53 {
-            self.facelets_second_half[index - 27] = val;
+    fn set_facelets(&mut self, index: usize, val: Facelets) {
+        if index < 54{
+            self[index] = val;
         } else {
             panic!("set_facelets: Outside the index range for facelets. Keep index within 0 and 53. Index found: {}", index);
         }
     }
-
+    
     /// A getter method fo rthe facelet arrays in `Cube`. This allows us to
     /// manage the two halfs of the array as one.
     ///
     /// # Parameters
     /// * `index` - The index of the facelets arrays you wish to access, must
     ///    be between 0 and 53 or the function will panic.
-    pub fn get_facelets(&self, index: usize) -> Facelets {
-        if index < 27{
-            return self.facelets_first_half[index];
-        } else if index >= 27 && index <= 53 {
-            return self.facelets_second_half[index - 27];
+    fn get_facelets(&self, index: usize) -> Facelets {
+        if index < 54 {
+            return self[index]
         } else {
             panic!("get_facelets: Outside the index range for facelets. Keep index within 0 and 53. Index found: {}", index);
         }
@@ -167,7 +151,7 @@ impl Face {
     ///      4 -> Corner and Edge Parity aren't equal.
     ///      5 -> Total Edge Flip is wrong.
     ///      6 -> Total Corner Twist is wrong.
-    pub fn check_if_can_be_solved(&self) -> usize {
+    fn check_if_can_be_solved(&self) -> usize {
         let return_code;
         let my_cube = self.turn_into_cube();
         //println!("Can be solved? {:?}", my_cube);
@@ -189,7 +173,7 @@ impl Face {
 
         return_code
     }
-
+    
     /// A method that checks if all 6 colours have 9 facelets representing them.
     ///
     /// # Returns
@@ -351,12 +335,12 @@ impl Face {
         }
         return_bool
     }
-
+    
     /// A method to turn a face into a cube.
     /// A heavy amount of the code was ported from (https://github.com/hkociemba/RubiksCube-TwophaseSolver/blob/master/face.py).
     /// # Returns
     /// * `Cube` - A `Cube` with values homomorphic to this face.
-    pub fn turn_into_cube(&self) -> Cube {
+    fn turn_into_cube(&self) -> Cube {
         let mut new_cube = Cube::new();
 
         let edges = [
@@ -434,7 +418,7 @@ impl Face {
         new_cube
     }
 
-    pub fn return_code_matcher(&self) -> (&'static str, bool) {
+    fn return_code_matcher(&self) -> (&'static str, bool) {
         let return_code = self.check_if_can_be_solved();
         println!("Return code is: {}", return_code);
         match return_code {
