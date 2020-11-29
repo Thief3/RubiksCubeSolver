@@ -197,7 +197,8 @@ impl Cube {
         for j in (0..3).rev(){
             let mut k = 0;
             while edge4[j] as usize != j + 8 {
-                //print!("edge4: {}, j: {}, j + 8: {} \n", edge4[j] as usize, j, j + 8);
+                
+                print!("edge4: {}, j: {}, j + 8: {} \n", edge4[j] as usize, j, j + 8);
                 //rotate_left(edge4, 0, j);
                 let temp = edge4[0];
                 for i in 0..j {
@@ -209,7 +210,8 @@ impl Cube {
             }
             b = (j + 1) * b + k;
         }
-        
+
+        print!("ud_sorted_slice");
         (24 * a + b as i32) as usize
     }
     //uuuuuuuuubffbrfdbdlbrlfllfbflrdddfflflbblddrdrrlrbrbdr

@@ -13,6 +13,8 @@
 //! use the same implamentation of IDA*, with different depths and goals.
 
 use physical;
+use prunning;
+use std::cmp;
 
 /// All the avaliable moves you can perfom on a rubiks cube. x3 is an
 /// anti-clockwise movement.
@@ -48,6 +50,7 @@ pub enum Moves {
 /// # Returns
 /// * `&'static str` - Returns move list.
 pub fn complete_search(rubiks: &mut physical::Cube) -> Vec<Moves>{
+    let tables: prunning::Tables = prunning::Tables::load_tables();
     let mut c = rubiks.clone();
     
     let mut pristine_state_move_list: Vec<Moves> = Vec::new();
@@ -56,7 +59,7 @@ pub fn complete_search(rubiks: &mut physical::Cube) -> Vec<Moves>{
 
     let mut depth = 0;
     while depth < max_depth {
-        let (move_list, c, b) = phase_one_search(Vec::new(), c, depth);
+        let (move_list, c, b) = phase_one_search(Vec::new(), c, depth, &tables);
         if b {
             pristine_state_move_list = move_list;
             break;}
@@ -68,7 +71,7 @@ pub fn complete_search(rubiks: &mut physical::Cube) -> Vec<Moves>{
     pristine_state_move_list
 }
 
-pub fn phase_one_search(moves: Vec<Moves>, rubiks: physical::Cube, depth: usize) -> (Vec<Moves>, physical::Cube, bool){
+pub fn phase_one_search(moves: Vec<Moves>, rubiks: physical::Cube, depth: usize, tables: &prunning::Tables) -> (Vec<Moves>, physical::Cube, bool){
     if depth == 0 {
         if phase_one_subgoal(rubiks){
             if moves.len()  == 0 {
@@ -85,13 +88,13 @@ pub fn phase_one_search(moves: Vec<Moves>, rubiks: physical::Cube, depth: usize)
                     || last_move == Moves::B1
                     || last_move == Moves::B3{
                         print!("G1 moves: {:?} \n", moves);
-                        return phase_two_start(moves, rubiks, 25 - depth);
+                        return phase_two_start(moves, rubiks, 25 - depth, tables);
                 }
             }
         }
     }
     else if depth > 0 {
-        if phase_one_prune(rubiks) <= depth {
+        if phase_one_prune(rubiks, tables) <= depth {
             for i in PHASE_ONE_MOVE_LIST.iter() {
                 let mut move_list = moves.clone();
                 if move_list.len() >= 1
@@ -100,7 +103,7 @@ pub fn phase_one_search(moves: Vec<Moves>, rubiks: physical::Cube, depth: usize)
                         continue;
                     }
                 move_list.push(*i);
-                let (m, c, b) = phase_one_search(move_list, do_move(rubiks, *i), depth - 1);
+                let (m, c, b) = phase_one_search(move_list, do_move(rubiks, *i), depth - 1, tables);
                 if b {
                     return (m, c, b);
                 }
@@ -111,24 +114,28 @@ pub fn phase_one_search(moves: Vec<Moves>, rubiks: physical::Cube, depth: usize)
     return (moves, rubiks, false);
 }
 
-fn phase_one_prune(rubiks: physical::Cube) -> usize {
-    return 0;
+fn phase_one_prune(rubiks: physical::Cube, tables: &prunning::Tables) -> usize {
+    print!("Phase One Prune: {}\n", 
+    cmp::max(tables.udslice_twist_prune.get(rubiks.ud_slice(), rubiks.corner_orientation()) as usize,
+             tables.udslice_flip_prune.get(rubiks.ud_slice(), rubiks.edge_orientation()) as usize));
+    cmp::max(tables.udslice_twist_prune.get(rubiks.ud_slice(), rubiks.corner_orientation()) as usize,
+             tables.udslice_flip_prune.get(rubiks.ud_slice(), rubiks.edge_orientation()) as usize)
 }
 
-fn phase_two_start(moves: Vec<Moves>, rubiks: physical::Cube, max_depth: usize) -> (Vec<Moves>, physical::Cube, bool){
+fn phase_two_start(moves: Vec<Moves>, rubiks: physical::Cube, max_depth: usize, tables: &prunning::Tables) -> (Vec<Moves>, physical::Cube, bool){
     if phase_two_subgoal(rubiks){
         print!("Phase two not required!!, Moves: {:?}\n", moves);
         return (moves, rubiks, true);
     }
     for depth in 0..max_depth{
-        let (m, r, b) = phase_two_search(moves.clone(), rubiks, depth);
+        let (m, r, b) = phase_two_search(moves.clone(), rubiks, depth, tables);
         if b { return (m, r, b); }
     }
 
     (moves, rubiks, false)
 }
 
-fn phase_two_search(moves: Vec<Moves>, rubiks: physical::Cube, depth: usize) -> (Vec<Moves>, physical::Cube, bool){
+fn phase_two_search(moves: Vec<Moves>, rubiks: physical::Cube, depth: usize, tables: &prunning::Tables) -> (Vec<Moves>, physical::Cube, bool){
     if depth != 0{
         print!("Depth: {}\n", depth);
     }
@@ -141,7 +148,7 @@ fn phase_two_search(moves: Vec<Moves>, rubiks: physical::Cube, depth: usize) -> 
         }
     }
     else if depth > 0 {
-        if phase_two_prune(rubiks) <= depth {
+        if phase_two_prune(rubiks, tables) <= depth {
             for i in PHASE_TWO_MOVE_LIST.iter() {
                 let mut move_list = moves.clone();
                 if move_list.len() >= 1
@@ -150,7 +157,7 @@ fn phase_two_search(moves: Vec<Moves>, rubiks: physical::Cube, depth: usize) -> 
                         continue;
                     }
                 move_list.push(*i);
-                let (m, c, b) = phase_two_search(move_list, do_move(rubiks, *i), depth - 1);
+                let (m, c, b) = phase_two_search(move_list, do_move(rubiks, *i), depth - 1, tables);
                 if b {
                     return (m, c, b);
                 }
@@ -161,8 +168,9 @@ fn phase_two_search(moves: Vec<Moves>, rubiks: physical::Cube, depth: usize) -> 
     return (moves, rubiks, false)
 }
 
-fn phase_two_prune(rubiks: physical::Cube) -> usize{
-    0
+fn phase_two_prune(rubiks: physical::Cube, tables: &prunning::Tables) -> usize{
+    cmp::max(tables.edge4_corner_prune.get(rubiks.ud_sorted_slice(), rubiks.corner_permutation()) as usize,
+             tables.edge4_edge8_prune.get(rubiks.ud_sorted_slice(), rubiks.ud_slice()) as usize)
 }
 
 /// Checks if the conditions for a G1 state cube have been achieved.
@@ -186,7 +194,8 @@ fn phase_one_subgoal(rubiks: physical::Cube) -> bool {
 fn phase_two_subgoal(rubiks: physical::Cube) -> bool {
     (rubiks.corner_permutation() == 0)
         && (rubiks.phase_two_edge_permutation() == 0)
-        && (rubiks.ud_sorted_slice() == 0)
+         && (rubiks.ud_sorted_slice() == 0)
+    //true
 }
 
 /// Pattern matching function that inputs a `Cube` and returns a `Cube` that has

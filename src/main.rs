@@ -16,10 +16,18 @@ extern crate glium;
 extern crate imgui_glium_renderer;
 extern crate imgui_winit_support;
 extern crate clipboard;
+#[macro_use]
+extern crate serde;
+#[macro_use]
+extern crate serde_derive;
+#[macro_use]
+extern crate serde_json;
+
 
 mod facelets;
 mod physical;
 mod solver;
+mod prunning;
 
 mod console;
 mod gui;

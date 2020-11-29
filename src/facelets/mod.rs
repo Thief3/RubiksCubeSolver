@@ -395,13 +395,30 @@ impl IFace for Face {
         // This is the problem
         //println!("New cube coordinates adjusted.");
         println!("New cube who dis?: {:?}\n", new_cube);
-        new_cube.d();
+        new_cube.b();
+        new_cube.r();
+        new_cube.r();
+        new_cube.r();
+        new_cube.l();
+        new_cube.r();
+        new_cube.r();
+        new_cube.r();
+        new_cube.f();
+        new_cube.f();
+        new_cube.f();
+        new_cube.f();
+        new_cube.f();
+        new_cube.f();
+        new_cube.l();
+        new_cube.l();
+        new_cube.l();
         println!("Cube after R: {:?}\n", new_cube);
         println!("Cube corner orientation: {:?}\n", new_cube.corner_orientation());
         println!("Cube edge orientation: {:?}\n", new_cube.edge_orientation());
         println!("Cube corner permutation: {:?}\n", new_cube.corner_permutation());
         println!("Cube edge permutation: {:?}\n", new_cube.edge_permutation());
         println!("Cube ud_slice: {:?}\n", new_cube.ud_slice());
+        println!("Cube ud_sorted_slice: {:?}\n", new_cube.ud_sorted_slice());
         new_cube
     }
     

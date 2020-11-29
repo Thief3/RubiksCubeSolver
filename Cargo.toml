@@ -13,4 +13,7 @@ imgui = "0.6.0"
 imgui-glium-renderer = "*"
 imgui-winit-support = "*"
 clipboard = "*"
+serde = "*"
+serde_json = "*"
+serde_derive = "*"
 
