@@ -100,18 +100,45 @@ impl Cube {
     /// to represent the corner permutation of the whole cube. Further
     /// explanation at (http://kociemba.org/math/coordlevel.htm)
     pub fn corner_permutation(&self) -> usize{
-        0
+        let mut s = 0;
+        for i in 1..8 {
+            let mut diff = 0_i32;
+            for j in 0..i {
+                if self.corners[j].coordinate as i32 > self.corners[i].coordinate as i32 {
+                    diff = diff + 1;
+                }
+            }
+            s = s + diff * utility::factorial(i as i64) as i32;
+        }
+        s as usize
     }
 
     /// Calculates the edge orientation.
     ///
-    /// Should be called after every movement. Calculates a tenary value used
+    /// Should be called after every movement. Calculates a binary value used
     /// to represent the edge orientation of the whole cube.  Further
     /// explanation at (http://kociemba.org/math/coordlevel.htm)
     pub fn edge_orientation(&self) -> usize{
-        
+        let mut s = 0;
+        for edge in 0..12 {
+            s = s + self.edges[edge].orientation * 2_i32.pow(11 - edge as u32);
+        }
+        s as usize
     }
 
+    /// Calculates the edge permutation.
+    ///
+    /// Should be called after every movement. Calculates a binary value used
+    /// to represent the corner permutation of the whole cube. Further
+    /// explanation at (http://kociemba.org/math/coordlevel.htm)
+    pub fn edge_permutation(&self) -> usize{
+        let mut s = 0;
+        for i in 0..12 {
+            s = s + self.edges[i].orientation * 2_i32.pow((11 - i) as u32)
+        }
+        s as usize
+    }
+    
     /// Calculates the UD Slice.
     ///
 
