@@ -26,6 +26,70 @@ pub enum Facelets {
     B,
 }
 
+trait GetFacelets {
+   fn get_facelet(&self) -> Facelets;
+}
+
+impl GetFacelets for char {
+    fn get_facelet(&self) -> Facelets{
+        match &self {
+            'U' => Facelets::U,
+            'R' => Facelets::R,
+            'F' => Facelets::F,
+            'D' => Facelets::D,
+            'L' => Facelets::L,
+            'B' => Facelets::B,
+             _  => panic!("That's not a facelet character!!"),
+        }
+    }
+}
+
+#[derive(PartialEq, Copy, Clone, Debug)]
+pub enum Color {
+    White,
+    Red,
+    Blue,
+    Orange,
+    Green,
+    Yellow
+}
+
+impl Color {
+    pub fn get_vec(&self) -> [f32; 4] {
+        match self {
+            Self::White  => [1.0, 1.0, 1.0, 1.0],
+            Self::Red    => [1.0, 0.0, 0.0, 1.0],
+            Self::Blue   => [0.0, 0.0, 1.0, 1.0],
+            Self::Orange => [1.0, 0.64, 0.0, 1.0],
+            Self::Green  => [0.0, 1.0, 0.0, 1.0],
+            Self::Yellow => [1.0, 1.0, 0.0, 1.0],
+            
+        }
+    }
+    // @@TODO:: 
+    #[allow(dead_code)]
+    pub fn get_facelet(&self) -> Facelets{
+        match self {
+            Self::White  => Facelets::U,
+            Self::Red    => Facelets::L,
+            Self::Blue   => Facelets::F,
+            Self::Orange => Facelets::R,
+            Self::Green  => Facelets::B,
+            Self::Yellow => Facelets::D,
+        }        
+    }
+    pub fn get_char(&self) -> char{
+        match self {
+            Self::White  => 'U',
+            Self::Red    => 'L',
+            Self::Blue   => 'F',
+            Self::Orange => 'R',
+            Self::Green  => 'B',
+            Self::Yellow => 'D',
+        }        
+    }
+}
+
 /// A list of all the edges and their index in face. Already in order.
 const EDGE_INDEXES: [[usize; 2]; 12] = [
         [ U6, R2 ], [ U8, F2 ], [ U4, L2 ], [ U2, B2 ], [ D6, R8 ], [ D2, F8 ],

@@ -15,6 +15,7 @@
 use imgui::*;
 use crate::defs;
 use crate::defs::facelets::Facelets as Facelets;
+use crate::defs::facelets::Color as Color;
 use super::support as support;
 
 macro_rules! ig_dynamic_str {
@@ -38,51 +39,6 @@ pub struct State {
     // 5
     rubiks: [Color; 54],
     notify_text: &'static str,
-}
-
-#[derive(PartialEq, Copy, Clone, Debug)]
-pub enum Color {
-    White,
-    Red,
-    Blue,
-    Orange,
-    Green,
-    Yellow
-}
-impl Color {
-    fn get_vec(&self) -> [f32; 4] {
-        match self {
-            Self::White  => [1.0, 1.0, 1.0, 1.0],
-            Self::Red    => [1.0, 0.0, 0.0, 1.0],
-            Self::Blue   => [0.0, 0.0, 1.0, 1.0],
-            Self::Orange => [1.0, 0.64, 0.0, 1.0],
-            Self::Green  => [0.0, 1.0, 0.0, 1.0],
-            Self::Yellow => [1.0, 1.0, 0.0, 1.0],
-            
-        }
-    }
-    // @@TODO:: 
-    #[allow(dead_code)]
-    fn get_facelet(&self) -> Facelets{
-        match self {
-            Self::White  => Facelets::U,
-            Self::Red    => Facelets::L,
-            Self::Blue   => Facelets::F,
-            Self::Orange => Facelets::R,
-            Self::Green  => Facelets::B,
-            Self::Yellow => Facelets::D,
-        }        
-    }
-    fn get_char(&self) -> char{
-        match self {
-            Self::White  => 'u',
-            Self::Red    => 'l',
-            Self::Blue   => 'f',
-            Self::Orange => 'r',
-            Self::Green  => 'b',
-            Self::Yellow => 'd',
-        }        
-    }
 }
 
 fn convert_color_rubiks_to_chars(rubiks: [Color; 54]) -> [char; 54]{
