@@ -94,13 +94,13 @@ pub fn phase_one_search(moves: Vec<Moves>, rubiks: physical::Cube, depth: usize)
         if phase_one_prune(rubiks) <= depth {
             for i in PHASE_ONE_MOVE_LIST.iter() {
                 let mut move_list = moves.clone();
-                if move_list.len() >= 1
-                    && (cannot_follow(move_list[move_list.len() - 1]) == *i
-                        || opposite_move(move_list[move_list.len() - 1]) == *i) {
-                        continue;
-                    }
+                //if move_list.len() >= 1
+                //    && (cannot_follow(move_list[move_list.len() - 1]) == *i
+                //        || opposite_move(move_list[move_list.len() - 1]) == *i) {
+                //        continue;
+                //    }
                 move_list.push(*i);
-                let (m, c, b) = phase_one_search(move_list, do_move(rubiks, *i), depth - 1);
+                let (m, c, b) = phase_one_search(move_list, do_move(rubiks, *i, false), depth - 1);
                 if b {
                     return (m, c, b);
                 }
@@ -129,6 +129,9 @@ fn phase_two_start(moves: Vec<Moves>, rubiks: physical::Cube, max_depth: usize) 
 }
 
 fn phase_two_search(moves: Vec<Moves>, rubiks: physical::Cube, depth: usize) -> (Vec<Moves>, physical::Cube, bool){
+    if depth != 0{
+        print!("Depth: {}\n", depth);
+    }
     if depth == 0 {
         if phase_two_subgoal(rubiks) {
             // Solved!!
@@ -141,13 +144,13 @@ fn phase_two_search(moves: Vec<Moves>, rubiks: physical::Cube, depth: usize) -> 
         if phase_two_prune(rubiks) <= depth {
             for i in PHASE_TWO_MOVE_LIST.iter() {
                 let mut move_list = moves.clone();
-                if move_list.len() >= 1
-                    && (cannot_follow(move_list[move_list.len() - 1]) == *i
-                        || opposite_move(move_list[move_list.len() - 1]) == *i) {
-                        continue;
-                    }
+                //if move_list.len() >= 1
+                //    && (cannot_follow(move_list[move_list.len() - 1]) == *i
+                //        || opposite_move(move_list[move_list.len() - 1]) == *i) {
+                //        continue;
+                //    }
                 move_list.push(*i);
-                let (m, c, b) = phase_two_search(move_list, do_move(rubiks, *i), depth - 1);
+                let (m, c, b) = phase_two_search(move_list, do_move(rubiks, *i, true), depth - 1);
                 if b {
                     return (m, c, b);
                 }
@@ -183,7 +186,7 @@ fn phase_one_subgoal(rubiks: physical::Cube) -> bool {
 fn phase_two_subgoal(rubiks: physical::Cube) -> bool {
     (rubiks.corner_permutation == 0)
         && (rubiks.phase_two_edge_permutation == 0)
-        //&& (rubiks.ud_sorted_slice == 0)
+        && (rubiks.ud_sorted_slice == 0)
 }
 
 /// Pattern matching function that inputs a `Cube` and returns a `Cube` that has
@@ -194,7 +197,7 @@ fn phase_two_subgoal(rubiks: physical::Cube) -> bool {
 /// * `movement` - A `Moves` to apply to `rubiks`.
 /// # Returns
 /// * `Cube` - A `Cube` with the `movement` applied to it.
-pub fn do_move(mut rubiks: physical::Cube, movement: Moves) -> physical::Cube {
+pub fn do_move(mut rubiks: physical::Cube, movement: Moves, phase_two: bool) -> physical::Cube {
     match movement {
         Moves::F1 => rubiks.f(),
         Moves::F2 => {
@@ -257,6 +260,9 @@ pub fn do_move(mut rubiks: physical::Cube, movement: Moves) -> physical::Cube {
             rubiks.r()
         }
         Moves::NONE => {}
+    }
+    if phase_two {
+        rubiks.calculate_ud_sorted_slice();
     }
     rubiks
 }
