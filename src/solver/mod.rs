@@ -47,29 +47,23 @@ pub enum Moves {
 ///     and a reference so other functions can use it from main.
 /// # Returns
 /// * `&'static str` - Returns move list.
-pub fn complete_search(rubiks: &mut physical::Cube) -> String{
-    //let a = Vec::new();
-    //let b = Vec::new();
+pub fn complete_search(rubiks: &mut physical::Cube) -> Vec<Moves>{
     let mut c = rubiks.clone();
-    //println!("We got to the cloning.");///RM
-    println!("Phase one starting");
-    // Mutable for error
-    let mut g1_state_move_list: Vec<Moves> = Vec::new();
+    
+    let mut pristine_state_move_list: Vec<Moves> = Vec::new();
     let b: bool;
     let mut max_depth = 25;
 
+    let mut depth = 0;
     while depth < max_depth {
-        let (g1_state_move_list, c, b) = phase_one_search(Vec::new(), c, depth);
+        let (pristine_state_move_list, c, b) = phase_one_search(Vec::new(), c, depth);
         if b {break;}
         depth = depth + 1;
     }
 
-    //return format!("Phase1 move list: {:?}", &g1_state_move_list[..]);
+    print!("Search Done?! Moves: {:?} \n", pristine_state_move_list);
     
-    return format!(
-        "Move list: {:?}",
-        [&g1_state_move_list[..], &pristine_state_move_list[..]].concat());
-    //return "Fine".to_string();
+    pristine_state_move_list
 }
 
 pub fn phase_one_search(moves: Vec<Moves>, rubiks: physical::Cube, depth: usize) -> (Vec<Moves>, physical::Cube, bool){
@@ -88,7 +82,8 @@ pub fn phase_one_search(moves: Vec<Moves>, rubiks: physical::Cube, depth: usize)
                     || last_move == Moves::F3
                     || last_move == Moves::B1
                     || last_move == Moves::B3{
-                        return (moves, rubiks, true);
+                        print!("G1 moves: {:?} \n", moves);
+                        return phase_two_search(moves, rubiks, 25 - depth);
                 }
             }
         }
@@ -118,20 +113,22 @@ fn phase_one_prune(rubiks: physical::Cube) -> usize {
     return 0;
 }
 
-fn phase_two_start(moves: Vec<Moves>, rubiks: physical::Cube, max_depth: usize) -> (Vec<Moves>, physical::cube, bool){
-    for depth from 0..max_depth{
-        let (m, r, b) = phase_two_search(moves, rubiks, depth);
+fn phase_two_start(moves: Vec<Moves>, rubiks: physical::Cube, max_depth: usize) -> (Vec<Moves>, physical::Cube, bool){
+    for depth in 0..max_depth{
+        let (m, r, b) = phase_two_search(moves.clone(), rubiks, depth);
         if b { return (m, r, b); }
     }
 
-    (moves, rubiks, false);
+    (moves, rubiks, false)
 }
 
-fn phase_two_search(moves: Vec<Moves>, rubiks: physical::Cube, depth: usize) -> (Vec<Moves>, physical::cube, bool){
+fn phase_two_search(moves: Vec<Moves>, rubiks: physical::Cube, depth: usize) -> (Vec<Moves>, physical::Cube, bool){
     if depth == 0 {
+        print!("Depth: {}\n", depth);
         if phase_two_subgoal(rubiks) {
             // Solved!!
             // Update Max depth later.
+            print!("Phase Two Moves: {:?}", moves);
             return (moves, rubiks, true)
         }
     }
@@ -150,12 +147,13 @@ fn phase_two_search(moves: Vec<Moves>, rubiks: physical::Cube, depth: usize) -> 
                     return (m, c, b);
                 }
             }
-
         }
     }
+
+    return (moves, rubiks, false)
 }
 
-fn phase_two_prune(rubiks: physical::Cube){
+fn phase_two_prune(rubiks: physical::Cube) -> usize{
     0
 }
 

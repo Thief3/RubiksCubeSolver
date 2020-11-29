@@ -41,7 +41,7 @@ pub fn create_terminal(){
                     print!("{}", msg);
                     if success {
                         let mut c_cube = face.turn_into_cube();
-                        print!("{}", solver::complete_search(&mut c_cube))
+                        print!("{:?}", solver::complete_search(&mut c_cube))
                     }
                 }
             }

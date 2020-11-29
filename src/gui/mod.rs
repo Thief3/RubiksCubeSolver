@@ -256,8 +256,11 @@ pub fn rubiks_cube_flat(ui: &Ui, state: &mut State) {
             if b {
                 let mut cube = face.turn_into_cube();
                 let moves = solver::complete_search(&mut cube);
-                //state.notify_text = &moves;
-                print!("{}", moves);
+                let s = format!("Moves: {:?}", moves);
+                
+                // Memory Leak!!! Shouldn't be a problem, but it could be.
+                state.notify_text = Box::leak(s.into_boxed_str());
+                //print!("{}", moves);
             }
         }
     });
