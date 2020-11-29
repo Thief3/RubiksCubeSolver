@@ -13,11 +13,21 @@
 
 
 use imgui::*;
+use crate::defs;
+use crate::defs::facelets::Facelets as Facelets;
+use super::support as support;
 
-use crate::facelets;
-use facelets::IFace;
-use crate::solver;
-use crate::ui_support;
+macro_rules! ig_dynamic_str {
+    ($x:expr) => {
+        unsafe { ImStr::from_utf8_with_nul_unchecked(format!("{}\0", $x).as_bytes()) }
+    }
+}
+
+macro_rules! ig_make_label {
+    ( $x:expr, $y:expr ) => {
+        ig_dynamic_str!(format!("{}::{}", $x, $y))
+    }
+}
 
 pub struct State {
     colors: [Color; 6],
@@ -53,14 +63,14 @@ impl Color {
     }
     // @@TODO:: 
     #[allow(dead_code)]
-    fn get_facelet(&self) -> facelets::Facelets{
+    fn get_facelet(&self) -> Facelets{
         match self {
-            Self::White  => facelets::Facelets::U,
-            Self::Red    => facelets::Facelets::L,
-            Self::Blue   => facelets::Facelets::F,
-            Self::Orange => facelets::Facelets::R,
-            Self::Green  => facelets::Facelets::B,
-            Self::Yellow => facelets::Facelets::D,
+            Self::White  => Facelets::U,
+            Self::Red    => Facelets::L,
+            Self::Blue   => Facelets::F,
+            Self::Orange => Facelets::R,
+            Self::Green  => Facelets::B,
+            Self::Yellow => Facelets::D,
         }        
     }
     fn get_char(&self) -> char{
@@ -75,8 +85,8 @@ impl Color {
     }
 }
 
-fn convert_color_rubiks_to_chars(rubiks: [Color; 54]) -> facelets::RubiksChar{
-    let mut a: facelets::RubiksChar = [' '; 54];
+fn convert_color_rubiks_to_chars(rubiks: [Color; 54]) -> [char; 54]{
+    let mut a: [char; 54] = [' '; 54];
     // Remap the way they are in the gui to the old order required for the algo.
     // Upper
     for i in 0..9{
@@ -105,6 +115,7 @@ fn convert_color_rubiks_to_chars(rubiks: [Color; 54]) -> facelets::RubiksChar{
     return a;
 }
 
+/*
 #[allow(dead_code)]
 fn convert_color_rubiks_to_facelets(rubiks: [Color; 54]) -> facelets::Face{
     let mut a: facelets::Face = [facelets::Facelets::U; 54];
@@ -136,7 +147,7 @@ fn convert_color_rubiks_to_facelets(rubiks: [Color; 54]) -> facelets::Face{
     }
 
     return a;
-}
+}*/
 
 pub fn create_window(){
     let mut state = State{
@@ -159,22 +170,10 @@ pub fn create_window(){
         }
     }
     
-    let system = ui_support::init(file!());
+    let system = support::init(file!());
     system.main_loop(move |_run, ui| {
         rubiks_cube_flat(ui, &mut state);
     });
-}
-
-macro_rules! ig_dynamic_str {
-    ($x:expr) => {
-        unsafe { ImStr::from_utf8_with_nul_unchecked(format!("{}\0", $x).as_bytes()) }
-    }
-}
-
-macro_rules! ig_make_label {
-    ( $x:expr, $y:expr ) => {
-        ig_dynamic_str!(format!("{}::{}", $x, $y))
-    }
 }
 
 fn row_buttons(ui: &Ui, width: i32, row: i32, state: &mut State){
@@ -248,20 +247,20 @@ pub fn rubiks_cube_flat(ui: &Ui, state: &mut State) {
         ui.new_line();
 
         if ui.button(im_str!("Solve!"), [90.0, 30.0]) {
-            let r = convert_color_rubiks_to_chars(state.rubiks).iter().cloned().collect::<String>();
-            let face = facelets::Face::new(&r);
-            print!("{:?}", face);
-            let (a, b) = face.return_code_matcher();
-            state.notify_text = a;
-            if b {
-                let mut cube = face.turn_into_cube();
-                let moves = solver::complete_search(&mut cube);
-                let s = format!("Moves: {:?}", moves);
+            //let r = convert_color_rubiks_to_chars(state.rubiks).iter().cloned().collect::<String>();
+            //let face = facelets::Face::new(&r);
+            //print!("{:?}", face);
+            //let (a, b) = face.return_code_matcher();
+            //state.notify_text = a;
+            //if b {
+               // let mut cube = face.turn_into_cube();
+                //let moves = solver::complete_search(&mut cube);
+                //let s = format!("Moves: {:?}", moves);
                 
                 // Memory Leak!!! Shouldn't be a problem, but it could be.
-                state.notify_text = Box::leak(s.into_boxed_str());
+                //state.notify_text = Box::leak(s.into_boxed_str());
                 //print!("{}", moves);
-            }
+            //}
         }
     });
 }

@@ -59,83 +59,6 @@ impl CornerCubie {
 
         a
     }
-
-    /// A generic movement function.
-    ///
-    /// # Parameters
-    /// * `corners` - A reference of what each corner should become with this
-    ///     movement.
-    /// * `orientation_change` - An array of 8 `i32` types, each relating to
-    ///     the additional orientation change.
-    fn movement(&mut self, corners: &[Corner; 8], orientation_change: &[i32; 8]) {
-        self.old_coordinate = self.coordinate;
-        match self.coordinate {
-            Corner::URF => {
-                self.coordinate = corners[0];
-                self.orientation = (self.orientation + orientation_change[0]) % 3;
-            }
-            Corner::UFL => {
-                self.coordinate = corners[1];
-                self.orientation = (self.orientation + orientation_change[1]) % 3;
-            }
-            Corner::ULB => {
-                self.coordinate = corners[2];
-                self.orientation = (self.orientation + orientation_change[2]) % 3;
-            }
-            Corner::UBR => {
-                self.coordinate = corners[3];
-                self.orientation = (self.orientation + orientation_change[3]) % 3;
-            }
-            Corner::DFR => {
-                self.coordinate = corners[4];
-                self.orientation = (self.orientation + orientation_change[4]) % 3;
-            }
-            Corner::DLF => {
-                self.coordinate = corners[5];
-                self.orientation = (self.orientation + orientation_change[5]) % 3;
-            }
-            Corner::DBL => {
-                self.coordinate = corners[6];
-                self.orientation = (self.orientation + orientation_change[6]) % 3;
-            }
-            Corner::DRB => {
-                self.coordinate = corners[7];
-                self.orientation = (self.orientation + orientation_change[7]) % 3;
-            }
-        };
-    }
-
-    /// Typical rubiks cube movements.
-
-    /// A forward clockwise movement.
-    pub fn f(&mut self) {
-        self.movement(&F_CORNER_TRANSFORM, &F_CORNER_ORIENTATION_TRANSFORM)
-    }
-
-    /// A back clockwise movement.
-    pub fn b(&mut self) {
-        self.movement(&B_CORNER_TRANSFORM, &B_CORNER_ORIENTATION_TRANSFORM)
-    }
-
-    /// A right clockwise movement.
-    pub fn r(&mut self) {
-        self.movement(&R_CORNER_TRANSFORM, &R_CORNER_ORIENTATION_TRANSFORM)
-    }
-
-    /// A left clockwise movement.
-    pub fn l(&mut self) {
-        self.movement(&L_CORNER_TRANSFORM, &L_CORNER_ORIENTATION_TRANSFORM)
-    }
-
-    /// A upper clockwise movement.
-    pub fn u(&mut self) {
-        self.movement(&U_CORNER_TRANSFORM, &U_CORNER_ORIENTATION_TRANSFORM)
-    }
-
-    /// A down clockwise movement.
-    pub fn d(&mut self) {
-        self.movement(&D_CORNER_TRANSFORM, &D_CORNER_ORIENTATION_TRANSFORM)
-    }
 }
 
 /// ***************************************************************************
@@ -217,3 +140,4 @@ const D_CORNER_TRANSFORM: [Corner; 8] = [
     Corner::DFR,
 ];
 const D_CORNER_ORIENTATION_TRANSFORM: [i32; 8] = [0, 0, 0, 0, 0, 0, 0, 0];
+

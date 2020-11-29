@@ -24,18 +24,14 @@ extern crate serde_derive;
 extern crate serde_json;
 
 
-mod facelets;
-mod physical;
 mod solver;
 mod prunning;
-
-mod console;
-mod gui;
-mod ui_support;
+mod ui;
+mod defs;
 
 mod utility;
     
 fn main() {
-    gui::create_window();
+    ui::gui::create_window();
     //console::create_terminal();
 }

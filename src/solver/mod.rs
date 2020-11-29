@@ -12,9 +12,9 @@
 //! parts, each focusing on a different mathematical group to solve. Both phases
 //! use the same implamentation of IDA*, with different depths and goals.
 
-use physical;
 use prunning;
 use std::cmp;
+
 
 /// All the avaliable moves you can perfom on a rubiks cube. x3 is an
 /// anti-clockwise movement.
@@ -40,7 +40,7 @@ pub enum Moves {
     R3,
     NONE,
 }
-
+/*
 /// Finds the solution of a rubiks cube in under 30 moves. Uses two IDA*
 /// searches.
 ///
@@ -274,6 +274,7 @@ pub fn do_move(mut rubiks: physical::Cube, movement: Moves) -> physical::Cube {
     rubiks
 }
 
+*/
 /// A pattern matching function which dictates what `Moves` are mathematically
 /// equal according to our group theory definitions of the cube.
 ///

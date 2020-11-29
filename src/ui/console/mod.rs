@@ -10,10 +10,6 @@
 //!
 //! Console based user interface.
 
-use crate::facelets;
-use facelets::IFace;
-use crate::solver;
-
 #[allow(dead_code)]
 pub fn create_terminal(){
     // Command line
@@ -36,13 +32,13 @@ pub fn create_terminal(){
                     println!("Your input has less facelets than in a 3x3 rubiks cube at: {}. Please insure you have 54 facelets", cube.len())
                 } else {
                     println!("Valid input; looking for moves now!");
-                    let face = facelets::Face::new(&cube);
-                    let (msg, success) = face.return_code_matcher();
-                    print!("{}", msg);
-                    if success {
-                        let mut c_cube = face.turn_into_cube();
-                        print!("{:?}", solver::complete_search(&mut c_cube))
-                    }
+                    //let face = facelets::Face::new(&cube);
+                    //let (msg, success) = face.return_code_matcher();
+                    //print!("{}", msg);
+                    //if success {
+                        //let mut c_cube = face.turn_into_cube();
+                        //print!("{:?}", solver::complete_search(&mut c_cube))
+                    //}
                 }
             }
             Err(_) => println!("Invalid input; try again."),

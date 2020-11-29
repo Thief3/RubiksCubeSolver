@@ -8,10 +8,7 @@
 //! @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
 //! ***************************************************************************
 //!
-//! A module relating specifically to the edge pieces of the rubiks cube.
-//!
-//! Deals with movements and how they shift the coordinates and orientation
-//! of the edge cubie in question.
+//! A module for Edge Cubie Defitions
 
 use std::cmp::Ordering;
 
@@ -82,98 +79,6 @@ impl EdgeCubie {
         };
 
         a
-    }
-
-    /// A generic movement function.
-    ///
-    /// # Parameters
-    /// * `edges` - A reference of what each edge should become with this
-    ///     movement.
-    /// * `orientation_change` - An array of 8 `i32` types, each relating to
-    ///     the additional orientation change.
-    fn movement(&mut self, edges: &[Edge; 12], orientation_change: &[i32; 12]) {
-        self.old_coordinate = self.coordinate;
-        match self.coordinate {
-            Edge::UR => {
-                self.coordinate = edges[0];
-                self.orientation = (self.orientation + orientation_change[0]) % 2;
-            }
-            Edge::UF => {
-                self.coordinate = edges[1];
-                self.orientation = (self.orientation + orientation_change[1]) % 2;
-            }
-            Edge::UL => {
-                self.coordinate = edges[2];
-                self.orientation = (self.orientation + orientation_change[2]) % 2;
-            }
-            Edge::UB => {
-                self.coordinate = edges[3];
-                self.orientation = (self.orientation + orientation_change[3]) % 2;
-            }
-            Edge::DR => {
-                self.coordinate = edges[4];
-                self.orientation = (self.orientation + orientation_change[4]) % 2;
-            }
-            Edge::DF => {
-                self.coordinate = edges[5];
-                self.orientation = (self.orientation + orientation_change[5]) % 2;
-            }
-            Edge::DL => {
-                self.coordinate = edges[6];
-                self.orientation = (self.orientation + orientation_change[6]) % 2;
-            }
-            Edge::DB => {
-                self.coordinate = edges[7];
-                self.orientation = (self.orientation + orientation_change[7]) % 2;
-            }
-            Edge::FR => {
-                self.coordinate = edges[8];
-                self.orientation = (self.orientation + orientation_change[8]) % 2;
-            }
-            Edge::FL => {
-                self.coordinate = edges[9];
-                self.orientation = (self.orientation + orientation_change[9]) % 2;
-            }
-            Edge::BL => {
-                self.coordinate = edges[10];
-                self.orientation = (self.orientation + orientation_change[10]) % 2;
-            }
-            Edge::BR => {
-                self.coordinate = edges[11];
-                self.orientation = (self.orientation + orientation_change[11]) % 2;
-            }
-        }
-    }
-    /// Typical rubiks cube movements.
-
-    /// A forward clockwise movement.
-    pub fn f(&mut self) {
-        self.movement(&F_EDGE_TRANSFORM, &F_EDGE_ORIENTATION_TRANSFORM)
-    }
-
-    /// A back clockwise movement.
-    pub fn b(&mut self) {
-        self.movement(&B_EDGE_TRANSFORM, &B_EDGE_ORIENTATION_TRANSFORM)
-    }
-
-    /// A right clockwise movement.
-    pub fn r(&mut self) {
-        self.movement(&R_EDGE_TRANSFORM, &R_EDGE_ORIENTATION_TRANSFORM)
-    }
-
-    /// A left clockwise movement.
-    pub fn l(&mut self) {
-        self.movement(&L_EDGE_TRANSFORM, &L_EDGE_ORIENTATION_TRANSFORM)
-    }
-
-    /// A upper clockwise movement.
-    pub fn u(&mut self) {
-        self.movement(&U_EDGE_TRANSFORM, &U_EDGE_ORIENTATION_TRANSFORM)
-    }
-
-    /// A down clockwise movement.
-    pub fn d(&mut self) {
-        self.movement(&D_EDGE_TRANSFORM, &D_EDGE_ORIENTATION_TRANSFORM)
     }
 }
 
