@@ -26,13 +26,30 @@ pub enum Facelets {
     B,
 }
 
-trait GetFacelets {
-   fn get_facelet(&self) -> Facelets;
+pub trait GetChar {
+    fn get_char(self) -> char;
+}
+
+impl GetChar for Facelets {
+    fn get_char(self) -> char{
+        match self {
+            Facelets::U => 'U',
+            Facelets::L => 'L',
+            Facelets::F => 'F',
+            Facelets::R => 'R',
+            Facelets::B => 'B',
+            Facelets::D => 'D',
+        }        
+    }
+}
+
+pub trait GetFacelets {
+   fn get_facelet(self) -> Facelets;
 }
 
 impl GetFacelets for char {
-    fn get_facelet(&self) -> Facelets{
-        match &self {
+    fn get_facelet(self) -> Facelets{
+        match self {
             'U' => Facelets::U,
             'R' => Facelets::R,
             'F' => Facelets::F,
@@ -66,21 +83,11 @@ impl Color {
             
         }
     }
-    pub fn get_char(&self) -> char{
-        match self {
-            Self::White  => 'U',
-            Self::Red    => 'L',
-            Self::Blue   => 'F',
-            Self::Orange => 'R',
-            Self::Green  => 'B',
-            Self::Yellow => 'D',
-        }        
-    }
 }
 
 impl GetFacelets for Color {
     #[allow(dead_code)]
-    fn get_facelet(&self) -> Facelets{
+    fn get_facelet(self) -> Facelets{
         match self {
             Self::White  => Facelets::U,
             Self::Red    => Facelets::L,
@@ -88,6 +95,20 @@ impl GetFacelets for Color {
             Self::Orange => Facelets::R,
             Self::Green  => Facelets::B,
             Self::Yellow => Facelets::D,
+        }        
+    }
+}
+
+
+impl GetChar for Color {
+    fn get_char(self) -> char{
+        match self {
+            Color::White  => 'U',
+            Color::Red    => 'L',
+            Color::Blue   => 'F',
+            Color::Orange => 'R',
+            Color::Green  => 'B',
+            Color::Yellow => 'D',
         }        
     }
 }
