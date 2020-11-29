@@ -43,37 +43,6 @@ pub struct State {
 }
 
 /*
-fn convert_color_rubiks_to_chars(rubiks: [Color; 54]) -> [char; 54]{
-    let mut a: [char; 54] = [' '; 54];
-    // Remap the way they are in the gui to the old order required for the algo.
-    // Upper
-    for i in 0..9{
-        a[i] = rubiks[i].get_char();
-    }
-    // Left
-    for i in 9..18{
-        a[i + 3 * 9] = rubiks[i].get_char();
-    }
-    // Front
-    for i in 18..27{
-        a[i] = rubiks[i].get_char();
-    }
-    // Right
-    for i in 27..36{
-        a[i - 9 * 2] = rubiks[i].get_char();
-    }
-    // Back
-    for i in 36..45{
-        a[i + 9] = rubiks[i].get_char();
-    }
-    // Down
-    for i in 45..54{
-        a[i - 9 * 2] = rubiks[i].get_char();
-    }
-    return a;
-}*/
-
-/*
 #[allow(dead_code)]
 fn convert_color_rubiks_to_facelets(rubiks: [Color; 54]) -> facelets::Face{
     let mut a: facelets::Face = [facelets::Facelets::U; 54];
