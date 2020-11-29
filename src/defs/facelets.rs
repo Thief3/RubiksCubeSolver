@@ -66,18 +66,6 @@ impl Color {
             
         }
     }
-    // @@TODO:: 
-    #[allow(dead_code)]
-    pub fn get_facelet(&self) -> Facelets{
-        match self {
-            Self::White  => Facelets::U,
-            Self::Red    => Facelets::L,
-            Self::Blue   => Facelets::F,
-            Self::Orange => Facelets::R,
-            Self::Green  => Facelets::B,
-            Self::Yellow => Facelets::D,
-        }        
-    }
     pub fn get_char(&self) -> char{
         match self {
             Self::White  => 'U',
@@ -86,6 +74,20 @@ impl Color {
             Self::Orange => 'R',
             Self::Green  => 'B',
             Self::Yellow => 'D',
+        }        
+    }
+}
+
+impl GetFacelets for Color {
+    #[allow(dead_code)]
+    fn get_facelet(&self) -> Facelets{
+        match self {
+            Self::White  => Facelets::U,
+            Self::Red    => Facelets::L,
+            Self::Blue   => Facelets::F,
+            Self::Orange => Facelets::R,
+            Self::Green  => Facelets::B,
+            Self::Yellow => Facelets::D,
         }        
     }
 }
