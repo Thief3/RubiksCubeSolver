@@ -56,8 +56,10 @@ pub fn complete_search(rubiks: &mut physical::Cube) -> Vec<Moves>{
 
     let mut depth = 0;
     while depth < max_depth {
-        let (pristine_state_move_list, c, b) = phase_one_search(Vec::new(), c, depth);
-        if b {break;}
+        let (move_list, c, b) = phase_one_search(Vec::new(), c, depth);
+        if b {
+            pristine_state_move_list = move_list;
+            break;}
         depth = depth + 1;
     }
 
@@ -83,7 +85,7 @@ pub fn phase_one_search(moves: Vec<Moves>, rubiks: physical::Cube, depth: usize)
                     || last_move == Moves::B1
                     || last_move == Moves::B3{
                         print!("G1 moves: {:?} \n", moves);
-                        return phase_two_search(moves, rubiks, 25 - depth);
+                        return phase_two_start(moves, rubiks, 25 - depth);
                 }
             }
         }
@@ -114,6 +116,10 @@ fn phase_one_prune(rubiks: physical::Cube) -> usize {
 }
 
 fn phase_two_start(moves: Vec<Moves>, rubiks: physical::Cube, max_depth: usize) -> (Vec<Moves>, physical::Cube, bool){
+    if phase_two_subgoal(rubiks){
+        print!("Phase two not required!!, Moves: {:?}\n", moves);
+        return (moves, rubiks, true);
+    }
     for depth in 0..max_depth{
         let (m, r, b) = phase_two_search(moves.clone(), rubiks, depth);
         if b { return (m, r, b); }
@@ -124,11 +130,10 @@ fn phase_two_start(moves: Vec<Moves>, rubiks: physical::Cube, max_depth: usize) 
 
 fn phase_two_search(moves: Vec<Moves>, rubiks: physical::Cube, depth: usize) -> (Vec<Moves>, physical::Cube, bool){
     if depth == 0 {
-        print!("Depth: {}\n", depth);
         if phase_two_subgoal(rubiks) {
             // Solved!!
             // Update Max depth later.
-            print!("Phase Two Moves: {:?}", moves);
+            print!("Phase Two Moves: {:?}\n", moves);
             return (moves, rubiks, true)
         }
     }
@@ -178,121 +183,7 @@ fn phase_one_subgoal(rubiks: physical::Cube) -> bool {
 fn phase_two_subgoal(rubiks: physical::Cube) -> bool {
     (rubiks.corner_permutation == 0)
         && (rubiks.phase_two_edge_permutation == 0)
-        && (rubiks.ud_sorted_slice == 0)
-}
-
-/// Basic IDA* search using the movements of the rubiks as a faux tree.
-///
-/// # Parameters
-/// * `rubiks` - A mutable reference to the `Cube` we are solving.
-/// * `move_list` - A `Vec<Moves>` of the current `Moves` done so far.
-/// * `max_depth` - A `usize` describing the maximum length the search should
-///     bother with.
-/// * `subgoal` - A function that tests the a `Cube` for a solution state.
-/// * `whole_move_list` - What rubiks cube moves are valid in the current phase
-///     of the search.
-/// # Returns
-/// * `Vec<Moves>` - The moves required to get from the input cube to a solution
-///     state.
-pub fn search(
-    rubiks: &mut physical::Cube,
-    move_list: Vec<Moves>,
-    max_depth: usize,
-    subgoal: fn(physical::Cube) -> bool,
-    whole_move_list: &[Moves],
-) -> Vec<Moves> {
-    let mut results: bool = false;
-    let mut c: physical::Cube = rubiks.clone();
-    let mut solution: Vec<Moves> = Vec::new();
-    if subgoal(rubiks.clone()) {
-        results = true;
-    }
-    for i in 0..max_depth {
-        //println!("{} out of {}", i, max_depth);
-        tree_search(
-            rubiks,
-            &mut c,
-            i,
-            move_list.clone(),
-            &mut results,
-            &mut solution,
-            whole_move_list,
-            subgoal,
-        );
-        if results == true {
-            break;
-        };
-    }
-    solution
-}
-
-/// The actual tree search used in the IDA* algorithim.
-///
-/// # Parameters
-/// * `rubiks` - A `Cube` that we are trying to solve. Note this is before any
-///     recursion occurs and this only changes if a solution is found.
-/// * `dummy_rubiks` - A `Cube` we pass between recursions that reflects the
-///     current state of the cube at any point in the tree. Upon a solution
-///     being found we set `rubiks` to this.
-/// * `move_list` - The current moves done going down the tree.
-/// * `found` - Mutable `bool` signialling if a solutions has been found yet
-///     or not. If a solution has been found we break out of any loops and
-///     recursions.
-/// * `final_list` - The final `Vec<Moves>` required to get the original `Cube`
-///     to the solution state.
-/// * `whole_move_list` - The current set of `Moves` that can be taken.
-/// * `subgoal` - A function that tests to see if the correct permutation of
-///     `Moves` have been performed to solve the `Cube`.
-fn tree_search(
-    rubiks: &mut physical::Cube,
-    dummy_rubiks: &mut physical::Cube,
-    depth: usize,
-    move_list: Vec<Moves>,
-    found: &mut bool,
-    final_list: &mut Vec<Moves>,
-    whole_move_list: &[Moves],
-    subgoal: fn(physical::Cube) -> bool,
-) {
-    if depth > 0 && *found == false {
-        for movement in whole_move_list.iter() {
-            if *found == false {
-                let last_move: Moves;
-                if move_list.len() != 0 {
-                    last_move = *move_list.last().unwrap();
-                } else {
-                    last_move = Moves::NONE;
-                }
-
-                if *movement != last_move
-                    && *movement != opposite_move(last_move)
-                    && *movement != cannot_follow(last_move)
-                {
-                    let mut current_list = move_list.clone();
-                    let mut c = dummy_rubiks.clone();
-                    c = do_move(c, *movement);
-                    current_list.push(*movement);
-
-                    if subgoal(c) {
-                        *found = true;
-                        *final_list = current_list.clone();
-                        *rubiks = c.clone();
-                        break;
-                    } else {
-                        tree_search(
-                            &mut *rubiks,
-                            &mut c,
-                            depth - 1,
-                            current_list.clone(),
-                            &mut *found,
-                            &mut *final_list,
-                            whole_move_list,
-                            subgoal,
-                        );
-                    }
-                }
-            }
-        }
-    }
+        //&& (rubiks.ud_sorted_slice == 0)
 }
 
 /// Pattern matching function that inputs a `Cube` and returns a `Cube` that has
@@ -460,15 +351,15 @@ const PHASE_ONE_MOVE_LIST: [Moves; 18] = [
     Moves::R3,
 ];
 const MAX_PHASE_TWO_DEPTH: usize = 10;//12;
-const PHASE_TWO_MOVE_LIST: [Moves; 6] = [
+const PHASE_TWO_MOVE_LIST: [Moves; 10] = [
     Moves::U1,
-    //Moves::U2,
-    //Moves::U3,
+    Moves::U2,
+    Moves::U3,
     Moves::B2,
     Moves::F2,
     Moves::D1,
-    //Moves::D2,
-    //Moves::D3,
+    Moves::D2,
+    Moves::D3,
     Moves::L2,
     Moves::R2,
 ];
