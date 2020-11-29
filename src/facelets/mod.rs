@@ -164,7 +164,7 @@ impl IFace for Face {
         else if !self.check_corners_colours() {
             return_code = 3;
         }
-        else if my_cube.edge_parity != my_cube.corner_parity {
+        else if my_cube.edge_parity() != my_cube.corner_parity() {
             return_code = 4;
         }
         else if !self.check_edge_flip(my_cube) {
@@ -393,9 +393,11 @@ impl IFace for Face {
             }
         }
         // This is the problem
-        new_cube.coordinate_adjustments();
         //println!("New cube coordinates adjusted.");
-        
+        println!("New cube who dis?: {:?}\n", new_cube);
+        new_cube.r();
+        println!("Cube after R: {:?}\n", new_cube);
+        println!("Cube Corner Orientation: {:?}\n", new_cube.corner_orientation());
         new_cube
     }
     
