@@ -152,7 +152,18 @@ impl Cube {
         // FR, FL, BL, BR are the UD slice edges. This corresponds to the last
         // four values in our edges array, so we take these values and order
         // them for the algorithm.
-        0
+        let mut ud_slice = 0;
+        let mut seen = 0;
+        for n in 0..11{
+            if 8 <= (self.edges[n].coordinate as usize) && (self.edges[n].coordinate as usize) < 12{
+                seen = seen + 1;
+            }
+            else if seen >= 1{
+                ud_slice = ud_slice + utility::binomial(n as i64, (seen - 1) as i64);
+            }
+        }
+
+        ud_slice as usize
     }
 
     /// Calculates the UD sorted slice.
