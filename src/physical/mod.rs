@@ -88,9 +88,8 @@ impl Cube {
     /// explanation at (http://kociemba.org/math/coordlevel.htm)
     pub fn corner_orientation(&self) -> usize{
         let mut s = 0;
-        for corner in (0..6).rev() {
-            
-            s = 3 * s + self.corners[corner].orientation;
+        for corner in 0..7 {
+            s = s + self.corners[corner].orientation * 3_i32.pow(6 - corner as u32);
         }
         s as usize
     }
@@ -110,7 +109,7 @@ impl Cube {
     /// to represent the edge orientation of the whole cube.  Further
     /// explanation at (http://kociemba.org/math/coordlevel.htm)
     pub fn edge_orientation(&self) -> usize{
-        0
+        
     }
 
     /// Calculates the UD Slice.
