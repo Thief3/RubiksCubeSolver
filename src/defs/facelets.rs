@@ -17,6 +17,7 @@ use defs::corner_cubies::Corner;
 /// * Definitions
 /// ****************************************************************************
 
+#[derive(Debug, PartialEq, PartialOrd, Copy, Clone)]
 pub enum Facelets {
     U = 0,
     R,
@@ -114,7 +115,7 @@ impl GetChar for Color {
 }
 
 /// A list of all the edges and their index in face. Already in order.
-const EDGE_INDEXES: [[usize; 2]; 12] = [
+pub const EDGE_INDEXES: [[usize; 2]; 12] = [
         [ U6, R2 ], [ U8, F2 ], [ U4, L2 ], [ U2, B2 ], [ D6, R8 ], [ D2, F8 ],
         [ D4, L8 ], [ D8, B8 ], [ F6, R4 ], [ F4, L6 ], [ B6, L4 ], [ B4, R6 ],
 ];
@@ -142,8 +143,23 @@ pub fn edge_colours(e: Edge) -> [Facelets; 2] {
     }
 }
 
+pub const EDGE_COLOR: [[Facelets; 2]; 12] = [
+    [Facelets::U, Facelets::R],
+    [Facelets::U, Facelets::F],
+    [Facelets::U, Facelets::L],
+    [Facelets::U, Facelets::B],
+    [Facelets::D, Facelets::R],
+    [Facelets::D, Facelets::F],
+    [Facelets::D, Facelets::L],
+    [Facelets::D, Facelets::B],
+    [Facelets::F, Facelets::R],
+    [Facelets::F, Facelets::L],
+    [Facelets::B, Facelets::L],
+    [Facelets::B, Facelets::R]
+];
+
 /// A list of all the corners and their indexes in `Face`. Already in order.
-const CORNER_INDEXES: [[usize; 3]; 8] = [
+pub const CORNER_INDEXES: [[usize; 3]; 8] = [
     [ U9, R1, F3 ], [ U7, F1, L3 ], [ U1, L1, B3 ], [ U3, B1, R3 ],
     [ D3, F9, R7 ], [ D1, L9, F7 ], [ D7, B9, L7 ], [ D9, R9, B7 ],
 ];
@@ -168,7 +184,18 @@ pub fn corner_colours(c: Corner) -> [Facelets; 3] {
     }
 }
 
-const CORNER_LIST: [Corner; 8] = [
+pub const CORNER_COLOR: [[Facelets; 3]; 8] = [
+    [Facelets::U, Facelets::R, Facelets::F],
+    [Facelets::U, Facelets::F, Facelets::L],
+    [Facelets::U, Facelets::L, Facelets::B],
+    [Facelets::U, Facelets::B, Facelets::R],
+    [Facelets::D, Facelets::F, Facelets::R],
+    [Facelets::D, Facelets::L, Facelets::F],
+    [Facelets::D, Facelets::B, Facelets::L],
+    [Facelets::D, Facelets::R, Facelets::B],
+];
+
+pub const CORNER_LIST: [Corner; 8] = [
     Corner::URF,
     Corner::UFL,
     Corner::ULB,
@@ -179,7 +206,7 @@ const CORNER_LIST: [Corner; 8] = [
     Corner::DRB,
 ];
 
-const EDGE_LIST: [Edge; 12] = [
+pub const EDGE_LIST: [Edge; 12] = [
     Edge::UR,
     Edge::UF,
     Edge::UL,

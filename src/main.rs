@@ -28,6 +28,7 @@ mod solver;
 mod prunning;
 mod ui;
 mod defs;
+mod cubes;
 
 mod utility;
     
