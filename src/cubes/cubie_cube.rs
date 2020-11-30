@@ -83,6 +83,27 @@ impl CubieCube {
         self.edge_orientation = eo;
     }
 
+    /// Computes both the edge and corner permutations and orientations.
+    pub fn multiply(&mut self, A: CubieCube){
+        self.corner_multiply(A);
+        self.edge_multiply(A);
+    }
+
+    /// Move helper function
+    pub fn movement(&mut self, movement: Facelets){
+        self.multiply(MOVEMENTS[movement as usize]);
+    }
+
+    /// Move helper function that takes usize
+    pub fn movement_u(&mut self, movement: usize){
+        if movement < MOVEMENTS.len() {
+            self.multiply(MOVEMENTS[movement]);
+        }
+        else{
+            panic!("Move {} doesn't exist!!", movement);
+        }
+    }
+
 
 }
 
