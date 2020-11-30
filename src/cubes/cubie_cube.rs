@@ -17,7 +17,7 @@ use defs::corner_cubies::Corner;
 use crate::defs;
 use crate::utility;
 
-//! Struct to represent a Rubiks cube at a corner and edge level.
+/// Struct to represent a Rubiks cube at a corner and edge level.
 pub struct CubieCube {
     pub corner_permutation: [Corner; 8],
     pub corner_orientation: [usize; 8],
@@ -28,7 +28,7 @@ pub struct CubieCube {
 
 impl CubieCube {
 
-    //! Creates a new default, solved, Cube.
+    /// Creates a new default, solved, Cube.
     pub fn new() -> CubieCube{
         CubieCube{
             corner_permutation: defs::facelets::CORNER_LIST,
@@ -38,8 +38,9 @@ impl CubieCube {
         }
     }
 
-    //! Helper function for creating a new CubieCube with prechosen values.
-    pub fn new_with_vals(
+    /// Helper function for creating a new CubieCube with prechosen values.
+    #[allow(dead_code)]
+    pub fn new_from_vals(
         cp: [Corner; 8],
         co: [usize; 8],
         ep: [Edge; 12],
@@ -51,13 +52,28 @@ impl CubieCube {
             edge_orientation: eo
         }
     }
+
+    /// Computes the permuation and orientation of the corners after applying a
+    /// permutation to the current cube.
+    pub fn corner_multiply(&mut self, A: CubieCube){
+        let mut cp: [Corner; 8] = [Corner::URF; 8];
+        let mut co: [usize; 8] = [0; 8];
+
+        for i in 0..8{
+            cp[i] = self.corner_permutation[A.corner_permutation[i] as usize];
+            co[i] = self.corner_orientation[A.corner_orientation[i]] + A.corner_orientation[i] % 3;
+        }
+
+        self.corner_permutation = cp;
+        self.corner_orientation = co;
+    }
 }
 
 
 /// Definitions for moves
 
 /// Upper Moves
-const _CP__U: [Corner; 8] = [
+const _CP_U: [Corner; 8] = [
     Corner::UBR,
     Corner::URF,
     Corner::UFL,
@@ -82,7 +98,7 @@ const _EP_U: [Edge; 12] = [
     Edge::BL,
     Edge::BR,
 ];
-const _EP___U: [usize; 12] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+const _EO_U: [usize; 12] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
 /// Right Moves
 const _CP_R: [Corner; 8] = [
@@ -110,7 +126,7 @@ const _EP_R: [Edge; 12] = [
     Edge::BL,
     Edge::UR,
 ];
-const _EP__R: [usize; 12] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+const _EO_R: [usize; 12] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
 /// Front Moves
 const _CP_F: [Corner; 8] = [
@@ -138,7 +154,7 @@ const _EP_F: [Edge; 12] = [
     Edge::BL,
     Edge::BR,
 ];
-const _EP__F: [usize; 12] = [0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0];
+const _EO_F: [usize; 12] = [0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0];
 
 /// Down Move
 const _CP_D: [Corner; 8] = [
@@ -166,7 +182,7 @@ const _EP_D: [Edge; 12] = [
     Edge::BL,
     Edge::BR,
 ];
-const _EP__D: [usize; 12] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+const _EO_D: [usize; 12] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
 /// Left Move
 const _CP_L: [Corner; 8] = [
@@ -194,7 +210,7 @@ const _EP_L: [Edge; 12] = [
     Edge::DL,
     Edge::BR,
 ];
-const _EP__L: [usize; 12] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+const _EO_L: [usize; 12] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
 /// Back Moves
 const _CP_B: [Corner; 8] = [
@@ -222,15 +238,44 @@ const _EP_B: [Edge; 12] = [
     Edge::UB,
     Edge::DB,
 ];
-const _EP__B: [usize; 12] = [0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1];
+const _EO_B: [usize; 12] = [0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1];
 
-/// Move Array
-
+// Move Array
 const MOVEMENTS: [CubieCube; 6] = [
-    CubieCube::new_from_val(_CP_U, _CO_U, _EP_U, _EO_U),
-    CubieCube::new_from_val(_CP_R, _CO_R, _EP_R, _EO_R),
-    CubieCube::new_from_val(_CP_F, _CO_F, _EP_F, _EO_F),
-    CubieCube::new_from_val(_CP_D, _CO_D, _EP_D, _EO_D),
-    CubieCube::new_from_val(_CP_L, _CO_L, _EP_L, _EO_L),
-    CubieCube::new_from_val(_CP_B, _CO_B, _EP_B, _EO_B),
+    CubieCube{
+        corner_permutation:  _CP_U,
+        corner_orientation: _CO_U,
+        edge_permutation:   _EP_U,
+        edge_orientation:   _EO_U
+    },
+    CubieCube{
+        corner_permutation:  _CP_R,
+        corner_orientation: _CO_R,
+        edge_permutation:   _EP_R,
+        edge_orientation:   _EO_R
+    },
+    CubieCube{
+        corner_permutation:  _CP_F,
+        corner_orientation: _CO_F,
+        edge_permutation:   _EP_F,
+        edge_orientation:   _EO_F
+    },
+    CubieCube{
+        corner_permutation:  _CP_D,
+        corner_orientation: _CO_D,
+        edge_permutation:   _EP_D,
+        edge_orientation:   _EO_D
+    },
+    CubieCube{
+        corner_permutation:  _CP_L,
+        corner_orientation: _CO_L,
+        edge_permutation:   _EP_L,
+        edge_orientation:   _EO_L
+    },
+    CubieCube{
+        corner_permutation:  _CP_B,
+        corner_orientation: _CO_B,
+        edge_permutation:   _EP_B,
+        edge_orientation:   _EO_B
+    }
 ];
