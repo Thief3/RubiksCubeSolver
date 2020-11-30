@@ -67,6 +67,23 @@ impl CubieCube {
         self.corner_permutation = cp;
         self.corner_orientation = co;
     }
+
+    /// Computes the permuation and orientation of the edges after applying a
+    /// permutation to the current cube.
+    pub fn edges_multiply(&mut self, A: CubieCube){
+        let mut ep: [Edge; 12] = [Edge::UR; 12];
+        let mut eo: [usize; 12] = [0; 12];
+
+        for i in 0..12{
+            ep[i] = self.edge_permutation[A.edge_permutation[i] as usize];
+            eo[i] = self.edge_orientation[A.edge_orientation[i]] + A.edge_orientation[i] % 3;
+        }
+
+        self.edge_permutation = ep;
+        self.edge_orientation = eo;
+    }
+
+
 }
 
 
