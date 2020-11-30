@@ -12,6 +12,7 @@
 
 use defs::edge_cubies::Edge;
 use defs::corner_cubies::Corner;
+use super::face_cube::FaceCube;
 use crate::defs;
 use crate::utility;
 
@@ -28,7 +29,7 @@ pub struct CubieCube {
 impl CubieCube {
 
     /// Creates a new default, solved, Cube.
-    pub fn new() -> CubieCube{
+    pub fn reset() -> CubieCube{
         CubieCube{
             corner_permutation: defs::facelets::CORNER_LIST,
             corner_orientation: [0; 8],
@@ -39,7 +40,7 @@ impl CubieCube {
 
     /// Helper function for creating a new CubieCube with prechosen values.
     #[allow(dead_code)]
-    pub fn new_from_vals(
+    pub fn new(
         cp: [Corner; 8],
         co: [usize; 8],
         ep: [Edge; 12],
@@ -50,6 +51,31 @@ impl CubieCube {
             edge_permutation: ep,
             edge_orientation: eo
         }
+    }
+
+    /// Turns this CubieCube into a FaceCube
+    pub fn to_facecube(self) -> FaceCube{
+        let mut fc = FaceCube::reset();
+        for i in 0..8 {
+            let j = self.corner_permutation[i];
+            let ori = self.corner_orientation[i];
+
+            for k in 0..3{
+                fc.f[defs::facelets::CORNER_INDEXES[i][(k + ori) % 3] as usize] =
+                    defs::facelets::CORNER_COLOR[j as usize][k];
+            }
+        }
+        for i in 0..12 {
+            let j = self.edge_permutation[i];
+            let ori = self.edge_orientation[i];
+
+            for k in 0..2 {
+                fc.f[defs::facelets::EDGE_INDEXES[i][(k + ori) % 2]] =
+                    defs::facelets::EDGE_COLOR[j as usize][k];
+            }
+        }
+
+        fc
     }
 
     /// Computes the permuation and orientation of the corners after applying a

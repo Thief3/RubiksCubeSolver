@@ -21,7 +21,7 @@ use crate::defs::facelets::{
 use cubes::cubie_cube::CubieCube;
 
 pub struct FaceCube {
-    f: [Facelets; 54]
+    pub f: [Facelets; 54]
 }
 
 impl FaceCube {
@@ -88,7 +88,7 @@ impl FaceCube {
     }
 
     pub fn to_cubie_cube(&self) -> CubieCube {
-        let mut cc = CubieCube::new();
+        let mut cc = CubieCube::reset();
 
         // Basically this entire algorithm was recreated from
         // https://github.com/hkociemba/RubiksCube-TwophaseSolver/blob/master/face.py
