@@ -12,12 +12,11 @@
 
 use defs::edge_cubies::Edge;
 use defs::corner_cubies::Corner;
-
-
 use crate::defs;
 use crate::utility;
 
 /// Struct to represent a Rubiks cube at a corner and edge level.
+#[derive(Copy, Clone)]
 pub struct CubieCube {
     pub corner_permutation: [Corner; 8],
     pub corner_orientation: [usize; 8],
@@ -55,13 +54,13 @@ impl CubieCube {
 
     /// Computes the permuation and orientation of the corners after applying a
     /// permutation to the current cube.
-    pub fn corner_multiply(&mut self, A: CubieCube){
+    pub fn corner_multiply(&mut self, a: CubieCube){
         let mut cp: [Corner; 8] = [Corner::URF; 8];
         let mut co: [usize; 8] = [0; 8];
 
         for i in 0..8{
-            cp[i] = self.corner_permutation[A.corner_permutation[i] as usize];
-            co[i] = self.corner_orientation[A.corner_orientation[i]] + A.corner_orientation[i] % 3;
+            cp[i] = self.corner_permutation[a.corner_permutation[i] as usize];
+            co[i] = self.corner_orientation[a.corner_orientation[i]] + a.corner_orientation[i] % 3;
         }
 
         self.corner_permutation = cp;
@@ -70,13 +69,13 @@ impl CubieCube {
 
     /// Computes the permuation and orientation of the edges after applying a
     /// permutation to the current cube.
-    pub fn edges_multiply(&mut self, A: CubieCube){
+    pub fn edge_multiply(&mut self, a: CubieCube){
         let mut ep: [Edge; 12] = [Edge::UR; 12];
         let mut eo: [usize; 12] = [0; 12];
 
         for i in 0..12{
-            ep[i] = self.edge_permutation[A.edge_permutation[i] as usize];
-            eo[i] = self.edge_orientation[A.edge_orientation[i]] + A.edge_orientation[i] % 3;
+            ep[i] = self.edge_permutation[a.edge_permutation[i] as usize];
+            eo[i] = self.edge_orientation[a.edge_orientation[i]] + a.edge_orientation[i] % 3;
         }
 
         self.edge_permutation = ep;
@@ -84,13 +83,13 @@ impl CubieCube {
     }
 
     /// Computes both the edge and corner permutations and orientations.
-    pub fn multiply(&mut self, A: CubieCube){
-        self.corner_multiply(A);
-        self.edge_multiply(A);
+    pub fn multiply(&mut self, a: CubieCube){
+        self.corner_multiply(a);
+        self.edge_multiply(a);
     }
 
     /// Move helper function
-    pub fn movement(&mut self, movement: Facelets){
+    pub fn movement(&mut self, movement: defs::facelets::Facelets){
         self.multiply(MOVEMENTS[movement as usize]);
     }
 
@@ -104,7 +103,27 @@ impl CubieCube {
         }
     }
 
+    /// Inverses the current cube and returns.
+    pub fn inverse_cubiecube(self) -> CubieCube {
+        let mut cc: CubieCube = self;
 
+        for i in 0..12 {
+            cc.edge_permutation[self.edge_permutation[i] as usize] = defs::facelets::EDGE_LIST[i];
+            if i < 8 {
+                cc.corner_permutation[self.corner_permutation[i] as usize] = defs::facelets::CORNER_LIST[i];
+            }
+        }
+
+        for i in 0..12 {
+            cc.edge_orientation[i] = self.edge_orientation[cc.edge_permutation[i] as usize];
+            if i < 8 {
+                let ori = self.corner_orientation[cc.corner_permutation[i] as usize];
+                cc.corner_orientation[i] = (- (ori as isize) % 3) as usize;
+            }
+        }
+
+        cc
+    }
 }
 
 

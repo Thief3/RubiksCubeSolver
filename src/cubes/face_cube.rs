@@ -82,7 +82,7 @@ impl FaceCube {
     }
 
     pub fn to_string(&self) -> String{
-        self.f.into_iter()
+        self.f.iter()
             .map(|x| x.get_char())
             .collect::<String>()
     }
