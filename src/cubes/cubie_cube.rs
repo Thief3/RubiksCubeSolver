@@ -27,7 +27,6 @@ pub struct CubieCube {
 }
 
 impl CubieCube {
-
     /// Creates a new default, solved, Cube.
     pub fn reset() -> CubieCube{
         CubieCube{
@@ -150,6 +149,38 @@ impl CubieCube {
 
         cc
     }
+
+    /// Property Methods
+
+    /// Corner Parity of cube. This must equal the edge parity for the cube to be solveable.
+    pub fn corner_parity(self) -> usize{
+        let mut s = 0;
+        for i in (0..8).rev(){
+            for j in (0..i).rev(){
+                if self.corner_permutation[j] > self.corner_permutation[i]{
+                    s = s + 1;
+                }
+            }
+        }
+
+        s % 2
+    }
+
+    /// Edge Parity of a cube. This must equal the corner parity of the cube to be aolveable.
+    pub fn edge_parity(self) -> usize{
+        let s = 0;
+        for i in (0..12).rev() {
+            for j in (0..i).rev() {
+                if self.edge_permutation[j] > self.edge_permutation[i]{
+                    s = s + 1;
+                }
+            }
+        }
+
+        s % 2
+    }
+
+    /// Phase One Coordinates.
 }
 
 
