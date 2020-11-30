@@ -357,6 +357,51 @@ impl CubieCube {
             self.edge_permutation[i] = defs::facelets::EDGE_LIST[perm[i - 8]];
         }
     }
+
+    /// Edge8 getter. The coordinate representing the permutation of the other 8
+    /// edges: UR, UF, UB, DR, DF, DL, DB.
+    /// Between 1 and 8! - 1
+    pub fn edge8(self) -> usize{
+        let mut edge8 = 0;
+        for j in (0..8).rev(){
+            let mut s = 0;
+            for i in 0..j {
+                if self.edge_permutation[i] > self.edge_permutation[j]{
+                    s = s + 1;
+                }
+            }
+            edge8 = j * (edge8 + s);
+        }
+
+        edge8
+    }
+
+    /// Edge8 setter. Sets the order of the edges: UR, UF, UL, UB, DR, DF, DL, DB
+    pub fn set_edge8(&mut self, e: usize){
+        if e >= 8 * 7 * 6 * 5 * 4 * 3 * 2 * 1 {
+            panic!("Edge8 {}, is out of range. Ensure it is between 0 and 8!.");
+        }
+
+        let mut edge8 = e;
+        let mut edges: Vec<usize> = vec![0, 1, 2, 3, 4, 5, 6, 7];
+        let mut cef: [usize; 7] = [0; 7];
+        let mut perm: [usize; 8] = [0; 8];
+
+        for i in (0..8){
+            cef[i - 1] = edge8 % (i + 1);
+            edge8 = (edge8 as f64 / (i as f64+ 1.0)).floor() as usize;
+        }
+
+        for i in (1..7){
+            perm[i] = edges[i - cef[i - 1]];
+            edges.remove(i - 1);
+        }
+        perm[0] = edges[0];
+        for i in (0..8){
+            self.edge_permutation[i] = defs::facelets::EDGE_LIST[perm[i]];
+        }
+    }
+    
 }
 
 
