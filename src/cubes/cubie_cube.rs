@@ -394,14 +394,57 @@ impl CubieCube {
 
         for i in (1..7){
             perm[i] = edges[i - cef[i - 1]];
-            edges.remove(i - 1);
+            edges.remove(i - cef[i -1]);
         }
         perm[0] = edges[0];
         for i in (0..8){
             self.edge_permutation[i] = defs::facelets::EDGE_LIST[perm[i]];
         }
     }
-    
+
+    /// Corner getter. Gets the coordinate representing the permutation of the
+    /// 8 corners: UR, UF, UL, UB, DR, DF, DL, DB.
+    /// Value is between 0 and 8! - 1;
+    pub fn corner(self) -> usize{
+        let mut c = 0;
+        for j in (1..8).rev(){
+            let mut s = 0;
+            for i in (0..j){
+                if self.corner_permutation[i] > self.corner_permutation[j]{
+                    s = s + 1;
+                }
+            }
+            c = j * (c + s);
+        }
+
+        c
+    }
+
+    /// Corner Setter. Sets the permutation of the corners according to the
+    /// parameter passed in.
+    pub fn set_corner(&mut self, c: usize){
+        if c >= 8 * 7 * 6 * 5 * 4 * 3 * 2 * 1{
+            panic!("Corner {}, is out of range. Please ensure it is between 0 and 8!.", c);
+        }
+
+        let mut corner = c;
+        let mut corners: Vec<usize> = vec![0, 1, 2, 3, 4, 5, 6, 7];
+        let mut perm: [usize; 8] = [0; 8];
+        let mut cef: [usize; 7] = [0; 7];
+
+        for i in (1..8){
+            cef[i - 1] = corner % (i + 1);
+            corner = (corner as f64 / (i as f64 + 1.0)).floor() as usize;
+        }
+        for i in (1..7).rev(){
+            perm[i] = corners[i - cef[i -1]];
+            corners.remove(i - cef[i - 1]);
+        }
+        perm[0] = corners[0];
+        for i in 0..8{
+            self.corner_permutation[i] = defs::facelets::CORNER_LIST[perm[i]];
+        }
+    }
 }
 
 
