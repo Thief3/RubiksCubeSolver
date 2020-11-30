@@ -17,6 +17,7 @@ use defs::corner_cubies::Corner;
 use crate::defs;
 use crate::utility;
 
+//! Struct to represent a Rubiks cube at a corner and edge level.
 pub struct CubieCube {
     pub corner_permutation: [Corner; 8],
     pub corner_orientation: [usize; 8],
@@ -26,12 +27,28 @@ pub struct CubieCube {
 }
 
 impl CubieCube {
+
+    //! Creates a new default, solved, Cube.
     pub fn new() -> CubieCube{
         CubieCube{
             corner_permutation: defs::facelets::CORNER_LIST,
             corner_orientation: [0; 8],
             edge_permutation: defs::facelets::EDGE_LIST,
             edge_orientation: [0; 12]
+        }
+    }
+
+    //! Helper function for creating a new CubieCube with prechosen values.
+    pub fn new_with_vals(
+        cp: [Corner; 8],
+        co: [usize; 8],
+        ep: [Edge; 12],
+        eo: [usize; 12]) -> CubieCube{
+        CubieCube{
+            corner_permutation: cp,
+            corner_orientation: co,
+            edge_permutation: ep,
+            edge_orientation: eo
         }
     }
 }
@@ -206,3 +223,14 @@ const _EP_B: [Edge; 12] = [
     Edge::DB,
 ];
 const _EP__B: [usize; 12] = [0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1];
+
+/// Move Array
+
+const MOVEMENTS: [CubieCube; 6] = [
+    CubieCube::new_from_val(_CP_U, _CO_U, _EP_U, _EO_U),
+    CubieCube::new_from_val(_CP_R, _CO_R, _EP_R, _EO_R),
+    CubieCube::new_from_val(_CP_F, _CO_F, _EP_F, _EO_F),
+    CubieCube::new_from_val(_CP_D, _CO_D, _EP_D, _EO_D),
+    CubieCube::new_from_val(_CP_L, _CO_L, _EP_L, _EO_L),
+    CubieCube::new_from_val(_CP_B, _CO_B, _EP_B, _EO_B),
+];
