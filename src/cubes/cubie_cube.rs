@@ -305,7 +305,58 @@ impl CubieCube {
         }
     }
 
-    
+    // Phase Two Coordinates
+
+    /// Edge4 getter. Edge4 is the coordinate that represents the permutation of
+    /// the edges FR, FL, BL, BR. (This assumes we are in phase two.)
+    /// Edge4 is between 0 and 23.
+    pub fn edge4(self) -> usize{
+        let mut out = 0;
+        let mut edge4: [Edge; 4] = [Edge::DB; 4];
+        for i in 8..12{
+            edge4[i - 8] = self.edge_permutation[i];
+        }
+
+        for j in (0..4).rev(){
+            let mut s = 0;
+            for i in 0..j{
+                if edge4[i] > edge4[j]{
+                    s = s + 1;
+                }
+            }
+            out = j * ( out + s);
+        }
+
+        out
+    }
+
+    /// Edge4 setter. Takes in an edge4 value and sets the cube to that
+    /// permutation of edges.
+    pub fn set_edge4(&mut self, e: usize){
+        if e >= 24{
+            panic!("Edge4 {}, is out of range. Ensure it is between 0 and 23(inclusive.)", e);
+        }
+
+        let mut edge4 = e;
+        let mut slice_edge: Vec<Edge> = vec![Edge::FR, Edge::FL, Edge::BL, Edge::BR];
+        let mut cef: [usize; 3] = [0; 3];
+        let mut perm: [usize; 4] = [0; 4];
+        
+        for i in 1..4{
+            cef[i - 1] = edge4 % (i + 1);
+            edge4 = (edge4 as f64 / (i as f64 + 1.0)).floor() as usize;
+        }
+
+        for i in (1..4).rev(){
+            perm[i] = slice_edge[i - cef[i - 1]] as usize;
+            slice_edge.remove(i - cef[i - 1]);
+        }
+        perm[0] = slice_edge[0] as usize;
+
+        for i in (8..12){
+            self.edge_permutation[i] = defs::facelets::EDGE_LIST[perm[i - 8]];
+        }
+    }
 }
 
 
