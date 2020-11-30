@@ -195,7 +195,7 @@ impl CubieCube {
 
     /// Takes a twist value, and sets the corner orientation to the matching array.
     pub fn set_twist(&mut self, twist: usize){
-        if twist < 0 || twist > 3_usize.pow(7) {
+        if twist < 0 || twist >= 3_usize.pow(7) {
             panic!("Twist: {}, is out of range. Must be between 0 and 2186.", twist);
         }
         
@@ -223,7 +223,7 @@ impl CubieCube {
 
     /// Takes a Flip property, and sets the edge orientation to the matching array.
     pub fn set_flip(&mut self, flip: usize){
-        if flip < 0 || flip > 2_usize.pow(11){
+        if flip < 0 || flip >= 2_usize.pow(11){
             panic!("Flip: {}, is out of range. It must be between 0 and 2047.", flip);
         }
 
@@ -238,6 +238,74 @@ impl CubieCube {
         }
         self.edge_orientation[11] = (- (total as isize) % 2 ) as usize;
     }
+
+    /// Computes the udslice coordinate. This coordinate represents the position
+    /// of the edges FR, FL, Bl, BR.
+    /// Phase two can only start when this value is 0, representing that these
+    /// edges are in the middle layer.
+    /// UDslice is a value between 0 and (12C4) - 1.
+    pub fn udslice(self) -> usize{
+        let mut udslice = 0;
+        let mut seen = 0;
+
+        for j in 0..12{
+            if (self.edge_permutation[j] as usize) >= 8
+                && (self.edge_permutation[j] as usize) < 12 {
+                    seen = seen + 1;
+                }
+            else if seen >= 1{
+                udslice = udslice + utility::binomial(j as i64, (seen - 1) as i64);
+            }
+        }
+
+        udslice as usize
+    }
+
+    /// Sets the UDslice of the cube. It takes in a UDslice and sets the positions
+    /// for FR, FL, BL and BR.
+    pub fn set_udslice(&mut self, u: usize){
+        if (u as i64) >= utility::binomial(12, 4){
+            panic!("UDSlice {}, is out of range. Make sure it is between 0 and 494", u);
+        }
+
+        let udslice_edge: [Edge; 4] = [Edge::FR, Edge::FL, Edge::BL, Edge::BR];
+        let other_edge: [Edge; 8] = [
+            Edge::UR,
+            Edge::UF,
+            Edge::UL,
+            Edge::UB,
+            Edge::DR,
+            Edge::DF,
+            Edge::DL,
+            Edge::DB,
+        ];
+        let mut seen = 3;
+        let mut udslice = u;
+        
+        for i in 0..12{
+            self.edge_permutation[i] = Edge::DB;
+        }
+
+        for j in (0..12).rev(){
+            if udslice as i64 - utility::binomial(j as i64, seen as i64) < 0{
+                self.edge_permutation[j] = udslice_edge[seen];
+                seen = seen - 1;
+            }
+            else{
+                udslice = (udslice as i64- utility::binomial(j as i64, seen as i64)) as usize;
+            }
+        }
+
+        let mut x = 0;
+        for j in 0..12{
+            if self.edge_permutation[j] == Edge::DB {
+                self.edge_permutation[j] = other_edge[x];
+                x = x + 1;
+            }
+        }
+    }
+
+    
 }
 
 
