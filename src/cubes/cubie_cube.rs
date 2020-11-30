@@ -150,6 +150,58 @@ impl CubieCube {
         cc
     }
 
+    /// Checks the cube can be solved.
+    pub fn can_solve(self) -> usize{
+        let mut total = 0;
+        let mut edge_count: [usize; 12] = [0, 1, 2, 3, 4, 5, 6, 7, 8 ,9, 10, 11];
+        let mut corner_count: [usize; 8] = [0; 8];
+        
+        // Not all edges exist.
+        for e in 0..12{
+            edge_count[self.edge_permutation[e] as usize] += 1;
+        }
+        for i in 0..12 {
+            if edge_count[i] != 1{
+                return 2;
+            }
+        }
+
+        // Flip error: one edge should be flipped.
+        for i in 0..12{
+            total = total + self.edge_orientation[i];
+        }
+        if total %2 != 0{
+            return 3;
+        }
+        
+        // Not all corners exist.
+        for i in 0..8{
+            corner_count[self.corner_permutation[i] as usize] += 1;
+        }
+        for i in 0..8{
+            if corner_count[i] != 1{
+                return 4
+            }
+        }
+        
+        // Twist error: A corner must be twisted.
+        total = 0;
+        for i in 0..8{
+            total = total + self.corner_orientation[i];
+        }
+        if total % 3 != 0{
+            return 5;
+        }
+        if self.edge_parity() != self.corner_parity(){
+            return 6;
+        }
+        
+        // Parity error: Two corners or edges have to be exchanged.
+
+        // Success
+        0
+    }
+
     /// Property Methods
 
     /// Corner Parity of cube. This must equal the edge parity for the cube to be solveable.
