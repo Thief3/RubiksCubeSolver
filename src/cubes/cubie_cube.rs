@@ -23,7 +23,7 @@ pub struct CubieCube {
     pub corner_orientation: [usize; 8],
     
     pub edge_permutation: [Edge; 12],
-    pub edge_orientation: [usize; 12]
+    pub edge_orientation: [usize; 12],
 }
 
 impl CubieCube {
@@ -33,7 +33,7 @@ impl CubieCube {
             corner_permutation: defs::facelets::CORNER_LIST,
             corner_orientation: [0; 8],
             edge_permutation: defs::facelets::EDGE_LIST,
-            edge_orientation: [0; 12]
+            edge_orientation: [0; 12],
         }
     }
 
@@ -48,7 +48,7 @@ impl CubieCube {
             corner_permutation: cp,
             corner_orientation: co,
             edge_permutation: ep,
-            edge_orientation: eo
+            edge_orientation: eo,
         }
     }
 
@@ -168,7 +168,7 @@ impl CubieCube {
 
     /// Edge Parity of a cube. This must equal the corner parity of the cube to be aolveable.
     pub fn edge_parity(self) -> usize{
-        let s = 0;
+        let mut s = 0;
         for i in (0..12).rev() {
             for j in (0..i).rev() {
                 if self.edge_permutation[j] > self.edge_permutation[i]{
@@ -180,11 +180,68 @@ impl CubieCube {
         s % 2
     }
 
-    /// Phase One Coordinates.
+    // Phase One Coordinates.
+
+    /// Get Twist property, the coordinate representing the corner orientation.
+    /// Between 0 and 3^7 - 1.
+    pub fn twist(self) -> usize{
+        let mut s = 0;
+        for corner in 0..7 {
+            s = s + self.corner_orientation[corner] * (3_i32.pow(6 - corner as u32) as usize);
+        }
+
+        s as usize
+    }
+
+    /// Takes a twist value, and sets the corner orientation to the matching array.
+    pub fn set_twist(&mut self, twist: usize){
+        if twist < 0 || twist > 3_usize.pow(7) {
+            panic!("Twist: {}, is out of range. Must be between 0 and 2186.", twist);
+        }
+        
+        let mut t = twist;
+        let mut total = 0;
+
+        for i in 0..7{
+            let x = t % 3;
+            self.corner_orientation[6 - i] = x;
+            total = total + x;
+            t = (t as f64 / 3.0).floor() as usize;
+        }
+        self.corner_orientation[7] = (- (total as isize) % 3) as usize;
+    }
+
+    /// Get Flip property, the coordinate representing the edge orientation.
+    /// Between 0 and 2^11 - 1.
+    pub fn flip(self) -> usize{
+        let mut s = 0;
+        for edge in 0..12 {
+            s = s + self.edge_orientation[edge] * (2_i64.pow(11 - edge as u32) as usize);
+        }
+        s as usize
+    }
+
+    /// Takes a Flip property, and sets the edge orientation to the matching array.
+    pub fn set_flip(&mut self, flip: usize){
+        if flip < 0 || flip > 2_usize.pow(11){
+            panic!("Flip: {}, is out of range. It must be between 0 and 2047.", flip);
+        }
+
+        let mut f = flip;
+        let mut total = 0;
+
+        for i in 0..11 {
+            let x = flip % 2;
+            self.edge_orientation[10 - i] = x;
+            total = total + x;
+            f = (f as f64 / 2.0).floor() as usize;
+        }
+        self.edge_orientation[11] = (- (total as isize) % 2 ) as usize;
+    }
 }
 
 
-/// Definitions for moves
+// Definitions for moves
 
 /// Upper Moves
 const _CP_U: [Corner; 8] = [
@@ -360,36 +417,36 @@ const MOVEMENTS: [CubieCube; 6] = [
         corner_permutation:  _CP_U,
         corner_orientation: _CO_U,
         edge_permutation:   _EP_U,
-        edge_orientation:   _EO_U
+        edge_orientation:   _EO_U,
     },
     CubieCube{
         corner_permutation:  _CP_R,
         corner_orientation: _CO_R,
         edge_permutation:   _EP_R,
-        edge_orientation:   _EO_R
+        edge_orientation:   _EO_R,
     },
     CubieCube{
         corner_permutation:  _CP_F,
         corner_orientation: _CO_F,
         edge_permutation:   _EP_F,
-        edge_orientation:   _EO_F
+        edge_orientation:   _EO_F,
     },
     CubieCube{
         corner_permutation:  _CP_D,
         corner_orientation: _CO_D,
         edge_permutation:   _EP_D,
-        edge_orientation:   _EO_D
+        edge_orientation:   _EO_D,
     },
     CubieCube{
         corner_permutation:  _CP_L,
         corner_orientation: _CO_L,
         edge_permutation:   _EP_L,
-        edge_orientation:   _EO_L
+        edge_orientation:   _EO_L,
     },
     CubieCube{
         corner_permutation:  _CP_B,
         corner_orientation: _CO_B,
         edge_permutation:   _EP_B,
-        edge_orientation:   _EO_B
+        edge_orientation:   _EO_B,
     }
 ];
