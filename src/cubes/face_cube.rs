@@ -10,9 +10,6 @@
 //!
 //! Module for Face level cube.
 
-use defs::edge_cubies::Edge;
-use defs::corner_cubies::Corner;
-
 use crate::defs::facelets::{
     GetChar, GetFacelets,
     Color, Facelets,

@@ -10,8 +10,9 @@
 //!
 //! Module for Cubie level cube.
 
-use defs::edge_cubies::Edge;
 use defs::corner_cubies::Corner;
+use defs::edge_cubies::Edge;
+
 use super::face_cube::FaceCube;
 use crate::defs;
 use crate::utility;
@@ -247,7 +248,7 @@ impl CubieCube {
 
     /// Takes a twist value, and sets the corner orientation to the matching array.
     pub fn set_twist(&mut self, twist: usize){
-        if twist < 0 || twist >= 3_usize.pow(7) {
+        if twist >= 3_usize.pow(7) {
             panic!("Twist: {}, is out of range. Must be between 0 and 2186.", twist);
         }
         
@@ -275,7 +276,7 @@ impl CubieCube {
 
     /// Takes a Flip property, and sets the edge orientation to the matching array.
     pub fn set_flip(&mut self, flip: usize){
-        if flip < 0 || flip >= 2_usize.pow(11){
+        if flip >= 2_usize.pow(11){
             panic!("Flip: {}, is out of range. It must be between 0 and 2047.", flip);
         }
 
@@ -405,7 +406,7 @@ impl CubieCube {
         }
         perm[0] = slice_edge[0] as usize;
 
-        for i in (8..12){
+        for i in 8..12{
             self.edge_permutation[i] = defs::facelets::EDGE_LIST[perm[i - 8]];
         }
     }
@@ -439,17 +440,17 @@ impl CubieCube {
         let mut cef: [usize; 7] = [0; 7];
         let mut perm: [usize; 8] = [0; 8];
 
-        for i in (0..8){
+        for i in 0..8{
             cef[i - 1] = edge8 % (i + 1);
             edge8 = (edge8 as f64 / (i as f64+ 1.0)).floor() as usize;
         }
 
-        for i in (1..7){
+        for i in 1..7{
             perm[i] = edges[i - cef[i - 1]];
             edges.remove(i - cef[i -1]);
         }
         perm[0] = edges[0];
-        for i in (0..8){
+        for i in 0..8{
             self.edge_permutation[i] = defs::facelets::EDGE_LIST[perm[i]];
         }
     }
@@ -461,7 +462,7 @@ impl CubieCube {
         let mut c = 0;
         for j in (1..8).rev(){
             let mut s = 0;
-            for i in (0..j){
+            for i in 0..j{
                 if self.corner_permutation[i] > self.corner_permutation[j]{
                     s = s + 1;
                 }
@@ -484,7 +485,7 @@ impl CubieCube {
         let mut perm: [usize; 8] = [0; 8];
         let mut cef: [usize; 7] = [0; 7];
 
-        for i in (1..8){
+        for i in 1..8{
             cef[i - 1] = corner % (i + 1);
             corner = (corner as f64 / (i as f64 + 1.0)).floor() as usize;
         }
