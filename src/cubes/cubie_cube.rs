@@ -154,15 +154,18 @@ impl CubieCube {
     /// Checks the cube can be solved.
     pub fn can_solve(self) -> usize{
         let mut total = 0;
-        let mut edge_count: [usize; 12] = [0, 1, 2, 3, 4, 5, 6, 7, 8 ,9, 10, 11];
+        let mut edge_count: [usize; 12] = [0; 12];
         let mut corner_count: [usize; 8] = [0; 8];
-        
+
+        //print!("Edge Permutation: {:?}\n", self.edge_permutation);
         // Not all edges exist.
         for e in 0..12{
             edge_count[self.edge_permutation[e] as usize] += 1;
         }
         for i in 0..12 {
+            //print!("Edge: {}\n", edge_count[i]);
             if edge_count[i] != 1{
+                //print!("Edge_count: {:?}\n", edge_count);
                 return 2;
             }
         }
