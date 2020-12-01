@@ -19,12 +19,12 @@ use std::fs::File;
 use io::BufReader;
 
 pub struct PruningTable {
-    table: Vec<i64>,
+    table: Vec<usize>,
     stride: usize
 }
 
 impl PruningTable{
-    pub fn get(&self, x: usize, y: usize) -> i64{
+    pub fn get(&self, x: usize, y: usize) -> usize{
         self.table[x * self.stride + y]
     }
 }
@@ -50,37 +50,37 @@ const MOVES: usize = 18;
 struct JsonTables {
     // Move
     #[serde(rename = "twist_move")]
-    pub twist_move: Vec<Vec<i64>>,
+    pub twist_move: Vec<Vec<usize>>,
     #[serde(rename = "flip_move")]
-    pub flip_move: Vec<Vec<i64>>,
+    pub flip_move: Vec<Vec<usize>>,
     #[serde(rename = "udslice_move")]
-    pub udslice_move: Vec<Vec<i64>>,
+    pub udslice_move: Vec<Vec<usize>>,
     #[serde(rename = "edge4_move")]
-    pub edge4_move: Vec<Vec<i64>>,
+    pub edge4_move: Vec<Vec<usize>>,
     #[serde(rename = "edge8_move")]
-    pub edge8_move: Vec<Vec<i64>>,
+    pub edge8_move: Vec<Vec<usize>>,
     #[serde(rename = "corner_move")]
-    pub corner_move: Vec<Vec<i64>>,
+    pub corner_move: Vec<Vec<usize>>,
 
     // Prunning
     #[serde(rename = "udslice_twist_prune")]
-    pub udslice_twist_prune: Vec<i64>,
+    pub udslice_twist_prune: Vec<usize>,
     #[serde(rename = "udslice_flip_prune")]
-    pub udslice_flip_prune: Vec<i64>,
+    pub udslice_flip_prune: Vec<usize>,
     #[serde(rename = "edge4_edge8_prune")]
-    pub edge4_edge8_prune: Vec<i64>,
+    pub edge4_edge8_prune: Vec<usize>,
     #[serde(rename = "edge4_corner_prune")]
-    pub edge4_corner_prune: Vec<i64>,
+    pub edge4_corner_prune: Vec<usize>,
 }
 
 pub struct Tables {
     // Move
-    pub twist_move: Vec<Vec<i64>>,
-    pub flip_move: Vec<Vec<i64>>,
-    pub udslice_move: Vec<Vec<i64>>,
-    pub edge4_move: Vec<Vec<i64>>,
-    pub edge8_move: Vec<Vec<i64>>,
-    pub corner_move: Vec<Vec<i64>>,
+    pub twist_move: Vec<Vec<usize>>,
+    pub flip_move: Vec<Vec<usize>>,
+    pub udslice_move: Vec<Vec<usize>>,
+    pub edge4_move: Vec<Vec<usize>>,
+    pub edge8_move: Vec<Vec<usize>>,
+    pub corner_move: Vec<Vec<usize>>,
 
     // Prunning
     pub udslice_twist_prune: PruningTable,

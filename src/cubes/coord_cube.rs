@@ -17,15 +17,15 @@ use super::cubie_cube::CubieCube;
 /// move table.
 pub struct CoordCube {
     // Phase One
-    twist: usize,
-    flip: usize,
-    udslice: usize,
+    pub twist: usize,
+    pub flip: usize,
+    pub udslice: usize,
 
     // Phase Two
-    edge4: usize,
-    edge8: usize,
-    corner: usize,
-    tables: Tables
+    pub edge4: usize,
+    pub edge8: usize,
+    pub corner: usize,
+    pub tables: Tables
 }
 
 impl CoordCube{

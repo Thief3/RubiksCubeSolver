@@ -17,6 +17,43 @@ use std::cmp;
 use crate::cubes::coord_cube::{ CoordCube, Moves };
 use crate::cubes::face_cube::FaceCube;
 
+struct Solver {
+    cc: CoordCube
+}
+
+impl Solver{
+    pub fn solve(cc: CoordCube, max_depth: usize) -> Vec<Moves>{
+        let moves: Vec<Moves> = Vec::new();
+        
+        for depth in 0..max_depth {
+            
+        }
+        
+        moves
+    }
+    
+    pub fn phase_one_cost(self) -> usize{
+        std::cmp::max(
+            self.cc.tables.udslice_twist_prune.get(
+                self.cc.udslice,
+                self.cc.twist),
+            self.cc.tables.udslice_flip_prune.get(
+                self.cc.udslice,
+                self.cc.flip)
+        ) as usize
+    }
+
+    pub fn phase_two_cost(self) -> usize{
+        std::cmp::max(
+            self.cc.tables.edge4_corner_prune.get(
+                self.cc.edge4,
+                self.cc.corner),
+            self.cc.tables.edge4_edge8_prune.get(
+                self.cc.edge4,
+                self.cc.edge8)
+        ) as usize
+    }
+}
 
 
 /// A pattern matching function which dictates what `Moves` are mathematically
