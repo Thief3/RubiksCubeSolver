@@ -18,23 +18,23 @@ use crate::cubes::coord_cube::{ CoordCube, Moves, MOVE_LIST };
 use crate::cubes::face_cube::FaceCube;
 
 #[derive(Clone)]
-struct Solver {
+pub struct Solver {
     original_cc: CoordCube,
     cc: CoordCube,
-    max_depth: usize,
+    max_depth: isize,
     tables: prunning::Tables,
 
-    axis: Vec<usize>,
-    power: Vec<usize>,
-    twist: Vec<usize>,
-    flip: Vec<usize>,
-    udslice: Vec<usize>,
-    corner: Vec<usize>,
-    edge4: Vec<usize>,
-    edge8: Vec<usize>,
+    axis: Vec<isize>,
+    power: Vec<isize>,
+    twist: Vec<isize>,
+    flip: Vec<isize>,
+    udslice: Vec<isize>,
+    corner: Vec<isize>,
+    edge4: Vec<isize>,
+    edge8: Vec<isize>,
 
-    min_dist_1: Vec<usize>,
-    min_dist_2: Vec<usize>
+    min_dist_1: Vec<isize>,
+    min_dist_2: Vec<isize>
 }
 
 impl Solver{
@@ -42,7 +42,7 @@ impl Solver{
         let mut sol = Solver{
             original_cc: cc.clone(),
             cc: cc.clone(),
-            max_depth: max_depth,
+            max_depth: max_depth as isize,
             tables: cc.tables.clone(),
 
             axis: vec![0; max_depth],
@@ -58,39 +58,45 @@ impl Solver{
             min_dist_2: vec![0; max_depth],
         };
 
-        sol.twist[0] = cc.twist;
-        sol.flip[0] = cc.flip;
-        sol.udslice[0] = cc.udslice;
-        sol.corner[0] = cc.corner;
-        sol.edge4[0] = cc.edge4;
-        sol.edge8[0] = cc.edge8;
+        sol.twist[0] = cc.twist as isize;
+        sol.flip[0] = cc.flip as isize;
+        sol.udslice[0] = cc.udslice as isize;
+        sol.corner[0] = cc.corner as isize;
+        sol.edge4[0] = cc.edge4 as isize;
+        sol.edge8[0] = cc.edge8 as isize;
         sol.min_dist_1[0] = sol.clone().phase_one_cost(0);
 
         sol
     }
     
-    pub fn solve(&mut self, cc: CoordCube, max_depth: usize) -> String{
-        for depth in 0..max_depth {
+    pub fn solve(&mut self) -> String{
+        let mut s: String = "No Solutions found in depth range.".to_string();
+        for depth in 0..self.max_depth {
             let n = self.phase_one_search(0, depth);
             if n >=0 {
-                return self.clone().solution_to_string(n as usize);
+                println!("Solved: {}", n);
+                s = self.clone().solution_to_string(n as usize);
+                println!("Move set: {}", s);
             }
         }
 
-        panic!("No solution??");
+        s
     }
 
-    pub fn phase_two_init(&mut self, n: usize) -> isize{
+    pub fn phase_two_init(&mut self, n: isize) -> isize{
         let mut cc = self.original_cc.clone();
-        for i in 0..n{
-            for _j in 0..self.power[i]{
-                cc.movement(MOVE_LIST[self.axis[i]]);
+        for i in 0..(n as usize){
+            // Power shouldn't ever be -1;
+            for _j in 0..(self.power[i] as usize){
+                if(self.axis[i] >= 0){
+                    cc.movement(MOVE_LIST[self.axis[i] as usize]);
+                }
             }
         }
-        self.edge4[n] = cc.edge4;
-        self.edge8[n] = cc.edge8;
-        self.corner[n] = cc.corner;
-        self.min_dist_2[n] = self.clone().phase_two_cost(n);
+        self.edge4[(n as usize)] = cc.edge4 as isize;
+        self.edge8[(n as usize)] = cc.edge8 as isize;
+        self.corner[(n as usize)] = cc.corner as isize;
+        self.min_dist_2[(n as usize)] = self.clone().phase_two_cost(n);
         for depth in 0..(self.max_depth - n){
             let m = self.phase_two_search(n, depth);
             if m >= 0 {
@@ -100,55 +106,55 @@ impl Solver{
         return -1;
     }
     
-    pub fn phase_one_cost(self, n: usize) -> usize{
+    pub fn phase_one_cost(self, n: isize) -> isize{
         std::cmp::max(
             self.cc.tables.udslice_twist_prune.get(
-                self.udslice[n],
-                self.twist[n]),
+                self.udslice[(n as usize)],
+                self.twist[(n as usize)]),
             self.cc.tables.udslice_flip_prune.get(
-                self.udslice[n],
-                self.flip[n])
-        ) as usize
+                self.udslice[(n as usize)],
+                self.flip[(n as usize)])
+        )
     }
 
-    pub fn phase_two_cost(self, n: usize) -> usize{
+    pub fn phase_two_cost(self, n: isize) -> isize{
         std::cmp::max(
             self.cc.tables.edge4_corner_prune.get(
-                self.edge4[n],
-                self.corner[n]),
+                self.edge4[(n as usize)],
+                self.corner[(n as usize)]),
             self.cc.tables.edge4_edge8_prune.get(
-                self.edge4[n],
-                self.edge8[n])
-        ) as usize
+                self.edge4[(n as usize)],
+                self.edge8[(n as usize)])
+        )
     }
 
-    pub fn phase_one_search(&mut self, n: usize, depth: usize) -> isize{
-        if self.min_dist_1[n] == 0{
-            return self.phase_two_init(n);
+    pub fn phase_one_search(&mut self, n: isize, depth: isize) -> isize{
+        //println!("Phase 1 search starting\n");
+        if self.min_dist_1[(n as usize)] == 0{
+            println!("Phase two started.");
+            return 1; //self.phase_two_init(n);
         }
-        else if self.min_dist_1[n] == 0{
+        else if self.min_dist_1[(n as usize)] <= depth{
+            //println!("Trying moves.");
             for i in 0..6{
                 // Don't do consecutive moves  of the same type.
-                if n > 0 && (i..(i + 3)).contains(&self.axis[n - 1]){
+                if n > 0 && [i, i + 1, i + 2].contains(&self.axis[(n as usize) - 1]){
                     continue;
                 }
                 
                 for j in 1..4{
-                    self.axis[n] = i;
-                    self.power[n] = j;
+                    self.axis[(n as usize)] = i;
+                    self.power[(n as usize)] = j;
                     let mv = 3 * i + j - 1;
 
-                    self.twist[n + 1] = self.tables.twist_move[self.twist[n]][mv];
-                    self.flip[n + 1] = self.tables.flip_move[self.flip[n]][mv];
-                    self.udslice[n + 1] = self.tables.udslice_move[self.udslice[n]][mv];
-                    self.min_dist_1[n + 1] = self.clone().phase_one_cost(n + 1);
+                    self.twist[(n as usize) + 1] = self.tables.twist_move[self.twist[(n as usize)] as usize][mv as usize];
+                    self.flip[(n as usize) + 1] = self.tables.flip_move[self.flip[(n as usize)] as usize][mv as usize];
+                    self.udslice[(n as usize) + 1] = self.tables.udslice_move[self.udslice[(n as usize)] as usize][mv as usize];
+                    self.min_dist_1[(n as usize) + 1] = self.clone().phase_one_cost(n + 1);
 
                     let m = self.phase_one_search(n + 1, depth - 1);
                     if m >= 0{
                         return m;
-                    }
-                    else {
-                        panic!("Ahhhh idk");
                     }
                 }
             }
@@ -157,13 +163,14 @@ impl Solver{
         return -1;
     }
 
-    pub fn phase_two_search(&mut self, n: usize, depth: usize) -> isize {
-        if self.min_dist_2[n] == 0{
+    pub fn phase_two_search(&mut self, n: isize, depth: isize) -> isize {
+        println!("Min_dist_2: {}", self.min_dist_2[(n as usize)]);
+        if self.min_dist_2[(n as usize)] == 0{
             return n as isize
         }
-        else if self.min_dist_2[n] <= depth {
+        else if self.min_dist_2[(n as usize)] <= depth {
             for i in 0..6{
-                if n > 0 && (i..(i + 3)).contains(&self.axis[n - 1]){
+                if n > 0 && [i, i + 1, i + 2].contains(&self.axis[(n as usize) - 1]){
                     continue;
                 }
                 for j in 1..4{
@@ -171,14 +178,14 @@ impl Solver{
                     if [1, 2, 4, 5].contains(&i) && j != 2{
                         continue;
                     }
-                    self.axis[n] = i;
-                    self.power[n] = j;
+                    self.axis[(n as usize)] = i;
+                    self.power[(n as usize)] = j;
                     let mv = 3 * i + j - 1;
 
-                    self.edge4[n + 1] = self.tables.edge4_move[self.edge4[n]][mv];
-                    self.edge8[n + 1] = self.tables.edge8_move[self.edge8[n]][mv];
-                    self.corner[n + 1] = self.tables.corner_move[self.corner[n]][mv];
-                    self.min_dist_2[n + 1] = self.clone().phase_two_cost(n + 1);
+                    self.edge4[(n as usize) + 1] = self.tables.edge4_move[self.edge4[(n as usize)] as usize][mv as usize];
+                    self.edge8[(n as usize) + 1] = self.tables.edge8_move[self.edge8[(n as usize)] as usize][mv as usize];
+                    self.corner[(n as usize) + 1] = self.tables.corner_move[self.corner[(n as usize)] as usize][mv as usize];
+                    self.min_dist_2[(n as usize) + 1] = self.clone().phase_two_cost(n + 1);
 
                     let m = self.phase_two_search(n + 1, depth - 1);
                     if m >= 0{

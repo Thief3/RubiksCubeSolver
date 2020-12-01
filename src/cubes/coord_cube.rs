@@ -45,15 +45,25 @@ impl CoordCube{
     }
 
     /// A Move method to update the coordinates in the cubie cube from tables.
-    pub fn movement(&mut self, m: Moves){
+    pub fn movement(&mut self, m: Moves) -> bool{
         let m_as_u = m as usize;
 
-        self.twist   = self.tables.twist_move[self.twist][m_as_u] as usize;
-        self.flip    = self.tables.flip_move[self.flip][m_as_u] as usize;
-        self.udslice = self.tables.udslice_move[self.udslice][m_as_u] as usize;
-        self.edge4   = self.tables.edge4_move[self.edge4][m_as_u] as usize;
-        self.edge8   = self.tables.edge8_move[self.edge8][m_as_u] as usize;
-        self.corner  = self.tables.corner_move[self.corner][m_as_u] as usize;
+        if  self.tables.twist_move[self.twist][m_as_u] >= 0
+            && self.tables.flip_move[self.flip][m_as_u] >=0
+            && self.tables.udslice_move[self.udslice][m_as_u] >= 0
+            && self.tables.edge4_move[self.edge4][m_as_u] >= 0
+            && self.tables.edge8_move[self.edge8][m_as_u] >= 0
+            &&  self.tables.corner_move[self.corner][m_as_u] >= 0 {
+                self.twist   = self.tables.twist_move[self.twist][m_as_u] as usize;
+                self.flip    = self.tables.flip_move[self.flip][m_as_u] as usize;
+                self.udslice = self.tables.udslice_move[self.udslice][m_as_u] as usize;
+                self.edge4   = self.tables.edge4_move[self.edge4][m_as_u] as usize;
+                self.edge8   = self.tables.edge8_move[self.edge8][m_as_u] as usize;
+                self.corner  = self.tables.corner_move[self.corner][m_as_u] as usize;
+                return true;
+            }
+
+        false
     }
 }
 
