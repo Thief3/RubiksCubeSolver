@@ -18,15 +18,15 @@ use super::cubie_cube::CubieCube;
 #[derive(Clone)]
 pub struct CoordCube {
     // Phase One
-    pub twist: isize,
-    pub flip: isize,
+    pub twist:   isize,
+    pub flip:    isize,
     pub udslice: isize,
 
     // Phase Two
-    pub edge4: isize,
-    pub edge8: isize,
-    pub corner: isize,
-    pub tables: Tables
+    pub edge4:   isize,
+    pub edge8:   isize,
+    pub corner:  isize,
+    pub tables:  Tables
 }
 
 impl CoordCube{
@@ -34,13 +34,13 @@ impl CoordCube{
     /// Create a CoordCube from a CubieCube struct.
     pub fn from_cubie_cube(cc: CubieCube) -> CoordCube {
         CoordCube{
-            twist: cc.twist() as isize,
-            flip: cc.flip() as isize,
+            twist:   cc.twist()   as isize,
+            flip:    cc.flip()    as isize,
             udslice: cc.udslice() as isize,
-            edge4: cc.edge4() as isize,
-            edge8: cc.edge8() as isize,
-            corner: cc.corner() as isize,
-            tables: Tables::load_tables(),
+            edge4:   cc.edge4()   as isize,
+            edge8:   cc.edge8()   as isize,
+            corner:  cc.corner()  as isize,
+            tables:  Tables::load_tables(),
         }
     }
 
@@ -48,12 +48,12 @@ impl CoordCube{
     pub fn movement(&mut self, m_as_u: usize){
         //let m_as_u = m as usize;
 
-        self.twist   = self.tables.twist_move[self.twist as usize][m_as_u];
-        self.flip    = self.tables.flip_move[self.flip as usize][m_as_u];
+        self.twist   = self.tables.twist_move  [self.twist   as usize][m_as_u];
+        self.flip    = self.tables.flip_move   [self.flip    as usize][m_as_u];
         self.udslice = self.tables.udslice_move[self.udslice as usize][m_as_u];
-        self.edge4   = self.tables.edge4_move[self.edge4 as usize][m_as_u];
-        self.edge8   = self.tables.edge8_move[self.edge8 as usize][m_as_u];
-        self.corner  = self.tables.corner_move[self.corner as usize][m_as_u];
+        self.edge4   = self.tables.edge4_move  [self.edge4   as usize][m_as_u];
+        self.edge8   = self.tables.edge8_move  [self.edge8   as usize][m_as_u];
+        self.corner  = self.tables.corner_move [self.corner  as usize][m_as_u];
     }
 }
 

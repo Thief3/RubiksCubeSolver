@@ -20,7 +20,7 @@ use io::BufReader;
 
 #[derive(Clone, Debug)]
 pub struct PruningTable {
-    table: Vec<isize>,
+    table:  Vec<isize>,
     stride: usize
 }
 
