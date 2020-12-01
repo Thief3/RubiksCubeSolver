@@ -18,6 +18,7 @@
 use std::fs::File;
 use io::BufReader;
 
+#[derive(Clone)]
 pub struct PruningTable {
     table: Vec<usize>,
     stride: usize
@@ -73,6 +74,7 @@ struct JsonTables {
     pub edge4_corner_prune: Vec<usize>,
 }
 
+#[derive(Clone)]
 pub struct Tables {
     // Move
     pub twist_move: Vec<Vec<usize>>,

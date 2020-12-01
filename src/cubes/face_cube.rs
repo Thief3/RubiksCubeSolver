@@ -17,6 +17,7 @@ use crate::defs::facelets::{
     CORNER_INDEXES, CORNER_LIST, CORNER_COLOR,};
 use cubes::cubie_cube::CubieCube;
 
+#[derive(Copy, Clone)]
 pub struct FaceCube {
     pub f: [Facelets; 54]
 }

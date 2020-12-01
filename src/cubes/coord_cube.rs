@@ -15,6 +15,7 @@ use super::cubie_cube::CubieCube;
 
 /// Coordinate Representation of a cube. Updates coordinates using a pre-computed
 /// move table.
+#[derive(Clone)]
 pub struct CoordCube {
     // Phase One
     pub twist: usize,
@@ -56,6 +57,7 @@ impl CoordCube{
     }
 }
 
+#[derive(Copy, Clone)]
 pub enum Moves {
     U1 = 0,
     U2, U3,
@@ -65,3 +67,12 @@ pub enum Moves {
     L1, L2, L3,
     B1, B2, B3
 }
+
+pub const MOVE_LIST: [Moves; 18] = [
+    Moves::U1, Moves::U2, Moves::U3,
+    Moves::R1, Moves::R2, Moves::R3,
+    Moves::F1, Moves::F2, Moves::F3,
+    Moves::D1, Moves::D2, Moves::D3,
+    Moves::L1, Moves::L2, Moves::L3,
+    Moves::B1, Moves::B2, Moves::B3
+];
