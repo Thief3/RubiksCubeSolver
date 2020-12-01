@@ -42,7 +42,7 @@ impl FaceCube {
 
     /// Make a new FaceCube from an array of Colors.
     /// The order of colors is ULFRBD because of the net, so we shift the squares.
-    fn new_from_colors(rubiks: [Color; 54]) -> FaceCube{
+    pub fn new_from_colors(rubiks: [Color; 54]) -> FaceCube{
         let mut a: [char; 54] = [' '; 54];
         // Remap the way they are in the gui to the old order required for the algo.
         // Upper

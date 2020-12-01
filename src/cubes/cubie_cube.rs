@@ -54,7 +54,7 @@ impl CubieCube {
     }
 
     /// Turns this CubieCube into a FaceCube
-    pub fn to_facecube(self) -> FaceCube{
+    pub fn to_face_cube(self) -> FaceCube{
         let mut fc = FaceCube::reset();
         for i in 0..8 {
             let j = self.corner_permutation[i];
@@ -201,6 +201,20 @@ impl CubieCube {
 
         // Success
         0
+    }
+
+    /// Outputs strings for can_solve
+    pub fn can_solve_matcher(self) -> (String, bool) {
+        match self.can_solve(){
+            0 => return ("Attempting solve...".to_string(), true),
+            1 => return ("Each colour should appear exactly 9 time.".to_string(), false),
+            2 => return ("Not all edges exist.".to_string(), false),
+            3 => return ("One edge should be flipped.".to_string(), false),
+            4 => return ("Not all corners exist.".to_string(), false),
+            5 => return ("One corner should be twisted.".to_string(), false),
+            6 => return ("Two corners or edges should be exchanged.".to_string(), false),
+            _ => panic!("Hooooooowwww did you get here!!????")
+        }
     }
 
     /// Property Methods

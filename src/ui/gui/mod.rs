@@ -19,6 +19,8 @@ use crate::defs::facelets::Color as Color;
 use crate::defs::facelets::GetChar;
 use super::support as support;
 
+use crate::cubes::face_cube::FaceCube;
+
 macro_rules! ig_dynamic_str {
     ($x:expr) => {
         unsafe { ImStr::from_utf8_with_nul_unchecked(format!("{}\0", $x).as_bytes()) }
@@ -174,12 +176,12 @@ pub fn rubiks_cube_flat(ui: &Ui, state: &mut State) {
         ui.new_line();
 
         if ui.button(im_str!("Solve!"), [90.0, 30.0]) {
-            //let r = convert_color_rubiks_to_chars(state.rubiks).iter().cloned().collect::<String>();
-            //let face = facelets::Face::new(&r);
-            //print!("{:?}", face);
-            //let (a, b) = face.return_code_matcher();
-            //state.notify_text = a;
-            //if b {
+            let fc = FaceCube::new_from_colors(state.rubiks);
+            let cc = fc.to_cubie_cube();
+            
+            let (a, b) = cc.can_solve_matcher();
+            state.notify_text = Box::leak(a.into_boxed_str());
+            if b {
                // let mut cube = face.turn_into_cube();
                 //let moves = solver::complete_search(&mut cube);
                 //let s = format!("Moves: {:?}", moves);
@@ -187,7 +189,7 @@ pub fn rubiks_cube_flat(ui: &Ui, state: &mut State) {
                 // Memory Leak!!! Shouldn't be a problem, but it could be.
                 //state.notify_text = Box::leak(s.into_boxed_str());
                 //print!("{}", moves);
-            //}
+            }
         }
     });
 }
