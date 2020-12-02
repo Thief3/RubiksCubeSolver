@@ -25,7 +25,6 @@ extern crate serde_json;
 
 
 mod solver;
-mod prunning;
 mod ui;
 mod defs;
 mod cubes;

@@ -17,6 +17,7 @@ use super::face_cube::FaceCube;
 use crate::defs;
 use crate::utility;
 use cubes::{TWIST, FLIP, UDSLICE, EDGE4, EDGE8, CORNER, r_cast, emod};
+use super::coord_cube::Moves;
 
 /// Struct to represent a Rubiks cube at a corner and edge level.
 #[derive(Copy, Clone)]
@@ -26,7 +27,10 @@ pub struct CubieCube {
     
     pub edge_permutation: [Edge; 12],
     pub edge_orientation: [usize; 12],
+
+    //pub moves: Vec<usize>,
 }
+
 
 impl CubieCube {
     /// Creates a new default, solved, Cube.
@@ -36,6 +40,8 @@ impl CubieCube {
             corner_orientation: [0; 8],
             edge_permutation: defs::facelets::EDGE_LIST,
             edge_orientation: [0; 12],
+
+            //moves: vec![],
         }
     }
 
@@ -51,6 +57,8 @@ impl CubieCube {
             corner_orientation: co,
             edge_permutation: ep,
             edge_orientation: eo,
+
+            //moves: vec![],
         }
     }
 
@@ -81,13 +89,14 @@ impl CubieCube {
 
     /// Computes the permuation and orientation of the corners after applying a
     /// permutation to the current cube.
+    #[allow(dead_code)]
     pub fn corner_multiply(&mut self, a: CubieCube){
         let mut cp: [Corner; 8] = [Corner::URF; 8];
         let mut co: [usize; 8] = [0; 8];
 
         for i in 0..8{
             cp[i] = self.corner_permutation[a.corner_permutation[i] as usize];
-            co[i] = self.corner_orientation[a.corner_orientation[i]] + emod(a.corner_orientation[i] as isize, 3) as usize;
+            co[i] = self.corner_orientation[a.corner_orientation[i]] + emod(a.corner_orientation[i] as isize, 2) as usize;
         }
 
         self.corner_permutation = cp;
@@ -96,13 +105,14 @@ impl CubieCube {
 
     /// Computes the permuation and orientation of the edges after applying a
     /// permutation to the current cube.
+    #[allow(dead_code)]
     pub fn edge_multiply(&mut self, a: CubieCube){
         let mut ep: [Edge; 12] = [Edge::UR; 12];
         let mut eo: [usize; 12] = [0; 12];
 
         for i in 0..12{
             ep[i] = self.edge_permutation[a.edge_permutation[i] as usize];
-            eo[i] = self.edge_orientation[a.edge_orientation[i]] + emod(a.edge_orientation[i] as isize, 3) as usize;
+            eo[i] = self.edge_orientation[a.edge_orientation[i]] + emod(a.edge_orientation[i] as isize, 1) as usize;
         }
 
         self.edge_permutation = ep;
@@ -110,14 +120,27 @@ impl CubieCube {
     }
 
     /// Computes both the edge and corner permutations and orientations.
+    #[allow(dead_code)]
     pub fn multiply(&mut self, a: CubieCube){
         self.corner_multiply(a);
         self.edge_multiply(a);
     }
 
+    /// Move helper function that takes a Move type.
+    pub fn movement(&mut self, movement: Moves){
+        let p = movement as usize % 3;
+        let m = (movement as usize - p)/3;
+        for _i in 0..p{
+            self.multiply(MOVEMENTS[m]);
+        }
+
+        //self.moves.push(movement as usize);
+    }
+
     /// Move helper function
-    pub fn movement(&mut self, movement: defs::facelets::Facelets){
+    pub fn movement_f(&mut self, movement: defs::facelets::Facelets){
         self.multiply(MOVEMENTS[movement as usize]);
+        //self.moves.push(movement as usize);
     }
 
     /// Move helper function that takes usize
@@ -128,9 +151,12 @@ impl CubieCube {
         else{
             panic!("Move {} doesn't exist!!", movement);
         }
+
+        //self.moves.push(movement as usize);
     }
 
     /// Inverses the current cube and returns.
+    #[allow(dead_code)]
     pub fn inverse_cubiecube(self) -> CubieCube {
         let mut cc: CubieCube = self;
 
@@ -227,6 +253,7 @@ impl CubieCube {
     /// Property Methods
 
     /// Corner Parity of cube. This must equal the edge parity for the cube to be solveable.
+    #[allow(dead_code)]
     pub fn corner_parity(self) -> usize{
         let mut s = 0;
         for i in (0..8).rev(){
@@ -241,6 +268,7 @@ impl CubieCube {
     }
 
     /// Edge Parity of a cube. This must equal the corner parity of the cube to be aolveable.
+    #[allow(dead_code)]
     pub fn edge_parity(self) -> usize{
         let mut s = 0;
         for i in (0..12).rev() {
@@ -258,6 +286,7 @@ impl CubieCube {
 
     /// Get Twist property, the coordinate representing the corner orientation.
     /// Between 0 and 3^7 - 1.
+    #[allow(dead_code)]
     pub fn twist(self) -> usize{
         let mut s = 0;
         for corner in 0..7 {
@@ -268,6 +297,7 @@ impl CubieCube {
     }
 
     /// Takes a twist value, and sets the corner orientation to the matching array.
+    #[allow(dead_code)]
     pub fn set_twist(&mut self, twist: usize){
         if twist >= 3_usize.pow(7) {
             panic!("Twist: {}, is out of range. Must be between 0 and 2186.", twist);
@@ -287,6 +317,7 @@ impl CubieCube {
 
     /// Get Flip property, the coordinate representing the edge orientation.
     /// Between 0 and 2^11 - 1.
+    #[allow(dead_code)]
     pub fn flip(self) -> usize{
         let mut s = 0;
         for edge in 0..12 {
@@ -296,6 +327,7 @@ impl CubieCube {
     }
 
     /// Takes a Flip property, and sets the edge orientation to the matching array.
+    #[allow(dead_code)]
     pub fn set_flip(&mut self, flip: usize){
         if flip >= 2_usize.pow(11){
             panic!("Flip: {}, is out of range. It must be between 0 and 2047.", flip);
@@ -318,6 +350,7 @@ impl CubieCube {
     /// Phase two can only start when this value is 0, representing that these
     /// edges are in the middle layer.
     /// UDslice is a value between 0 and (12C4) - 1.
+    #[allow(dead_code)]
     pub fn udslice(self) -> usize{
         let mut udslice = 0;
         let mut seen = 0;
@@ -337,6 +370,7 @@ impl CubieCube {
 
     /// Sets the UDslice of the cube. It takes in a UDslice and sets the positions
     /// for FR, FL, BL and BR.
+    #[allow(dead_code)]
     pub fn set_udslice(&mut self, u: usize){
         if (u as i64) >= utility::binomial(12, 4){
             panic!("UDSlice {}, is out of range. Make sure it is between 0 and 494", u);
@@ -384,6 +418,7 @@ impl CubieCube {
     /// Edge4 getter. Edge4 is the coordinate that represents the permutation of
     /// the edges FR, FL, BL, BR. (This assumes we are in phase two.)
     /// Edge4 is between 0 and 23.
+    #[allow(dead_code)]
     pub fn edge4(self) -> usize{
         let mut out = 0;
         let mut edge4: [Edge; 4] = [Edge::DB; 4];
@@ -406,6 +441,7 @@ impl CubieCube {
 
     /// Edge4 setter. Takes in an edge4 value and sets the cube to that
     /// permutation of edges.
+    #[allow(dead_code)]
     pub fn set_edge4(&mut self, e: usize){
         if e >= 24{
             panic!("Edge4 {}, is out of range. Ensure it is between 0 and 23(inclusive.)", e);
@@ -435,6 +471,7 @@ impl CubieCube {
     /// Edge8 getter. The coordinate representing the permutation of the other 8
     /// edges: UR, UF, UB, DR, DF, DL, DB.
     /// Between 1 and 8! - 1
+    #[allow(dead_code)]
     pub fn edge8(self) -> usize{
         let mut edge8 = 0;
         for j in (0..8).rev(){
@@ -451,6 +488,7 @@ impl CubieCube {
     }
 
     /// Edge8 setter. Sets the order of the edges: UR, UF, UL, UB, DR, DF, DL, DB
+    #[allow(dead_code)]
     pub fn set_edge8(&mut self, e: usize){
         if e >= 8 * 7 * 6 * 5 * 4 * 3 * 2 * 1 {
             panic!("Edge8 {}, is out of range. Ensure it is between 0 and 8!.");
@@ -479,6 +517,7 @@ impl CubieCube {
     /// Corner getter. Gets the coordinate representing the permutation of the
     /// 8 corners: UR, UF, UL, UB, DR, DF, DL, DB.
     /// Value is between 0 and 8! - 1;
+    #[allow(dead_code)]    
     pub fn corner(self) -> usize{
         let mut c = 0;
         for j in (1..8).rev(){
@@ -496,6 +535,7 @@ impl CubieCube {
 
     /// Corner Setter. Sets the permutation of the corners according to the
     /// parameter passed in.
+    #[allow(dead_code)]
     pub fn set_corner(&mut self, c: usize){
         if c >= 8 * 7 * 6 * 5 * 4 * 3 * 2 * 1{
             panic!("Corner {}, is out of range. Please ensure it is between 0 and 8!.", c);
@@ -699,35 +739,41 @@ const MOVEMENTS: [CubieCube; 6] = [
         corner_orientation: _CO_U,
         edge_permutation:   _EP_U,
         edge_orientation:   _EO_U,
+        //moves: vec![]
     },
     CubieCube{
         corner_permutation:  _CP_R,
         corner_orientation: _CO_R,
         edge_permutation:   _EP_R,
         edge_orientation:   _EO_R,
+        //moves: vec![]
     },
     CubieCube{
         corner_permutation:  _CP_F,
         corner_orientation: _CO_F,
         edge_permutation:   _EP_F,
         edge_orientation:   _EO_F,
+        //moves: vec![]
     },
     CubieCube{
         corner_permutation:  _CP_D,
         corner_orientation: _CO_D,
         edge_permutation:   _EP_D,
         edge_orientation:   _EO_D,
+        //moves: vec![]
     },
     CubieCube{
         corner_permutation:  _CP_L,
         corner_orientation: _CO_L,
         edge_permutation:   _EP_L,
         edge_orientation:   _EO_L,
+        //moves: vec![]
     },
     CubieCube{
         corner_permutation:  _CP_B,
         corner_orientation: _CO_B,
         edge_permutation:   _EP_B,
         edge_orientation:   _EO_B,
+        //moves: vec![]
     }
 ];

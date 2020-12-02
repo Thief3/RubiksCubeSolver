@@ -10,13 +10,13 @@
 //!
 //! Module for coord level cube.
 
-use crate::prunning::Tables;
 use super::cubie_cube::CubieCube;
 use cubes::{TWIST, FLIP, UDSLICE, EDGE4, EDGE8, CORNER};
 
 /// Coordinate Representation of a cube. Updates coordinates using a pre-computed
 /// move table.
 #[derive(Clone)]
+#[allow(dead_code)]
 pub struct CoordCube {
     // Phase One
     pub twist:   isize,
@@ -27,11 +27,12 @@ pub struct CoordCube {
     pub edge4:   isize,
     pub edge8:   isize,
     pub corner:  isize,
-    pub tables:  Tables,
+    //pub tables:  Tables,
 
     pub last_move: Vec<usize>,
 }
 
+#[allow(dead_code)]
 impl CoordCube{
 
     /// Create a CoordCube from a CubieCube struct.
@@ -43,7 +44,7 @@ impl CoordCube{
             edge4:   cc.edge4()   as isize,
             edge8:   cc.edge8()   as isize,
             corner:  cc.corner()  as isize,
-            tables:  Tables::load_tables(),
+            //tables:  Tables::load_tables(),
             last_move: Vec::new(),
         }
     }
@@ -51,7 +52,7 @@ impl CoordCube{
     /// A Move method to update the coordinates in the cubie cube from tables.
     pub fn movement(&mut self, m_as_u: usize){
         //let m_as_u = m as usize;
-
+        /*
         if self.twist < 0 {
             self.twist = TWIST as isize + self.twist;
         }
@@ -78,7 +79,7 @@ impl CoordCube{
         self.edge4   = self.tables.edge4_move  [self.edge4   as usize][m_as_u];
         self.edge8   = self.tables.edge8_move  [self.edge8   as usize][m_as_u];
         self.corner  = self.tables.corner_move [self.corner  as usize][m_as_u];
-
+        */
         self.last_move.push(m_as_u);
     }
 }
