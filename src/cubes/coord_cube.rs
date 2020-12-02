@@ -26,7 +26,9 @@ pub struct CoordCube {
     pub edge4:   isize,
     pub edge8:   isize,
     pub corner:  isize,
-    pub tables:  Tables
+    pub tables:  Tables,
+
+    pub last_move: Vec<usize>,
 }
 
 impl CoordCube{
@@ -41,6 +43,7 @@ impl CoordCube{
             edge8:   cc.edge8()   as isize,
             corner:  cc.corner()  as isize,
             tables:  Tables::load_tables(),
+            last_move: Vec::new(),
         }
     }
 
@@ -54,6 +57,8 @@ impl CoordCube{
         self.edge4   = self.tables.edge4_move  [self.edge4   as usize][m_as_u];
         self.edge8   = self.tables.edge8_move  [self.edge8   as usize][m_as_u];
         self.corner  = self.tables.corner_move [self.corner  as usize][m_as_u];
+
+        self.last_move.push(m_as_u);
     }
 }
 
@@ -75,4 +80,14 @@ pub const MOVE_LIST: [Moves; 18] = [
     Moves::D1, Moves::D2, Moves::D3,
     Moves::L1, Moves::L2, Moves::L3,
     Moves::B1, Moves::B2, Moves::B3
+];
+
+
+pub const PHASE_TWO_MOVE_LIST: [usize; 10] = [
+    Moves::U1 as usize, Moves::U2 as usize, Moves::U3 as usize,
+    Moves::R2 as usize,
+    Moves::F2 as usize,
+    Moves::D1 as usize, Moves::D2 as usize, Moves::D3 as usize,
+    Moves::L2 as usize,
+    Moves::B2 as usize,
 ];

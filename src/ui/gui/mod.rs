@@ -21,7 +21,7 @@ use super::support as support;
 
 use crate::cubes::face_cube::FaceCube;
 use crate::cubes::coord_cube::CoordCube;
-use crate::solver::Solver;
+use crate::solver;
 
 macro_rules! ig_dynamic_str {
     ($x:expr) => {
@@ -184,13 +184,12 @@ pub fn rubiks_cube_flat(ui: &Ui, state: &mut State) {
             let (a, b) = cc.can_solve_matcher();
             state.notify_text = Box::leak(a.into_boxed_str());
             if b {
-                let mut solver = Solver::new(CoordCube::from_cubie_cube(cc), 8);
-                let moves = solver.solve();
+                let mut solver = solver::solve(CoordCube::from_cubie_cube(cc), 25);
                 
-                let s = format!("Moves: {:?}", moves);
+                //let s = format!("Moves: {:?}", moves);
                 
                 // Memory Leak!!! Shouldn't be a problem, but it could be.
-                state.notify_text = Box::leak(s.into_boxed_str());
+                //state.notify_text = Box::leak(s.into_boxed_str());
                 //print!("{}", moves);
             }
         }

@@ -14,11 +14,166 @@
 
 use prunning;
 use std::cmp;
-use crate::cubes::coord_cube::{ CoordCube, Moves, MOVE_LIST };
+use crate::cubes::coord_cube::{ CoordCube, Moves, MOVE_LIST, PHASE_TWO_MOVE_LIST };
 use crate::cubes::face_cube::FaceCube;
 
+pub fn solve(cc: CoordCube, max_length: usize){
+    for depth in 0..max_length {
+        println!("Depth is: {}", depth);
+        let (cc_1, dd, t) = phase_one_search(cc.clone(), depth, max_length);
+        if t {
+            println!("We succeeded! Moves are:");
+            break;
+        }
+    }
+}
+
+pub fn phase_one_search(cc: CoordCube, depth: usize, max_length: usize) -> (CoordCube, usize, bool){
+    if depth == 0 {
+        if phase_one_subgoal(cc.clone()){
+            println!("Phase Two Achieved");
+            if cc.last_move.len() == 0 {
+                return phase_two_init(cc.clone(), depth, max_length);
+            }
+            else if [Moves::R1 as usize,
+                     Moves::F1 as usize,
+                     Moves::L1 as usize,
+                     Moves::B1 as usize,
+                     Moves::R2 as usize,
+                     Moves::F2 as usize,
+                     Moves::L2 as usize,
+                    Moves::B2 as usize].contains(&cc.last_move[cc.last_move.len() - 1]){
+                
+                return phase_two_init(cc.clone(), depth, max_length);
+            }
+        }
+    }
+    else if depth > 0 {
+        println!("Trying different Moves?");
+        if phase_one_cost(cc.clone()) <= depth {
+            for i in 0..18 {
+                let mut cc_1 = cc.clone();
+                cc_1.movement(i);
+                if i == Moves::R3 as usize && depth == 0{
+                    println!("#### Phase One Coordinates:\nFlip: {}, \nTwist: {},\nUDSlice: {}\n", cc_1.flip, cc_1.twist, cc_1.udslice);
+                    println!("#### Phase Two Coordinates: \nEdge4: {},\nEdge8: {},\nCorner: {}", cc_1.edge4, cc_1.edge8, cc_1.corner);
+                }
+                let (cc_1, dd, b) = phase_one_search(cc_1, depth - 1, max_length);
+                if b {
+                    return (cc_1, dd, b);
+                }
+            }
+        }
+    }
+
+    (cc, depth, false)
+}
+
+pub fn phase_two_init(cc: CoordCube, p1_depth: usize, max_length: usize) -> (CoordCube, usize, bool){
+    for depth in 0..(max_length - p1_depth){
+        let (cc_1, dd, t) = phase_two_search(cc.clone(), p1_depth, max_length);
+        if t {
+            return (cc_1, dd, t)
+        }
+    }
+
+    (cc.clone(), p1_depth, false)
+}
+
+pub fn phase_two_search(cc: CoordCube, depth: usize, max_length: usize) -> (CoordCube, usize, bool){
+    if depth == 0 {
+        if phase_two_subgoal(cc.clone()){
+            // Success!!
+            return (cc.clone(), depth, true);
+        }
+    }
+    else if depth > 0 {
+        if phase_two_cost(cc.clone()) <= depth {
+            for i in PHASE_TWO_MOVE_LIST.iter() {
+                let mut cc_1 = cc.clone();
+                cc_1.movement(*i as usize);
+                let (cc_1, dd, b) =  phase_two_search(cc_1, depth - 1, max_length);
+                if b {
+                    return (cc_1, dd, b);
+                }
+            }
+        }
+    }
+
+    (cc, depth, false)
+}
+
+pub fn phase_one_subgoal(cc: CoordCube) -> bool {
+    cc.udslice == 0 && cc.twist == 0 && cc.flip == 0
+}
+
+pub fn phase_two_subgoal(cc: CoordCube) -> bool {
+    cc.edge4 == 0 && cc.edge8 == 0 && cc.corner == 0
+}
+
+pub fn phase_one_cost(cc: CoordCube) -> usize{
+    std::cmp::max(
+        cc.tables.udslice_twist_prune.get(
+            cc.udslice,
+            cc.twist),
+        cc.tables.udslice_flip_prune.get(
+            cc.udslice,
+            cc.flip)
+    ) as usize
+}
+
+pub fn phase_two_cost(cc: CoordCube) -> usize{
+    std::cmp::max(
+        cc.tables.edge4_corner_prune.get(
+            cc.edge4,
+            cc.corner),
+        cc.tables.edge4_edge8_prune.get(
+            cc.edge4,
+            cc.edge8)
+    ) as usize
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #[derive(Clone)]
-pub struct Solver {
+pub struct Solver1 {
     original_cc: CoordCube,
     cc: CoordCube,
     max_depth: isize,
@@ -37,9 +192,9 @@ pub struct Solver {
     min_dist_2: Vec<isize>
 }
 
-impl Solver{
-    pub fn new(cc: CoordCube, max_depth: usize) -> Solver{
-        let mut sol = Solver{
+impl Solver1{
+    pub fn new(cc: CoordCube, max_depth: usize) -> Solver1{
+        let mut sol = Solver1{
             original_cc: cc.clone(),
             cc: cc.clone(),
             max_depth: max_depth as isize,
