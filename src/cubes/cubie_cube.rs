@@ -16,6 +16,7 @@ use defs::edge_cubies::Edge;
 use super::face_cube::FaceCube;
 use crate::defs;
 use crate::utility;
+use cubes::{TWIST, FLIP, UDSLICE, EDGE4, EDGE8, CORNER, r_cast, emod};
 
 /// Struct to represent a Rubiks cube at a corner and edge level.
 #[derive(Copy, Clone)]
@@ -61,7 +62,7 @@ impl CubieCube {
             let ori = self.corner_orientation[i];
 
             for k in 0..3{
-                fc.f[defs::facelets::CORNER_INDEXES[i][(k + ori) % 3] as usize] =
+                fc.f[defs::facelets::CORNER_INDEXES[i][emod((k + ori) as isize, 3) as usize] as usize] =
                     defs::facelets::CORNER_COLOR[j as usize][k];
             }
         }
@@ -70,7 +71,7 @@ impl CubieCube {
             let ori = self.edge_orientation[i];
 
             for k in 0..2 {
-                fc.f[defs::facelets::EDGE_INDEXES[i][(k + ori) % 2]] =
+                fc.f[defs::facelets::EDGE_INDEXES[i][emod((k + ori) as isize, 2) as usize]] =
                     defs::facelets::EDGE_COLOR[j as usize][k];
             }
         }
@@ -86,7 +87,7 @@ impl CubieCube {
 
         for i in 0..8{
             cp[i] = self.corner_permutation[a.corner_permutation[i] as usize];
-            co[i] = self.corner_orientation[a.corner_orientation[i]] + a.corner_orientation[i] % 3;
+            co[i] = self.corner_orientation[a.corner_orientation[i]] + emod(a.corner_orientation[i] as isize, 3) as usize;
         }
 
         self.corner_permutation = cp;
@@ -101,7 +102,7 @@ impl CubieCube {
 
         for i in 0..12{
             ep[i] = self.edge_permutation[a.edge_permutation[i] as usize];
-            eo[i] = self.edge_orientation[a.edge_orientation[i]] + a.edge_orientation[i] % 3;
+            eo[i] = self.edge_orientation[a.edge_orientation[i]] + emod(a.edge_orientation[i] as isize, 3) as usize;
         }
 
         self.edge_permutation = ep;
@@ -144,16 +145,19 @@ impl CubieCube {
             cc.edge_orientation[i] = self.edge_orientation[cc.edge_permutation[i] as usize];
             if i < 8 {
                 let ori = self.corner_orientation[cc.corner_permutation[i] as usize];
-                cc.corner_orientation[i] = (- (ori as isize) % 3) as usize;
+                println!("ori: {}, ori set: {}, ori_modded", (- (ori as isize)), emod((- (ori as isize)), 3));
+                cc.corner_orientation[i] = emod(- (ori as isize),3) as usize;
             }
         }
 
+        println!("edge perm, ori {:?}: {:?}", cc.edge_permutation, cc.edge_orientation);
+        println!("Corner, ori {:?}: {:?}", cc.corner_permutation, cc.corner_orientation);
         cc
     }
 
     /// Checks the cube can be solved.
     pub fn can_solve(self) -> usize{
-        let mut total = 0;
+        let mut total: usize = 0;
         let mut edge_count: [usize; 12] = [0; 12];
         let mut corner_count: [usize; 8] = [0; 8];
 
@@ -174,7 +178,7 @@ impl CubieCube {
         for i in 0..12{
             total = total + self.edge_orientation[i];
         }
-        if total %2 != 0{
+        if emod(total as isize, 2) != 0{
             return 3;
         }
         
@@ -193,7 +197,7 @@ impl CubieCube {
         for i in 0..8{
             total = total + self.corner_orientation[i];
         }
-        if total % 3 != 0{
+        if emod(total as isize, 3) != 0{
             return 5;
         }
         if self.edge_parity() != self.corner_parity(){
@@ -233,7 +237,7 @@ impl CubieCube {
             }
         }
 
-        s % 2
+        emod(s, 2) as usize
     }
 
     /// Edge Parity of a cube. This must equal the corner parity of the cube to be aolveable.
@@ -247,7 +251,7 @@ impl CubieCube {
             }
         }
 
-        s % 2
+        emod(s, 2) as usize
     }
 
     // Phase One Coordinates.
@@ -273,12 +277,12 @@ impl CubieCube {
         let mut total = 0;
 
         for i in 0..7{
-            let x = t % 3;
+            let x = emod(t as isize, 3) as usize;
             self.corner_orientation[6 - i] = x;
             total = total + x;
             t = (t as f64 / 3.0).floor() as usize;
         }
-        self.corner_orientation[7] = (- (total as isize) % 3) as usize;
+        self.corner_orientation[7] = emod(- (total as isize), 3) as usize;
     }
 
     /// Get Flip property, the coordinate representing the edge orientation.
@@ -301,12 +305,12 @@ impl CubieCube {
         let mut total = 0;
 
         for i in 0..11 {
-            let x = flip % 2;
+            let x = emod(flip as isize, 2) as usize;
             self.edge_orientation[10 - i] = x;
             total = total + x;
             f = (f as f64 / 2.0).floor() as usize;
         }
-        self.edge_orientation[11] = (- (total as isize) % 2 ) as usize;
+        self.edge_orientation[11] = emod(- (total as isize), 2) as usize;
     }
 
     /// Computes the udslice coordinate. This coordinate represents the position
@@ -413,7 +417,7 @@ impl CubieCube {
         let mut perm: [usize; 4] = [0; 4];
         
         for i in 1..4{
-            cef[i - 1] = edge4 % (i + 1);
+            cef[i - 1] = emod(edge4 as isize, i + 1) as usize;
             edge4 = (edge4 as f64 / (i as f64 + 1.0)).floor() as usize;
         }
 
@@ -458,7 +462,7 @@ impl CubieCube {
         let mut perm: [usize; 8] = [0; 8];
 
         for i in 0..8{
-            cef[i - 1] = edge8 % (i + 1);
+            cef[i - 1] = emod(edge8 as isize, i + 1) as usize;
             edge8 = (edge8 as f64 / (i as f64+ 1.0)).floor() as usize;
         }
 
@@ -503,7 +507,7 @@ impl CubieCube {
         let mut cef: [usize; 7] = [0; 7];
 
         for i in 1..8{
-            cef[i - 1] = corner % (i + 1);
+            cef[i - 1] = emod(corner as isize, i + 1) as usize;
             corner = (corner as f64 / (i as f64 + 1.0)).floor() as usize;
         }
         for i in (1..7).rev(){

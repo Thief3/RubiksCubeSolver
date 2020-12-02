@@ -16,6 +16,7 @@ use crate::defs::facelets::{
     EDGE_INDEXES, EDGE_LIST, EDGE_COLOR,
     CORNER_INDEXES, CORNER_LIST, CORNER_COLOR,};
 use cubes::cubie_cube::CubieCube;
+use cubes::{ emod };
 
 #[derive(Copy, Clone)]
 pub struct FaceCube {
@@ -103,8 +104,8 @@ impl FaceCube {
                     break;
                 }
             }
-            col1 = self.f[fac[(o + 1) % 3]];
-            col2 = self.f[fac[(o + 2) % 3]];
+            col1 = self.f[fac[emod((o + 1) as isize, 3) as usize]];
+            col2 = self.f[fac[emod((o + 2) as isize, 3) as usize]];
             for c in 0..8 {
                 let col = CORNER_COLOR[c as usize];
                 if col1 == col[1] && col2 == col[2] {

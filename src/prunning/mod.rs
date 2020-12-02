@@ -17,6 +17,7 @@
 
 use std::fs::File;
 use io::BufReader;
+use cubes::{TWIST, FLIP, UDSLICE, EDGE4, EDGE8, CORNER, r_cast};
 
 #[derive(Clone, Debug)]
 pub struct PruningTable {
@@ -26,26 +27,11 @@ pub struct PruningTable {
 
 impl PruningTable{
     pub fn get(&self, x: isize, y: isize) -> isize{
-        self.table[x as usize * self.stride + y as usize]
+        let v = self.table[x as usize * self.stride + y as usize]    ;
+ 
+        r_cast(v, self.stride) as isize
     }
 }
-
-// 3^7 possible corner orientations
-const TWIST: usize = 2187;
-// 2^11 possible edge flips
-const FLIP: usize = 2048;
-// 12C4 possible positions of FR, FL, BL, BR
-const UDSLICE: usize = 495;
-// 4! possible permutations of FR, FL, BL, BR
-const EDGE4: usize = 24;
-// 8! possible permutations of UR, UF, UL, UB, DR, DF, DL, DB in phase two
-const EDGE8: usize = 40320;
-// 8! possible permutations of the corners
-const CORNER: usize = 40320;
-// 12! possible permutations of all edges
-const EDGE: usize = 479001600;
-// 6*3 possible moves
-const MOVES: usize = 18;
 
 #[derive(Serialize, Deserialize, Debug)]
 struct JsonTables {

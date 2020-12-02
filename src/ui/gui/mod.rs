@@ -184,7 +184,7 @@ pub fn rubiks_cube_flat(ui: &Ui, state: &mut State) {
             let (a, b) = cc.can_solve_matcher();
             state.notify_text = Box::leak(a.into_boxed_str());
             if b {
-                let mut solver = solver::solve(CoordCube::from_cubie_cube(cc), 25);
+                let mut solver = solver::solve(cc, 25);
                 
                 //let s = format!("Moves: {:?}", moves);
                 

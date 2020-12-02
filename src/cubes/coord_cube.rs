@@ -12,6 +12,7 @@
 
 use crate::prunning::Tables;
 use super::cubie_cube::CubieCube;
+use cubes::{TWIST, FLIP, UDSLICE, EDGE4, EDGE8, CORNER};
 
 /// Coordinate Representation of a cube. Updates coordinates using a pre-computed
 /// move table.
@@ -51,6 +52,26 @@ impl CoordCube{
     pub fn movement(&mut self, m_as_u: usize){
         //let m_as_u = m as usize;
 
+        if self.twist < 0 {
+            self.twist = TWIST as isize + self.twist;
+        }
+        if self.flip < 0 {
+            self.flip = FLIP as isize + self.flip;
+        }
+        if self.udslice < 0 {
+            self.udslice = UDSLICE as isize + self.udslice;
+        }
+        if self.edge4 < 0 {
+            //println!("Edge4 is under 0 again: {}", self.edge4);
+            self.edge4 = EDGE4 as isize + self.edge4;
+        }
+        if self.edge8 < 0 {
+            self.edge8 = EDGE8 as isize + self.edge8;
+        }
+        if self.corner < 0 {
+            self.corner = CORNER as isize + self.corner;
+        }
+        
         self.twist   = self.tables.twist_move  [self.twist   as usize][m_as_u];
         self.flip    = self.tables.flip_move   [self.flip    as usize][m_as_u];
         self.udslice = self.tables.udslice_move[self.udslice as usize][m_as_u];
