@@ -31,8 +31,8 @@ pub fn cross_solve(c: CubieCube) -> CubieCube{
     let mut cc = c.clone();
     let mut moves: Vec<usize> = Vec::new();
     println!("Cross Solve started.");
-    //while !cross_layer_goal(cc){
-        // Iterate through top edges.
+    while !cross_layer_goal(cc){
+    // Iterate through top edges.
         for edge in 0..12 {
             let mut perm = cc.edge_permutation[edge];
             // Check if its one of the cross edges.
@@ -44,7 +44,6 @@ pub fn cross_solve(c: CubieCube) -> CubieCube{
                 if perm == EDGE_LIST[edge] && ori != 0 {
                     let (cc, new_moves) = cross_right_perm_wrong_ori(cc.clone(), &perm);
                     moves.extend(&new_moves);
-                    println!("Perm now: {:?}, Edge now: {:?}", cc.edge_permutation[edge], cc.edge_orientation[edge]);
                 }
                 
                 perm = cc.edge_permutation[edge];
@@ -53,11 +52,23 @@ pub fn cross_solve(c: CubieCube) -> CubieCube{
                 // If the edge is in the middle layer
                 if [8, 9, 10, 11].contains(&edge){
                     let (cc, new_moves) = cross_middle_layer(cc.clone(), &perm);
+                    moves.extend(&new_moves);
                 }
+
+                // Hidden ones.
+                else if [4, 5, 6, 7].contains(&edge){
+                    let (cc, new_moves) = cross_hidden(cc.clone(), &perm);
+                    moves.extend(&new_moves);
+                }
+
+                let (cc, new_moves) = cross_vertical__align(cc.clone());
+                moves.extend(&new_moves);
                 
             }
-        }  
-    //}
+        }
+        
+        //println!("Moves are: {:?}", moves_to_string(moves.clone()));
+    }
     
     println!("Moves are: {:?}", moves_to_string(moves));  
     cc
@@ -92,7 +103,7 @@ pub fn moves_to_string(moves: Vec<usize>) -> String {
             out.push_str(&count.to_string());
         }
 
-        out.push(" ");
+        out.push_str(" ");
         i = i + count;
     }
     
@@ -102,7 +113,11 @@ pub fn moves_to_string(moves: Vec<usize>) -> String {
 pub fn cross_layer_goal(cc: CubieCube) -> bool {
     let mut b = true;
 
+    println!("Permutation: {:?}", cc.edge_permutation);
+    
     for i in 0..4 {
+        println!("Our perm: {:?} vs should be: {:?}", cc.edge_permutation[i], CROSS_EDGES[i]);
+        println!("Our ori: {:?}", cc.edge_orientation[i]);
         if cc.edge_permutation[i] != CROSS_EDGES[i]
             || cc.edge_orientation[i] != 0{
                 b = false;
@@ -111,6 +126,82 @@ pub fn cross_layer_goal(cc: CubieCube) -> bool {
     }
 
     b
+}
+
+pub fn cross_vertical_align(c: CubieCube) -> (CubieCube, Vec<usize>){
+    let mut cc = c.clone();
+
+    let mut move_set: Vec<usize> = vec![];
+
+    let mut count = 0;
+    let mut incorrect_edge = cc.edge_permutation[0];
+    for i in 0..4 {
+        if cc.edge_permutation[i] != CROSS_EDGES[i] {
+            count = count + 1;
+            if count == 1 {
+                incorrect_edge = cc.edge_permutation[i];
+            }
+        }
+    }
+
+    if count == 2 {
+        // Opposite edges are wrong
+        if (cc.edge_permutation[0] != CROSS_EDGES[0] && cc.edge_permutation[2] != CROSS_EDGES[2])
+            || (cc.edge_permutation[1] != CROSS_EDGES[1] && cc.edge_permutation[3] != CROSS_EDGES[3]){
+
+                // Moves R2 L2 U2 R2 L2  but rotated depending on which face should be the front.
+                move_set = match incorrect_edge {
+                    Edge::UF => vec![1, 1, 4, 4, 0, 0, 1, 1, 4, 4],
+                    Edge::UR => vec![5, 5, 2, 2, 0, 0, 5, 5, 2, 2],
+                    Edge::UB => vec![4, 4, 1, 1, 0, 0, 4, 4, 1, 1],
+                    Edge::UL => vec![2, 2, 5, 5, 0, 0, 2, 2, 5, 5],
+                    _ => panic!("How has edge {:?}, got this far?", perm)
+                };
+                
+                for i in &move_set{
+                    cc.movement_u(*i)
+                }
+            }
+        // Consecutive edges are wrong
+        else {
+            // Moves F2 D R2 D3 F2 but rotated depending on which face should be the front.
+            move_set = match incorrect_edge {
+                Edge::UF => vec![2, 2, 3, 1, 1, 3, 3, 3, 2, 2],
+                Edge::UR => vec![1, 1, 3, 5, 5, 3, 3, 3, 2, 2],
+                Edge::UB => vec![5, 5, 3, 4, 4, 3, 3, 3, 5, 5],
+                Edge::UL => vec![4, 4, 3, 2, 2, 3, 3, 3, 4, 4],
+                _ => panic!("How has edge {:?}, got this far?", perm)
+            };
+            
+            for i in &move_set{
+                cc.movement_u(*i)
+            }
+        }
+    }
+    else if count == 3 {
+        // Moves R B3 R3 B2 but rotated depending on which face should be the front.
+        move_set = match incorrect_edge {
+            Edge::UF => vec![2, 2, 1, 1, 1, 2, 2, 2, 1, 1],
+            Edge::UR => vec![1, 1, 5, 5, 5, 1, 1, 1, 5, 5],
+            Edge::UB => vec![5, 5, 4, 4, 4, 5, 5, 5, 4, 4],
+            Edge::UL => vec![4, 4, 2, 2, 2, 4, 4, 4, 2, 2],
+            _ => panic!("How has edge {:?}, got this far?", perm)
+        };
+        
+        for i in &move_set{
+            cc.movement_u(*i)
+        }
+    }
+    // Rotate until things line up.
+    else if count == 4 {
+        while(true){
+            move_set.push(0);
+            cc.movement_u(0);
+            if cc.edge_permutation[0] == CROSS_EDGES[0] {
+                break;
+            }
+        }
+    }
 }
 
 pub fn cross_right_perm_wrong_ori(c: CubieCube, perm: &Edge) -> (CubieCube, Vec<usize>)  {
@@ -135,12 +226,30 @@ pub fn cross_right_perm_wrong_ori(c: CubieCube, perm: &Edge) -> (CubieCube, Vec<
 
 pub fn cross_middle_layer(c: CubieCube, perm: &Edge) -> (CubieCube, Vec<usize>){
     let mut cc = c.clone();
-    // Moves F R3 D3 R F2 but rotated depending on which face should be the front.
+    // Moves R3, D3, R, F2 but rotated depending on which face should be the front.
     let move_set = match perm {
         Edge::UF => vec![1, 1, 1, 3, 3, 3, 1, 2, 2],
         Edge::UR => vec![5, 5, 5, 3, 3, 3, 5, 1, 1],
         Edge::UB => vec![4, 4, 4, 3, 3, 3, 4, 5, 5],
         Edge::UL => vec![2, 2, 2, 3, 3, 3, 2, 4, 4],
+        _ => panic!("How has edge {:?}, got this far?", perm)
+    };
+
+    for i in &move_set{
+        cc.movement_u(*i)
+    }
+
+    (cc, move_set)
+}
+
+pub fn cross_hidden(c: CubieCube, perm: &Edge) -> (CubieCube, Vec<usize>){
+    let mut cc = c.clone();
+    // Moves F3, R3, D3, R1, F2 but rotated depending on which face should be the front.
+    let move_set = match perm {
+        Edge::UF => vec![2, 2, 2, 1, 1, 1, 3, 3, 3, 1, 2, 2],
+        Edge::UR => vec![1, 1, 1, 5, 5, 5, 3, 3, 3, 5, 1, 1],
+        Edge::UB => vec![5, 5, 5, 4, 4, 4, 3, 3, 3, 4, 5, 5],
+        Edge::UL => vec![4, 4, 4, 2, 2, 2, 3, 3, 3, 2, 4, 4],
         _ => panic!("How has edge {:?}, got this far?", perm)
     };
 
