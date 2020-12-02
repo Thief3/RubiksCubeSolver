@@ -21,25 +21,25 @@ use crate::cubes::cubie_cube::CubieCube;
 use std::thread;
 pub fn solve(cc: CubieCube, max_length: usize){
     let mut children = vec![];
-
+    
+    //solve_thread(CoordCube::from_cubie_cube(cc), max_length.clone(), 0);
+    
     //for rot in 0..3{
        // let mut cc_rot = cc.clone();
         
         
-        for invert in 0..2 {
-            let mut cc_alt = cc.clone();
-            if invert == 1 {
-                cc_alt = cc_alt.inverse_cubiecube();
-            }
-            let ml = max_length.clone();
-            children.push(
-                thread::spawn( move || {
-                    solve_thread(CoordCube::from_cubie_cube(cc_alt),  max_length.clone(), invert.clone()); 
-                })
-            );
+    for invert in 0..2 {
+        let mut cc_alt = cc.clone();
+        if invert == 1 {
+            cc_alt = cc_alt.inverse_cubiecube();
         }
-
-    
+        let ml = max_length.clone();
+        children.push(
+            thread::spawn( move || {
+                solve_thread(CoordCube::from_cubie_cube(cc_alt),  max_length.clone(), invert.clone()); 
+            })
+        );
+    }
 }
 
 pub fn solve_thread(cc: CoordCube, max_length: usize, invert: usize){
