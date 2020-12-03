@@ -133,7 +133,6 @@ impl CubieCube {
         for _i in 0..p{
             self.multiply(MOVEMENTS[m]);
         }
-
         //self.moves.push(movement as usize);
     }
 
@@ -146,7 +145,9 @@ impl CubieCube {
     /// Move helper function that takes usize
     pub fn movement_u(&mut self, movement: usize){
         if movement < MOVEMENTS.len() {
+            println!("Before Perm: {:?}", self.edge_permutation);
             self.multiply(MOVEMENTS[movement]);
+            println!("After Perm: {:?}", self.edge_permutation);
         }
         else{
             panic!("Move {} doesn't exist!!", movement);
